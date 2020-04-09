@@ -8,10 +8,13 @@ import java.util.Iterator;
 public class ReviewsIterator implements Iterator<ProductReview> {
     private BufferedReader inputFile;
     private String curLine;
+    long reviewIdCounter;
+
     public ReviewsIterator(String inputFile){
         try {
             this.inputFile = new BufferedReader(new FileReader(inputFile));
             this.curLine = this.inputFile.readLine();
+            this.reviewIdCounter = 0;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -27,6 +30,7 @@ public class ReviewsIterator implements Iterator<ProductReview> {
     public ProductReview next() {
 
         try {
+
             String productId = this.curLine;
             String userId = this.inputFile.readLine();
             String profileName = this.inputFile.readLine();
@@ -36,9 +40,9 @@ public class ReviewsIterator implements Iterator<ProductReview> {
             String summary = this.inputFile.readLine();
             String text = this.inputFile.readLine();
 
+            this.reviewIdCounter++;
             while((this.curLine = this.inputFile.readLine()) != null && this.curLine.equals(""));
-
-            return new ProductReview(productId, userId, profileName, helpfulness, score, time, summary, text);
+            return new ProductReview(Long.toString(this.reviewIdCounter), productId, userId, profileName, helpfulness, score, time, summary, text);
         } catch (IOException e) {
             e.printStackTrace();
         }

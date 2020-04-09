@@ -1,6 +1,7 @@
 package webdata.models;
 
 public class ProductReview {
+    private String id;
     public final String productId;
     public final String userId;
     public final String profileName;
@@ -10,8 +11,8 @@ public class ProductReview {
     public final String summary;
     public final String text;
 
-    public ProductReview(String productId, String userId, String profileName, String helpfulness, String score, String time, String summary, String text ){
-
+    public ProductReview(String id, String productId, String userId, String profileName, String helpfulness, String score, String time, String summary, String text ){
+        this.id = id;
         this.productId = productId.substring("product/productId: ".length());
         this.userId = userId.substring("review/userId: ".length());;
         this.profileName = profileName.substring("review/profileName: ".length());;
@@ -25,6 +26,7 @@ public class ProductReview {
     @Override
     public String toString() {
         return "ProductReview{" +
+                "id='" + id + '\'' +
                 "productId='" + productId + '\'' +
                 ", userId='" + userId + '\'' +
                 ", profileName='" + profileName + '\'' +
