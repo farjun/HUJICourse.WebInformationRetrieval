@@ -1,6 +1,52 @@
 package webdata;
 
+import webdata.indexwriters.ProductsIndexWriter;
+import webdata.indexwriters.ReviewsIndexWriter;
+import webdata.indexwriters.WordsIndexWriter;
+import webdata.iterators.ReviewsIterator;
+import webdata.models.ProductReview;
+
+import java.io.*;
+import java.nio.file.Paths;
+
 public class SlowIndexWriter {
+    WordsIndexWriter wordsIndexWriter;
+    ReviewsIndexWriter reviewsIndexWriter;
+    ProductsIndexWriter productsIndexWriter;
+
+
+    public void close(){
+        this.wordsIndexWriter.close();
+        this.productsIndexWriter.close();
+        this.reviewsIndexWriter.close();
+
+    }
+
+
+    /**
+     * creats the dir and files for the index
+     * @param dirPath the dir to create the index files in
+     */
+    private void setWriters(String dirPath){
+        File directory = new File(dirPath);
+        try {
+            if (!directory.exists()) {
+                if (!directory.mkdirs()) {
+                    throw new IOException("directories were not created");
+                }
+            }
+
+            this.wordsIndexWriter = new WordsIndexWriter( Paths.get(dirPath,"words.txt").toString());
+            this.reviewsIndexWriter = new ReviewsIndexWriter( Paths.get(dirPath,"reviews.txt").toString());
+            this.productsIndexWriter = new ProductsIndexWriter( Paths.get(dirPath,"products.txt").toString());
+
+        } catch (IOException e) {
+            this.close();
+            e.printStackTrace();
+            System.err.println("IO Exception in Slow index writer");
+        }
+    }
+
 
     /**
      * Given product review data, creates an on disk index
@@ -9,6 +55,19 @@ public class SlowIndexWriter {
      * if the directory does not exist, it should be created
      */
     public void slowWrite(String inputFile, String dir) {
+        this.setWriters(dir);
+        ReviewsIterator iter = new ReviewsIterator(inputFile);
+        try {
+            while(iter.hasNext()) {
+                ProductReview review = iter.next();
+                this.wordsIndexWriter.write(review);
+                this.reviewsIndexWriter.write(review);
+                this.productsIndexWriter.write(review);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+
+        }
 
     }
     /**
