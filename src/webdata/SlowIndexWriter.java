@@ -1,6 +1,6 @@
 package webdata;
 
-public class SlowIndexReader {
+public class SlowIndexWriter {
 
     /**
      * Given product review data, creates an on disk index
