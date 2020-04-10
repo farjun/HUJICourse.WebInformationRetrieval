@@ -11,6 +11,7 @@ public class ReviewsIndexWriter extends IndexWriter {
     public ReviewsIndexWriter(String filePath) {
         super(filePath);
     }
+
     @Override
     public void write(ProductReview review) {
 

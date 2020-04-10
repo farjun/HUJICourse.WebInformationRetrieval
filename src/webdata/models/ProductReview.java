@@ -1,5 +1,9 @@
 package webdata.models;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class ProductReview {
     private String id;
     public final String productId;
@@ -10,6 +14,7 @@ public class ProductReview {
     public final String time;
     public final String summary;
     public final String text;
+    private ArrayList<String> tokens;
 
     public ProductReview(String id, String productId, String userId, String profileName, String helpfulness, String score, String time, String summary, String text ){
         this.id = id;
@@ -21,6 +26,8 @@ public class ProductReview {
         this.time = time.substring("review/time: ".length());;
         this.summary = summary.substring("review/summary: ".length());;
         this.text = text.substring("review/text: ".length());;
+        this.tokens = new ArrayList<>(Arrays.asList(this.text.split("[^a-zA-Z0-9']+")));
+
     }
 
     @Override
