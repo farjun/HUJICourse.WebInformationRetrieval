@@ -19,14 +19,15 @@ public class ProductReview {
     public ProductReview(String id, String productId, String userId, String profileName, String helpfulness, String score, String time, String summary, String text ){
         this.id = id;
         this.productId = productId.substring("product/productId: ".length());
-        this.userId = userId.substring("review/userId: ".length());;
-        this.profileName = profileName.substring("review/profileName: ".length());;
-        this.helpfulness = helpfulness.substring("review/helpfulness: ".length());;
-        this.score = score.substring("review/score: ".length());;
-        this.time = time.substring("review/time: ".length());;
-        this.summary = summary.substring("review/summary: ".length());;
-        this.text = text.substring("review/text: ".length());;
-        this.tokens = new ArrayList<>(Arrays.asList(this.text.split("[^a-zA-Z0-9']+")));
+        this.userId = userId.substring("review/userId: ".length());
+        this.profileName = profileName.substring("review/profileName: ".length());
+        this.helpfulness = helpfulness.substring("review/helpfulness: ".length());
+        this.score = score.substring("review/score: ".length());
+        this.time = time.substring("review/time: ".length());
+        this.summary = summary.substring("review/summary: ".length());
+        this.text = text.substring("review/text: ".length());
+
+        this.tokens = new ArrayList<>(Arrays.asList(this.text.toLowerCase().split("[^a-zA-Z0-9']+")));
 
     }
 
