@@ -42,7 +42,7 @@ public class ReviewsIterator implements Iterator<ProductReview> {
 
             this.reviewIdCounter++;
             while((this.curLine = this.inputFile.readLine()) != null && this.curLine.equals(""));
-            return new ProductReview(Long.toString(this.reviewIdCounter), productId, userId, profileName, helpfulness, score, time, summary, text);
+            return new ProductReview(this.reviewIdCounter, productId, userId, profileName, helpfulness, score, time, summary, text);
         } catch (IOException e) {
             e.printStackTrace();
         }
