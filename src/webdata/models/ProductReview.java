@@ -66,15 +66,14 @@ public class ProductReview implements Serializable {
     private void readObject(ObjectInputStream aInputStream) throws ClassNotFoundException, IOException
     {
         // not tested yet
-        aInputStream.defaultReadObject(); // are we allowed?
+//        aInputStream.defaultReadObject(); // are we allowed?
         byte[] entryBytesArr = aInputStream.readAllBytes();
         ByteBuffer entryBuffer = ByteBuffer.wrap(entryBytesArr);
-        ProductReview newObj = null;
-        newObj.id = entryBuffer.getLong();
-        newObj.score = entryBuffer.getShort();
-        newObj.helpfulnessNumerator = entryBuffer.getInt();
-        newObj.helpfulnessDenominator = entryBuffer.getInt();
-        newObj.length = entryBuffer.getInt();
+        this.id = entryBuffer.getLong();
+        this.score = entryBuffer.getShort();
+        this.helpfulnessNumerator = entryBuffer.getInt();
+        this.helpfulnessDenominator = entryBuffer.getInt();
+        this.length = entryBuffer.getInt();
 
     }
 
