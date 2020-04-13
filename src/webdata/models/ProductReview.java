@@ -47,6 +47,7 @@ public class ProductReview implements Serializable {
         this.length = this.tokens.size();
     }
 
+
     @Override
     public String toString() {
         return "ProductReview{" +
@@ -63,24 +64,21 @@ public class ProductReview implements Serializable {
                 '}';
     }
 
+
     private void readObject(ObjectInputStream aInputStream) throws ClassNotFoundException, IOException
     {
-        // not tested yet
-//        aInputStream.defaultReadObject(); // are we allowed?
         byte[] entryBytesArr = aInputStream.readAllBytes();
         ByteBuffer entryBuffer = ByteBuffer.wrap(entryBytesArr);
+        entryBuffer.rewind();
         this.id = entryBuffer.getLong();
         this.score = entryBuffer.getShort();
         this.helpfulnessNumerator = entryBuffer.getInt();
         this.helpfulnessDenominator = entryBuffer.getInt();
         this.length = entryBuffer.getInt();
-
     }
 
     private void writeObject(ObjectOutputStream aOutputStream) throws IOException
     {
-        // not tested yet
-        aOutputStream.defaultWriteObject(); // are we allowed?
         // fixed len for now. it will then use a compression method
         ByteBuffer entryBuffer = ByteBuffer.allocate(this.TOTAL_SIZE);
         // TODO: place for optimization
