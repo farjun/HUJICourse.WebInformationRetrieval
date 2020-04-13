@@ -6,11 +6,13 @@ import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.nio.ByteBuffer;
 
 public class ProductReview implements Serializable {
     private long id;
+
     public final String productId;
     public final String userId;
     public final String profileName;
@@ -21,7 +23,10 @@ public class ProductReview implements Serializable {
     public final String summary;
     public final String text;
     public int length;
+    private HashMap<String, Integer> tokenStats;
+
     private ArrayList<String> tokens;
+
     // Sizes. fixed for now
     private final int REVIEW_ID = Long.BYTES;
     private final int SCORE = Short.BYTES;
@@ -29,8 +34,8 @@ public class ProductReview implements Serializable {
     private final int HELPFUL_DEN = Integer.BYTES;
     private final int LENGTH = Integer.BYTES;
     private final int TOTAL_SIZE = REVIEW_ID + SCORE + HELPFUL_NUM + HELPFUL_DEN + LENGTH;
-
-    public ProductReview(long id, String productId, String userId, String profileName, String helpfulness, String score, String time, String summary, String text ){
+    public ProductReview(long id, String productId, String userId, String profileName, String helpfulness, String score,
+                         String time, String summary, String text ){
         this.id = id;
         this.productId = productId.substring("product/productId: ".length());
         this.userId = userId.substring("review/userId: ".length());
@@ -43,10 +48,22 @@ public class ProductReview implements Serializable {
         this.summary = summary.substring("review/summary: ".length());
         this.text = text.substring("review/text: ".length());
 
+        this.tokenStats = new HashMap<String, Integer>();
         this.tokens = new ArrayList<>(Arrays.asList(this.text.toLowerCase().split("[^a-zA-Z0-9']+")));
         this.length = this.tokens.size();
+        for(var token: this.tokens){
+            var count = this.tokenStats.getOrDefault(token, 0);
+            this.tokenStats.put(token, count+1);
+        }
     }
 
+    public HashMap<String, Integer> getTokenStats() {
+        return tokenStats;
+    }
+
+    public long getId() {
+        return id;
+    }
 
     @Override
     public String toString() {
