@@ -3,6 +3,7 @@ package webdata.indexwriters;
 import webdata.models.ProductReview;
 
 import java.io.BufferedWriter;
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 
 public class WordsIndexWriter extends IndexWriter {
@@ -10,6 +11,9 @@ public class WordsIndexWriter extends IndexWriter {
     private HashMap<String, HashMap<Long, Integer>> tokenFreq;
     // will host map of sort { token : globalCounter }
     private HashMap<String, Integer> tokenGlobalFreq;
+    private ByteBuffer entryBuffer = ByteBuffer.allocate(
+
+    );
 
     public WordsIndexWriter(BufferedWriter outputFile) {
         super(outputFile);
