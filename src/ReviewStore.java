@@ -1,15 +1,52 @@
+import webdata.IndexReader;
+import webdata.iostreams.BitInputStream;
 import webdata.SlowIndexWriter;
 
 //to manually test serialization
+import webdata.encoders.ArithmicDecoder;
+import webdata.encoders.ArithmicEncoder;
+import webdata.iostreams.BitOutputStream;
 import webdata.models.ProductReview;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+
+import java.io.*;
 
 public class ReviewStore {
 
-    public static void main(String[] args) {
+    public static void main(String[] args)  throws IOException {
+        run();
+//        runArithmicCompressOnEntireFile();
+    }
+
+    private static void runArithmicCompressOnEntireFile() throws IOException {
+        File inputFile = new File("src\\datasets\\1000.txt");
+        File encodedFile = new File("src\\datasets\\1000-encoded.txt");
+        File decodedFile = new File("src\\datasets\\1000-decoded.txt");
+
+        // Perform file compression
+        try (InputStream in = new BufferedInputStream(new FileInputStream(inputFile));
+             BitOutputStream out = new BitOutputStream(new BufferedOutputStream(new FileOutputStream(encodedFile)))) {
+            ArithmicEncoder.writeEncoded(in, out);
+        }
+
+        // Perform file decompression
+        try (BitInputStream in = new BitInputStream(new BufferedInputStream(new FileInputStream(encodedFile)));
+             OutputStream out = new BufferedOutputStream(new FileOutputStream(decodedFile))) {
+            ArithmicDecoder.decompress(in, out);
+        }
+    }
+
+    private static void run() {
+        String reviewsFilePath = "./src/datasets/1000.txt";
+        String indexDir =  "./src/index";
+        SlowIndexWriter writer = new SlowIndexWriter();
+        writer.slowWrite(reviewsFilePath,indexDir);
+
+        IndexReader reader = new IndexReader(indexDir);
+
+
+    }
+
+    private static void run1() {
         String reviewsFilePath = "./src/datasets/1000.txt";
         SlowIndexWriter writer = new SlowIndexWriter();
         writer.slowWrite(reviewsFilePath, "./src/index");
@@ -42,6 +79,5 @@ public class ReviewStore {
         catch (Exception e){
             e.printStackTrace();
         }
-
     }
 }
