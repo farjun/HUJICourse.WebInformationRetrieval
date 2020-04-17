@@ -12,12 +12,10 @@ import java.util.HashMap;
 
 public class ProductsIndexWriter extends IndexWriter {
 
-    private final ArithmicEncoder encoder;
     private SerializeableHashMap productToReviewsMap;
 
     public ProductsIndexWriter(AppOutputStream outputStream) {
         super(outputStream);
-        this.encoder = new ArithmicEncoder(outputStream);
         this.productToReviewsMap = new SerializeableHashMap();
     }
 
@@ -26,7 +24,7 @@ public class ProductsIndexWriter extends IndexWriter {
     }
 
     @Override
-    public void proccess(ProductReview review) throws IOException {
+    public void proccess(ProductReview review) {
         this.productToReviewsMap.addTo(review.productId, review.getStringId());
     }
 

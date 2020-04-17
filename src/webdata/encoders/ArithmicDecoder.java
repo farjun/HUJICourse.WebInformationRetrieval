@@ -71,7 +71,7 @@ public final class ArithmicDecoder extends ArithmicCoderBase {
 
 
     // To allow unit testing, this method is package-private instead of private.
-    public static void decompress(BitInputStream in, OutputStream out) throws IOException {
+    public static void decompress(AppInputStream in, OutputStream out) throws IOException {
         SymbolFreqTable freqs = new SymbolFreqTable(257);
         ArithmicDecoder dec = new ArithmicDecoder(in);
         while (true) {
@@ -81,6 +81,14 @@ public final class ArithmicDecoder extends ArithmicCoderBase {
                 break;
             out.write(symbol);
             freqs.increment(symbol);
+        }
+    }
+
+    public static void main(String[] args) throws IOException{
+        // Perform file decompression
+        try (BitInputStream in = new BitInputStream(new BufferedInputStream(new FileInputStream("src\\index\\products.txt")));
+             OutputStream out = new BufferedOutputStream(new FileOutputStream("src\\index\\products-decoded.txt"))) {
+            ArithmicDecoder.decompress(in, out);
         }
     }
 

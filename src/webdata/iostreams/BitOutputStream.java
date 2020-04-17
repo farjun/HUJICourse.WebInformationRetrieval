@@ -65,5 +65,10 @@ public final class BitOutputStream implements AutoCloseable, AppOutputStream {
 			write(0);
 		output.close();
 	}
-	
+
+	@Override
+	public void flush() throws IOException {
+		output.flush();
+	}
+
 }

@@ -5,6 +5,7 @@ import webdata.iostreams.BitOutputStream;
 import webdata.models.SymbolFreqTable;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Objects;
 
 public final class ArithmicEncoder extends ArithmicCoderBase {
@@ -41,8 +42,6 @@ public final class ArithmicEncoder extends ArithmicCoderBase {
 
 
     protected void underflow() {
-        if (numUnderflow == Integer.MAX_VALUE)
-            throw new ArithmeticException("Maximum underflow reached");
         numUnderflow++;
     }
 
@@ -54,6 +53,7 @@ public final class ArithmicEncoder extends ArithmicCoderBase {
             freqs.increment(symbol);
         }
         enc.finish(freqs);  // Flush remaining code bits
+
     }
 
     public static void writeEncoded(InputStream in, AppOutputStream out) throws IOException {

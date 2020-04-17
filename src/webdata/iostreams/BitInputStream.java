@@ -11,6 +11,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 
 /**
@@ -34,28 +35,21 @@ public final class BitInputStream implements AutoCloseable, AppInputStream {
 	
 	
 	
-	/*---- Constructor ----*/
-	
+
 	/**
 	 * Constructs a bit input stream based on the specified byte input stream.
 	 * @param in the byte input stream
-	 * @throws NullPointerException if the input stream is {@code null}
 	 */
 	public BitInputStream(InputStream in) {
 		input = Objects.requireNonNull(in);
 		currentByte = 0;
 		numBitsRemaining = 0;
 	}
-	
-	
-	
-	/*---- Methods ----*/
-	
+
 	/**
 	 * Reads a bit from this stream. Returns 0 or 1 if a bit is available, or -1 if
 	 * the end of stream is reached. The end of stream always occurs on a byte boundary.
 	 * @return the next bit of 0 or 1, or -1 for the end of stream
-	 * @throws IOException if an I/O exception occurred
 	 */
 	public int read() throws IOException {
 		if (currentByte == -1)
