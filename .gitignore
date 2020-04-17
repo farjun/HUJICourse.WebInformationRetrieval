@@ -1,9 +1,1 @@
-
-*.class
-HUJICourse.WebInformationRetrieval.iml
-*.xml
-*.txt
-*.ser
-*.txt
-*.kotlin_module
-out/production/HUJICourse.WebInformationRetrieval/index/example/words
+/src/old/
