@@ -1,4 +1,4 @@
-package webdata.indexwriters;
+package webdata.encoders;
 
 interface EncoderInterface { // not sure if redundant, keeping it for now
     public int encode(String text);

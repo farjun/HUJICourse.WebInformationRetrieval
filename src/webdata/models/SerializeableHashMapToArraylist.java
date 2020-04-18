@@ -1,25 +1,21 @@
 package webdata.models;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-public class SerializeableHashMap implements Serializable {
+public class SerializeableHashMapToArraylist implements Serializable {
     private final HashMap<String, String> hashMap;
 
-    public SerializeableHashMap(){
+    public SerializeableHashMapToArraylist(){
         this.hashMap = new HashMap<>();
     }
 
-    public SerializeableHashMap(String serializedHashMap){
+    public SerializeableHashMapToArraylist(String serializedHashMap){
         this();
         String[] keysAndValues = serializedHashMap.split("\\|");
-        for (int i = 0; i < keysAndValues.length; i++) {
-            String[] keysAndValue = keysAndValues[i].split(":");
+        for (String andValue : keysAndValues) {
+            String[] keysAndValue = andValue.split(":");
             this.hashMap.put(keysAndValue[0], keysAndValues[1]);
         }
     }

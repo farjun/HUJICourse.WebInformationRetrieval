@@ -3,18 +3,15 @@ package webdata.indexreaders;
 import webdata.encoders.ArithmicDecoder;
 import webdata.iostreams.AppInputStream;
 import webdata.iostreams.BitInputStream;
-import webdata.iostreams.BitOutputStream;
-import webdata.models.SerializeableHashMap;
+import webdata.models.SerializeableHashMapToArraylist;
 import webdata.models.SymbolFreqTable;
 
-import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class ProductsIndexReader extends IndexReader {
 
-    private SerializeableHashMap productToReviewsMap;
+    private SerializeableHashMapToArraylist productToReviewsMap;
 
     public ProductsIndexReader(AppInputStream inputStream) {
         super(inputStream);

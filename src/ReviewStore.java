@@ -18,13 +18,10 @@ public class ReviewStore {
     }
 
     private static void runArithmicCompressOnEntireFile() throws IOException {
-//        File inputFile = new File("src\\datasets\\1000.txt");
-//        File encodedFile = new File("src\\datasets\\1000-encoded.txt");
-//        File decodedFile = new File("src\\datasets\\1000-decoded.txt");
-
-        File inputFile = new File("src\\index\\temp1.txt");
-        File encodedFile = new File("src\\index\\temp1-encoded.txt");
-        File decodedFile = new File("src\\index\\temp1-decoded.txt");
+        File inputFile = new File("src\\datasets\\1000.txt");
+        File encodedFile = new File("src\\datasets\\1000-encoded.txt");
+        File decodedFile = new File("src\\datasets\\1000-decoded.txt");
+        
 
         // Perform file compression
         try (InputStream in = new BufferedInputStream(new FileInputStream(inputFile));
