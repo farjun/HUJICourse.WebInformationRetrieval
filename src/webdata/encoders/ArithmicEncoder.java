@@ -68,6 +68,7 @@ public final class ArithmicEncoder extends ArithmicCoderBase {
             freqs.increment(symbol);
         }
         enc.finish(freqs);  // Flush remaining code bits
+        out.close();
     }
 
 }

@@ -63,7 +63,9 @@ public final class BitOutputStream implements AutoCloseable, AppOutputStream {
 	public void close() throws IOException {
 		while (numBitsFilled != 0)
 			write(0);
-		output.close();
+		if(output != null) {
+			output.close();
+		}
 	}
 
 	@Override
