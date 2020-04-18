@@ -1,23 +1,39 @@
 package webdata.indexwriters;
 
+import webdata.encoders.ArithmicEncoder;
+import webdata.iostreams.AppOutputStream;
+import webdata.iostreams.BitOutputStream;
 import webdata.models.ProductReview;
+import webdata.models.SerializeableHashMapToArraylist;
 
+import java.io.*;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
 public class ProductsIndexWriter extends IndexWriter {
 
-    public ProductsIndexWriter(BufferedWriter outputFile) {
-        super(outputFile);
+    private SerializeableHashMap productToReviewsMap;
+
+    public ProductsIndexWriter(AppOutputStream outputStream) {
+        super(outputStream);
+        this.productToReviewsMap = new SerializeableHashMap();
     }
 
-    public ProductsIndexWriter(String filePath) {
-        super(filePath);
+    public ProductsIndexWriter(String filePath) throws IOException {
+        this(new BitOutputStream(new FileOutputStream(filePath)));
     }
 
     @Override
-    public void write(ProductReview review) throws IOException {
-        System.out.println(review);
+    public void proccess(ProductReview review) {
+        this.productToReviewsMap.addTo(review.productId, review.getStringId());
+    }
+
+    @Override
+    public void writeProccessed() throws IOException {
+        ArithmicEncoder.writeEncoded(this.productToReviewsMap.toString(), this.outputStream);
+        this.outputStream.close();
+        this.productToReviewsMap = new SerializeableHashMapToArraylist();
+
     }
 
 
