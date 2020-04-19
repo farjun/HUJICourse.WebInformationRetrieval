@@ -44,7 +44,7 @@ public abstract class ArithmicCoderBase {
 
         // Update range
         long newLow  = low + symLow  * range / total;
-        long newHigh = low + symHigh * range / total;
+        long newHigh = low + symHigh * range / total -1;
         low = newLow;
         high = newHigh;
 
