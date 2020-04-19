@@ -1,8 +1,18 @@
 package webdata;
 
+import webdata.indexreaders.ProductsIndexReader;
+import webdata.indexreaders.ReviewsIndexReader;
+import webdata.indexreaders.WordsIndexReader;
+
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Enumeration;
 
 public class IndexReader {
+
+    private WordsIndexReader wordsIndexReader;
+    private ReviewsIndexReader reviewsIndexReader;
+    private ProductsIndexReader productsIndexReader;
 
     /**
      * Creates an IndexReader which will read from the given directory
@@ -10,6 +20,17 @@ public class IndexReader {
      */
     public IndexReader(String dir) {
 
+        try {
+            this.wordsIndexReader = new WordsIndexReader(Paths.get(dir,"words.txt").toString());
+            this.reviewsIndexReader = new ReviewsIndexReader(Paths.get(dir,"reviews.txt").toString());
+            this.productsIndexReader = new ProductsIndexReader(Paths.get(dir,"products.txt").toString());
+            this.wordsIndexReader.loadIndex();
+            this.reviewsIndexReader.loadIndex();
+            this.productsIndexReader.loadIndex();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
