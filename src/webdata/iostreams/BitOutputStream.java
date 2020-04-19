@@ -31,11 +31,11 @@ public final class BitOutputStream implements AutoCloseable, AppOutputStream {
 		buffer = (buffer << 1) | b;
 		bufferCurCapacity++;
 		if (bufferCurCapacity == MAX_BUFFER_SIZE) {
-			resetBuffer();
+			resetAndFlushBuffer();
 		}
 	}
 	
-	private void resetBuffer() throws IOException{
+	private void resetAndFlushBuffer() throws IOException{
 		output.write(buffer);
 		buffer = 0;
 		bufferCurCapacity = 0;
@@ -52,6 +52,8 @@ public final class BitOutputStream implements AutoCloseable, AppOutputStream {
 
 	@Override
 	public void flush() throws IOException {
+		while (bufferCurCapacity != 0)
+			write(0);
 		output.flush();
 	}
 
