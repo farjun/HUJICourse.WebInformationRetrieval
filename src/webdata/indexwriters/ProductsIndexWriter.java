@@ -7,14 +7,16 @@ import webdata.models.ProductReview;
 import webdata.models.SerializeableHashMapToArraylist;
 
 import java.io.*;
+import java.io.BufferedWriter;
+import java.io.IOException;
 
 public class ProductsIndexWriter extends IndexWriter {
 
-    private SerializeableHashMapToArraylist productToReviewsMap;
+    private SerializeableHashMap productToReviewsMap;
 
     public ProductsIndexWriter(AppOutputStream outputStream) {
         super(outputStream);
-        this.productToReviewsMap = new SerializeableHashMapToArraylist();
+        this.productToReviewsMap = new SerializeableHashMap();
     }
 
     public ProductsIndexWriter(String filePath) throws IOException {

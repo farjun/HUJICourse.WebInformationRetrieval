@@ -65,10 +65,6 @@ public class ProductReview implements Serializable {
         return id;
     }
 
-    public String getStringId() {
-        return String.valueOf(id);
-    }
-
     @Override
     public String toString() {
         return "ProductReview{" +

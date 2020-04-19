@@ -1,28 +1,19 @@
 package webdata.indexwriters;
 
-import webdata.iostreams.AppOutputStream;
-import webdata.iostreams.BitOutputStream;
 import webdata.models.ProductReview;
 
 import java.io.BufferedWriter;
-import java.io.FileOutputStream;
-import java.io.IOException;
 
 public class ReviewsIndexWriter extends IndexWriter {
-    ReviewsIndexWriter(AppOutputStream outputStream) {
-        super(outputStream);
+    ReviewsIndexWriter(BufferedWriter outputFile) {
+        super(outputFile);
     }
-    public ReviewsIndexWriter(String filePath)  throws IOException {
-        super(new BitOutputStream(new FileOutputStream(filePath)));
-    }
-
-    @Override
-    public void proccess(ProductReview review) {
-
+    public ReviewsIndexWriter(String filePath) {
+        super(filePath);
     }
 
     @Override
-    public void writeProccessed() throws IOException {
+    public void write(ProductReview review) {
 
     }
 }
