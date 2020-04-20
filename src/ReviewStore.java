@@ -5,6 +5,8 @@ import webdata.SlowIndexWriter;
 //to manually test serialization
 import webdata.encoders.ArithmicDecoder;
 import webdata.encoders.ArithmicEncoder;
+import webdata.encoders.ConcatEncoder;
+import webdata.encoders.ConcatDecoder;
 import webdata.iostreams.BitOutputStream;
 import webdata.models.ProductReview;
 
@@ -12,8 +14,9 @@ import java.io.*;
 
 public class ReviewStore {
 
-    public static void main(String[] args)  throws IOException {
+    public static void main(String[] args) throws Exception {
         run();
+//        runConcatEncoder();
 //        runArithmicCompressOnEntireFile();
     }
 
@@ -45,6 +48,15 @@ public class ReviewStore {
         IndexReader reader = new IndexReader(indexDir);
 
 
+    }
+
+    private static void runConcatEncoder() throws Exception {
+        String[] words = new String[]{"the", "cat", "walk"};
+        ConcatEncoder encodedObj = new ConcatEncoder(10, words);
+        var buffer = encodedObj.getBuffer();
+        var pointers = encodedObj.getPointers();
+        ConcatDecoder decodedObj = new ConcatDecoder(buffer, pointers);
+        System.out.println(decodedObj);
     }
 
     private static void run1() {

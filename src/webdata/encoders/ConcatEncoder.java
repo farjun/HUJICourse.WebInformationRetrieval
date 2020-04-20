@@ -28,9 +28,9 @@ public class ConcatEncoder {
 
     public ConcatEncoder(int globalNumOfChars, String[] words){
         this.pointers = new ArrayList<Integer>();
-        this.bufferSize = globalNumOfChars * Character.BYTES;
+//        this.bufferSize = globalNumOfChars * Character.BYTES;
         this.words = words;
-        this.buffer = CharBuffer.allocate(bufferSize);
+        this.buffer = CharBuffer.allocate(globalNumOfChars);
         int curr = 0;
         for(var word: words){
             this.pointers.add(curr);
