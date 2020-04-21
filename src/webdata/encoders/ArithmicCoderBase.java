@@ -50,7 +50,7 @@ public abstract class ArithmicCoderBase {
 
         // While low and high have the same top bit value, shift them out
         while (((low ^ high) & halfRange) == 0) {
-            shift();
+            shiftAndWrite();
             low  = ((low  << 1) & stateMask);
             high = ((high << 1) & stateMask) | 1;
         }
@@ -68,7 +68,7 @@ public abstract class ArithmicCoderBase {
      * Called to handle the situation when the top bit of {@code low} and {@code high} are equal.
      * @throws IOException if an I/O exception occurred
      */
-    protected abstract void shift() throws IOException;
+    protected abstract void shiftAndWrite() throws IOException;
 
 
     /**

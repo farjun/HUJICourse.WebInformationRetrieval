@@ -24,6 +24,7 @@ public class IndexReader {
             this.wordsIndexReader = new WordsIndexReader(Paths.get(dir,"words.txt").toString());
             this.reviewsIndexReader = new ReviewsIndexReader(Paths.get(dir,"reviews.txt").toString());
             this.productsIndexReader = new ProductsIndexReader(Paths.get(dir,"products.txt").toString());
+
             this.wordsIndexReader.loadIndex();
             this.reviewsIndexReader.loadIndex();
             this.productsIndexReader.loadIndex();
@@ -133,7 +134,7 @@ public class IndexReader {
      * Returns an empty Enumeration if there are no reviews for this product
      */
     public Enumeration<Integer> getProductReviews(String productId) {
-        return null;
+        return this.productsIndexReader.getReviewsByProductId(productId);
     }
 
 }

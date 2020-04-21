@@ -1,11 +1,10 @@
 package webdata.models;
 
-import java.io.Serializable;
-import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.HashMap;
 
-public class SerializeableHashMapToArraylist implements Serializable {
-    private final HashMap<String, String> hashMap;
+public class SerializeableHashMapToArraylist {
+    private final HashMap<String, CompressedArrayList > hashMap;
 
     public SerializeableHashMapToArraylist(){
         this.hashMap = new HashMap<>();
@@ -16,23 +15,31 @@ public class SerializeableHashMapToArraylist implements Serializable {
         String[] keysAndValues = serializedHashMap.split("\\|");
         for (String andValue : keysAndValues) {
             String[] keysAndValue = andValue.split(":");
-            this.hashMap.put(keysAndValue[0], keysAndValues[1]);
+            this.hashMap.put(keysAndValue[0], new CompressedArrayList(keysAndValue[1]));
         }
     }
 
-    public String put(String key,  String value){
-        return this.hashMap.put(key,value);
+    public void put(String key,  CompressedArrayList value){
+        this.hashMap.put(key, value);
     }
 
-    public String addTo(String key,  String value){
+    public boolean contains(String key){
+        return this.hashMap.containsKey(key);
+    }
+
+    public void addTo(String key, String value){
         if(this.hashMap.containsKey(key)){
-            return this.hashMap.put(key, this.hashMap.get(key)+ "," + value);
+            this.hashMap.get(key).add(value);
         }
-        return this.hashMap.put(key, value);
+        else{
+            CompressedArrayList cal = new CompressedArrayList();
+            cal.add(value);
+            this.hashMap.put(key, cal);
+        }
     }
 
-    public Long[] get(String key){
-        return Arrays.stream(this.hashMap.get(key).split(",")).map(Long::parseLong).toArray(Long[]::new);
+    public Enumeration<Integer> get(String key){
+        return this.hashMap.get(key).iter();
     }
 
     @Override
@@ -43,5 +50,9 @@ public class SerializeableHashMapToArraylist implements Serializable {
         }
         sb.deleteCharAt(sb.length()-1);
         return sb.toString();
+    }
+
+    public String toCompressedString() {
+        return this.toString();
     }
 }

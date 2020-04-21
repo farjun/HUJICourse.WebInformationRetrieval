@@ -8,6 +8,8 @@ import webdata.models.SymbolFreqTable;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Enumeration;
 
 public class ProductsIndexReader extends IndexReader {
 
@@ -36,9 +38,17 @@ public class ProductsIndexReader extends IndexReader {
             sb.append((char)symbol);
             freqs.increment(symbol);
         }
-        System.out.println(sb.toString());
+        this.productToReviewsMap = new SerializeableHashMapToArraylist(sb.toString());
     }
 
+    public Enumeration<Integer> getReviewsByProductId(String productId){
+        if (this.productToReviewsMap.contains(productId)) {
+            return this.productToReviewsMap.get(productId);
+        }
+        else{
+            return Collections.enumeration(Collections.emptyList());
+        }
+    }
 
 
 

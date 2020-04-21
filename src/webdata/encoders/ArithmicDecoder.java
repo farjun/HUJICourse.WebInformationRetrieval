@@ -49,7 +49,7 @@ public final class ArithmicDecoder extends ArithmicCoderBase {
     }
 
 
-    protected void shift() throws IOException {
+    protected void shiftAndWrite() throws IOException {
         code = ((code << 1) & stateMask) | readCodeBit();
     }
 

@@ -31,7 +31,7 @@ public final class ArithmicEncoder extends ArithmicCoderBase {
     }
 
 
-    protected void shift() throws IOException {
+    protected void shiftAndWrite() throws IOException {
         int bit = (int)(low >>> (numStateBits - 1));
         output.write(bit);
 
@@ -53,22 +53,6 @@ public final class ArithmicEncoder extends ArithmicCoderBase {
             freqs.increment(symbol);
         }
         enc.finish(freqs);  // Flush remaining code bits
-
-    }
-
-    public static void writeEncoded(InputStream in, AppOutputStream out) throws IOException {
-        SymbolFreqTable freqs = new SymbolFreqTable(257);
-        ArithmicEncoder enc = new ArithmicEncoder(out);
-        while (true) {
-            // Read and encode one byte
-            int symbol = in.read();
-            if (symbol == -1)
-                break;
-            enc.writeSymbol(freqs, symbol);
-            freqs.increment(symbol);
-        }
-        enc.finish(freqs);  // Flush remaining code bits
-        out.close();
     }
 
 }
