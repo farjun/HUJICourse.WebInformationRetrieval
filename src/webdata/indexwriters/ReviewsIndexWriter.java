@@ -14,6 +14,7 @@ public class ReviewsIndexWriter extends IndexWriter {
     }
     public ReviewsIndexWriter(String filePath)  throws IOException {
         super(new BitOutputStream(new FileOutputStream(filePath)));
+        StringBuilder sb = new StringBuilder();
     }
 
     @Override

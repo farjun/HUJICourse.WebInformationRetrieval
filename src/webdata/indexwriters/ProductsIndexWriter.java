@@ -4,17 +4,17 @@ import webdata.encoders.ArithmicEncoder;
 import webdata.iostreams.AppOutputStream;
 import webdata.iostreams.BitOutputStream;
 import webdata.models.ProductReview;
-import webdata.models.SerializeableHashMapToArraylist;
+import webdata.models.ProductsPostingList;
 
 import java.io.*;
 
 public class ProductsIndexWriter extends IndexWriter {
 
-    private SerializeableHashMapToArraylist productToReviewsMap;
+    private ProductsPostingList productToReviewsMap;
 
     public ProductsIndexWriter(AppOutputStream outputStream) {
         super(outputStream);
-        this.productToReviewsMap = new SerializeableHashMapToArraylist();
+        this.productToReviewsMap = new ProductsPostingList();
     }
 
     public ProductsIndexWriter(String filePath) throws IOException {
@@ -30,7 +30,7 @@ public class ProductsIndexWriter extends IndexWriter {
     public void writeProccessed() throws IOException {
         ArithmicEncoder.writeEncoded(this.productToReviewsMap.toString(), this.outputStream);
         this.outputStream.close();
-        this.productToReviewsMap = new SerializeableHashMapToArraylist();
+        this.productToReviewsMap = new ProductsPostingList();
 
     }
 

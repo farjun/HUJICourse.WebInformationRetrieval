@@ -3,14 +3,14 @@ package webdata.models;
 import java.util.Enumeration;
 import java.util.HashMap;
 
-public class SerializeableHashMapToArraylist {
+public class ProductsPostingList {
     private final HashMap<String, CompressedArrayList > hashMap;
 
-    public SerializeableHashMapToArraylist(){
+    public ProductsPostingList(){
         this.hashMap = new HashMap<>();
     }
 
-    public SerializeableHashMapToArraylist(String serializedHashMap){
+    public ProductsPostingList(String serializedHashMap){
         this();
         String[] keysAndValues = serializedHashMap.split("\\|");
         for (String andValue : keysAndValues) {

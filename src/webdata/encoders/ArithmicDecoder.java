@@ -5,10 +5,6 @@ import webdata.models.SymbolFreqTable;
 
 import java.io.*;
 
-/**
- * Reads from an arithmetic-coded bit stream and decodes symbols. Not thread-safe.
- * @see ArithmicCoderBase
- */
 public final class ArithmicDecoder extends ArithmicCoderBase {
 
     private AppInputStream input;
@@ -58,9 +54,6 @@ public final class ArithmicDecoder extends ArithmicCoderBase {
         code = (code & halfRange) | ((code << 1) & (stateMask >>> 1)) | readCodeBit();
     }
 
-
-    // Returns the next bit (0 or 1) from the input stream. The end
-    // of stream is treated as an infinite number of trailing zeros.
     private int readCodeBit() throws IOException {
         int temp = input.read();
         if (temp == -1)
