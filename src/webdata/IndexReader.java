@@ -49,14 +49,14 @@ public class IndexReader {
      * @return the score for a given review -1 if there is no review with the given identifier
      */
     public int getReviewScore(int reviewId) {
-        return 0;
+        return this.reviewsIndexReader.getReviewScore(reviewId);
     }
     /**
      * @param reviewId
      * @return the numerator for the helpfulness of a given review  -1 if there is no review with the given identifier
      */
     public int getReviewHelpfulnessNumerator(int reviewId) {
-        return 0;
+        return this.reviewsIndexReader.getReviewHelpfulnessNumerator(reviewId);
     }
 
     /**
@@ -64,7 +64,7 @@ public class IndexReader {
      * @return the denominator for the helpfulness of a given review Returns -1 if there is no review with the given identifier
      */
     public int getReviewHelpfulnessDenominator(int reviewId) {
-        return 0;
+        return this.reviewsIndexReader.getReviewHelpfulnessDenominator(reviewId);
     }
 
     /**
@@ -74,7 +74,7 @@ public class IndexReader {
      * Returns -1 if there is no review with the given identifier
      */
     public int getReviewLength(int reviewId) {
-        return 0;
+        return this.reviewsIndexReader.getReviewLength(reviewId);
     }
 
     /**

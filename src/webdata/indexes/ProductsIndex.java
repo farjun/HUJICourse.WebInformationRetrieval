@@ -1,16 +1,18 @@
-package webdata.models;
+package webdata.indexes;
+
+import webdata.models.CompressedArrayList;
 
 import java.util.Enumeration;
 import java.util.HashMap;
 
-public class ProductsPostingList {
-    private final HashMap<String, CompressedArrayList > hashMap;
+public class ProductsIndex {
+    private final HashMap<String, CompressedArrayList> hashMap;
 
-    public ProductsPostingList(){
+    public ProductsIndex(){
         this.hashMap = new HashMap<>();
     }
 
-    public ProductsPostingList(String serializedHashMap){
+    public ProductsIndex(String serializedHashMap){
         this();
         String[] keysAndValues = serializedHashMap.split("\\|");
         for (String andValue : keysAndValues) {

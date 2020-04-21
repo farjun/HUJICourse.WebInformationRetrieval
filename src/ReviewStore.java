@@ -34,6 +34,14 @@ public class ReviewStore {
             System.out.print(enumeration.nextElement());
             System.out.print(",");
         }
+        System.out.println("");
+
+        for (int i = 0; i < 50; i++) {
+            System.out.println(reader.getReviewHelpfulnessDenominator(i));
+            System.out.println(reader.getReviewHelpfulnessNumerator(i));
+            System.out.println(reader.getReviewLength(i));
+            System.out.println(reader.getReviewScore(i));
+        }
 
     }
 

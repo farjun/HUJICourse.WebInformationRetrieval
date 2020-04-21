@@ -3,7 +3,7 @@ package webdata.indexreaders;
 import webdata.encoders.ArithmicDecoder;
 import webdata.iostreams.AppInputStream;
 import webdata.iostreams.BitInputStream;
-import webdata.models.ProductsPostingList;
+import webdata.indexes.ProductsIndex;
 import webdata.models.SymbolFreqTable;
 
 import java.io.FileInputStream;
@@ -13,7 +13,7 @@ import java.util.Enumeration;
 
 public class ProductsIndexReader extends IndexReader {
 
-    private ProductsPostingList productToReviewsMap;
+    private ProductsIndex productToReviewsMap;
 
     public ProductsIndexReader(AppInputStream inputStream) {
         super(inputStream);
@@ -38,7 +38,7 @@ public class ProductsIndexReader extends IndexReader {
             sb.append((char)symbol);
             freqs.increment(symbol);
         }
-        this.productToReviewsMap = new ProductsPostingList(sb.toString());
+        this.productToReviewsMap = new ProductsIndex(sb.toString());
     }
 
     public Enumeration<Integer> getReviewsByProductId(String productId){

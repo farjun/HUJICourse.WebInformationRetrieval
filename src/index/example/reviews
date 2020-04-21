@@ -1,1 +1,1 @@
-review-id (counter) | score | helpfullness (numerator, denumenetor) | lenght
+score,helpfullness,(numerator, denumenetor),lenght|
