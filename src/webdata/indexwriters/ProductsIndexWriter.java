@@ -22,16 +22,15 @@ public class ProductsIndexWriter extends IndexWriter {
     }
 
     @Override
-    public void proccess(ProductReview review) {
+    public void process(ProductReview review) {
         this.productToReviewsMap.addTo(review.productId, review.getStringId());
     }
 
     @Override
-    public void writeProccessed() throws IOException {
+    public void writeProcessed() throws IOException {
         ArithmicEncoder.writeEncoded(this.productToReviewsMap.toString(), this.outputStream);
         this.outputStream.close();
         this.productToReviewsMap = new ProductsIndex();
-
     }
 
 

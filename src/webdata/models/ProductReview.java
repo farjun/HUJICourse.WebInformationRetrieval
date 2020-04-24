@@ -52,6 +52,9 @@ public class ProductReview implements Serializable {
         this.tokens = new ArrayList<>(Arrays.asList(this.text.toLowerCase().split("[^a-zA-Z0-9']+")));
         this.length = this.tokens.size();
         for(var token: this.tokens){
+            if(token.length()==0){
+                continue;
+            }
             var count = this.tokenStats.getOrDefault(token, 0);
             this.tokenStats.put(token, count+1);
         }
@@ -100,9 +103,10 @@ public class ProductReview implements Serializable {
 
     private void writeObject(ObjectOutputStream aOutputStream) throws IOException
     {
+        // TODO: use for perf comparison
+        // TODO: use for perf comparison
         // fixed len for now. it will then use a compression method
         ByteBuffer entryBuffer = ByteBuffer.allocate(this.TOTAL_SIZE);
-        // TODO: place for optimization
         entryBuffer.putLong(this.id);
         entryBuffer.putShort(this.score);
         entryBuffer.putInt(this.helpfulnessNumerator);

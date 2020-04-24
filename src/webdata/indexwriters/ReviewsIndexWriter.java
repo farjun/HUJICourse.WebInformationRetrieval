@@ -29,12 +29,12 @@ public class ReviewsIndexWriter extends IndexWriter {
 
 
     @Override
-    public void proccess(ProductReview review) {
+    public void process(ProductReview review) {
         this.reviewsIndex.add(review.score + "," + review.helpfulnessNumerator + "," + review.helpfulnessDenominator + "," + review.length);
     }
 
     @Override
-    public void writeProccessed() throws IOException {
+    public void writeProcessed() throws IOException {
         ArithmicEncoder.writeEncoded(this.reviewsIndex.toString(), this.outputStream);
         this.outputStream.close();
         this.reviewsIndex = new ReviewsIndex();

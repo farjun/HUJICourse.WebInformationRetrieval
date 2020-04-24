@@ -12,8 +12,8 @@ public abstract class IndexWriter {
         this.outputStream = outputStream;
     }
 
-    abstract void proccess(ProductReview review) throws IOException;
-    abstract void writeProccessed() throws IOException;
+    abstract void process(ProductReview review) throws IOException;
+    abstract void writeProcessed() throws IOException;
 
     public void close(){
         try {

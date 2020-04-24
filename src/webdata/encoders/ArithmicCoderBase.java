@@ -5,7 +5,7 @@ import webdata.models.SymbolFreqTable;
 import java.io.IOException;
 
 public abstract class ArithmicCoderBase {
-    public static final int NUM_OF_BITS_IN_LONG = 32;
+    public static final int NUM_OF_BITS_IN_INT = 32;
 
     protected final int numStateBits;
 
@@ -25,7 +25,7 @@ public abstract class ArithmicCoderBase {
     protected long high;
 
     public ArithmicCoderBase() {
-        numStateBits = NUM_OF_BITS_IN_LONG;
+        numStateBits = NUM_OF_BITS_IN_INT;
         fullRange = 1L << numStateBits;
         halfRange = fullRange >>> 1;  // Non-zero
         quarterRange = halfRange >>> 1;  // Can be zero
@@ -44,7 +44,7 @@ public abstract class ArithmicCoderBase {
 
         // Update range
         long newLow  = low + symLow  * range / total;
-        long newHigh = low + symHigh * range / total -1;
+        long newHigh = low + symHigh * range / total - 1; // Tamer: the minus one because the range is [,) in the algo
         low = newLow;
         high = newHigh;
 

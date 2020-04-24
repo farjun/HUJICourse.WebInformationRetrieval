@@ -29,19 +29,7 @@ public class ReviewsIndexReader extends IndexReader {
 
     @Override
     public void loadIndex() throws IOException {
-        SymbolFreqTable freqs = new SymbolFreqTable(257);
-        ArithmicDecoder dec = new ArithmicDecoder(this.inputStream);
-        StringBuffer sb = new StringBuffer();
-
-        while (true) {
-            // Decode and write one byte
-            int symbol = dec.read(freqs);
-            if (symbol == 256)  // EOF symbol
-                break;
-
-            sb.append((char)symbol);
-            freqs.increment(symbol);
-        }
+        var sb = this.decode(this.inputStream, this.DEFAULT_NUM_SYMBOLS);
         this.reviewsIndex = new ReviewsIndex(sb.toString());
     }
 

@@ -60,13 +60,13 @@ public class SlowIndexWriter {
         try {
             while(iter.hasNext()) {
                 ProductReview review = iter.next();
-                this.wordsIndexWriter.proccess(review);
-                this.reviewsIndexWriter.proccess(review);
-                this.productsIndexWriter.proccess(review);
+                this.wordsIndexWriter.process(review);
+                this.reviewsIndexWriter.process(review);
+                this.productsIndexWriter.process(review);
             }
-            this.wordsIndexWriter.writeProccessed();
-            this.reviewsIndexWriter.writeProccessed();
-            this.productsIndexWriter.writeProccessed();
+            this.wordsIndexWriter.writeProcessed();
+            this.reviewsIndexWriter.writeProcessed();
+            this.productsIndexWriter.writeProcessed();
 
         } catch (IOException e) {
             e.printStackTrace();
