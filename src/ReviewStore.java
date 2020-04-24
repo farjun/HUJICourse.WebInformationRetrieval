@@ -41,6 +41,8 @@ public class ReviewStore {
             System.out.println(reader.getReviewHelpfulnessNumerator(i));
             System.out.println(reader.getReviewLength(i));
             System.out.println(reader.getReviewScore(i));
+            System.out.println(reader.getTokenCollectionFrequency("the"));
+            System.out.println(reader.getTokenFrequency("the"));
         }
 
     }

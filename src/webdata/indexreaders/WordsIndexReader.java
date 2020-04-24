@@ -27,6 +27,10 @@ public class WordsIndexReader extends IndexReader {
         super(inputStream);
     }
 
+    public WordsIndex getWordEntry() {
+        return wordEntry;
+    }
+
     private WordsIndex wordEntry;
 
     @Override

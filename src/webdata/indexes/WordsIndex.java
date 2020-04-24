@@ -4,6 +4,7 @@ package webdata.indexes;
 
 import webdata.models.ProductReview;
 
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 
@@ -31,6 +32,14 @@ public class WordsIndex {
             this.tokenGlobalFreq.put(key, Integer.parseInt(globFreq));
             this.tokenFreq.put(key, this.loadJSON(freqJSON));
         }
+    }
+
+    public Enumeration<Integer> getReviewsWithToken(String token){
+        if(!this.tokenGlobalFreq.containsKey(token)){
+            return Collections.enumeration(Collections.emptyList());
+        }
+        var tokenFreqMap = this.tokenFreq.get(token);
+        return Collections.enumeration(Collections.emptyList());
     }
 
     public void insert(ProductReview review) {
