@@ -84,7 +84,7 @@ public class IndexReader {
      * Returns 0 if there are no reviews containing this token
      */
     public int getTokenFrequency(String token) {
-        return this.wordsIndexReader.getWordEntry().tokenFreq.size();
+        return this.wordsIndexReader.getTokenFrequency(token);
     }
 
     /**
@@ -94,7 +94,7 @@ public class IndexReader {
      * Returns 0 if there are no reviews containing this token
      */
     public int getTokenCollectionFrequency(String token) {
-        return this.wordsIndexReader.getWordEntry().tokenGlobalFreq.getOrDefault(token,0);
+        return this.wordsIndexReader.getTokenCollectionFrequency(token);
     }
 
     /**

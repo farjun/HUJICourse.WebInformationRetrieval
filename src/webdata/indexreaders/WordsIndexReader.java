@@ -33,4 +33,12 @@ public class WordsIndexReader extends IndexReader {
     public Enumeration<Integer> getReviewsWithToken(String token){
         return this.wordEntry.getReviewsWithToken(token);
     }
+
+    public int getTokenCollectionFrequency(String token) {
+        return this.wordEntry.tokenGlobalFreq.getOrDefault(token,0);
+    }
+
+    public int getTokenFrequency(String token) {
+        return this.wordEntry.tokenFreq.size();
+    }
 }
