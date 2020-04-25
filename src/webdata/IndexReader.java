@@ -114,7 +114,7 @@ public class IndexReader {
      * @return  the number of product reviews available in the system
      */
     public int getNumberOfReviews() {
-        return 0;
+        return this.reviewsIndexReader.getNumberOfReviews();
     }
 
     /**

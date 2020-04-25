@@ -38,6 +38,10 @@ public class ReviewsIndex {
         }
     }
 
+    public int getNumberOfReviews() {
+        return this.reviews.size();
+    }
+
     @Override
     public String toString() {
         return String.join("|", this.reviews);

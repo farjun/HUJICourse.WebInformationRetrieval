@@ -67,4 +67,8 @@ public class ReviewsIndexReader extends IndexReader {
         return ret[ReviewsIndex.LENGHT];
     }
 
+    public int getNumberOfReviews() {
+        return this.reviewsIndex.getNumberOfReviews();
+    }
+
 }
