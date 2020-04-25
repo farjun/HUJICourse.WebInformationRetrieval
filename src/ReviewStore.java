@@ -53,7 +53,8 @@ public class ReviewStore {
             System.out.println(reader.getTokenCollectionFrequency("the"));
             System.out.println(reader.getTokenFrequency("the"));
         }
-
+        System.out.print("getTokenSizeOfReviews:");
+        System.out.println(reader.getTokenSizeOfReviews());
     }
 
     private static void runConcatEncoder() throws Exception {

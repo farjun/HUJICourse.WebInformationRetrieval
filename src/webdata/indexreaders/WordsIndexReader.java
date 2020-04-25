@@ -41,4 +41,13 @@ public class WordsIndexReader extends IndexReader {
     public int getTokenFrequency(String token) {
         return this.wordEntry.tokenFreq.size();
     }
+
+    public int getTokenSizeOfReviews() {
+        if(this.wordEntry.tokenGlobalFreq.isEmpty()) return 0;
+        return this.wordEntry.tokenGlobalFreq
+                .values()
+                .stream()
+                .mapToInt(Integer::valueOf)
+                .sum();
+    }
 }

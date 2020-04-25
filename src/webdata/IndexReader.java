@@ -123,7 +123,7 @@ public class IndexReader {
      * (Tokens should be counted as many times as they appear)
      */
     public int getTokenSizeOfReviews() {
-        return 0;
+        return this.wordsIndexReader.getTokenSizeOfReviews();
     }
 
     /**
