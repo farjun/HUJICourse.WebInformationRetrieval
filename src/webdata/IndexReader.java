@@ -107,8 +107,7 @@ public class IndexReader {
      * Returns an empty Enumeration if there are no reviews containing this token
      */
      public Enumeration<Integer> getReviewsWithToken(String token) {
-
-         return null;
+         return this.wordsIndexReader.getReviewsWithToken(token);
      }
 
     /**

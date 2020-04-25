@@ -7,11 +7,10 @@ import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.nio.ByteBuffer;
 
 public class ProductReview implements Serializable {
-    private long id;
+    private int id;
 
     public final String productId;
     public final String userId;
@@ -28,13 +27,13 @@ public class ProductReview implements Serializable {
     private ArrayList<String> tokens;
 
     // Sizes. fixed for now
-    private final int REVIEW_ID = Long.BYTES;
+    private final int REVIEW_ID = Integer.BYTES;
     private final int SCORE = Short.BYTES;
     private final int HELPFUL_NUM = Integer.BYTES;
     private final int HELPFUL_DEN = Integer.BYTES;
     private final int LENGTH = Integer.BYTES;
     private final int TOTAL_SIZE = REVIEW_ID + SCORE + HELPFUL_NUM + HELPFUL_DEN + LENGTH;
-    public ProductReview(long id, String productId, String userId, String profileName, String helpfulness, String score,
+    public ProductReview(int id, String productId, String userId, String profileName, String helpfulness, String score,
                          String time, String summary, String text ){
         this.id = id;
         this.productId = productId.substring("product/productId: ".length());
@@ -64,7 +63,7 @@ public class ProductReview implements Serializable {
         return tokenStats;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
@@ -94,7 +93,7 @@ public class ProductReview implements Serializable {
         byte[] entryBytesArr = aInputStream.readAllBytes();
         ByteBuffer entryBuffer = ByteBuffer.wrap(entryBytesArr);
         entryBuffer.rewind();
-        this.id = entryBuffer.getLong();
+        this.id = entryBuffer.getInt();
         this.score = entryBuffer.getShort();
         this.helpfulnessNumerator = entryBuffer.getInt();
         this.helpfulnessDenominator = entryBuffer.getInt();
@@ -103,11 +102,10 @@ public class ProductReview implements Serializable {
 
     private void writeObject(ObjectOutputStream aOutputStream) throws IOException
     {
-        // TODO: use for perf comparison
-        // TODO: use for perf comparison
+        // TODO: use for encoder performance comparison
         // fixed len for now. it will then use a compression method
         ByteBuffer entryBuffer = ByteBuffer.allocate(this.TOTAL_SIZE);
-        entryBuffer.putLong(this.id);
+        entryBuffer.putInt(this.id);
         entryBuffer.putShort(this.score);
         entryBuffer.putInt(this.helpfulnessNumerator);
         entryBuffer.putInt(this.helpfulnessDenominator);

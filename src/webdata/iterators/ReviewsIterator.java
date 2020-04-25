@@ -8,7 +8,7 @@ import java.util.Iterator;
 public class ReviewsIterator implements Iterator<ProductReview> {
     private BufferedReader inputFile;
     private String curLine;
-    long reviewIdCounter;
+    int reviewIdCounter;
 
     public ReviewsIterator(String inputFile){
         try {

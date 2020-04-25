@@ -30,8 +30,17 @@ public class ReviewStore {
         IndexReader reader = new IndexReader(indexDir);
         Enumeration<Integer> enumeration = reader.getProductReviews("B0009XLVG0");
 
+        System.out.println("getProductReviews:");
         while (enumeration.hasMoreElements()){
             System.out.print(enumeration.nextElement());
+            System.out.print(",");
+        }
+
+        System.out.println("");
+        System.out.println("getReviewsWithToken:");
+        Enumeration<Integer> revWithTokenEnumeration = reader.getReviewsWithToken("the");
+        while (revWithTokenEnumeration.hasMoreElements()){
+            System.out.print(revWithTokenEnumeration.nextElement());
             System.out.print(",");
         }
         System.out.println("");

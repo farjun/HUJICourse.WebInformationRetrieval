@@ -26,8 +26,6 @@ public class ReviewsIndexWriter extends IndexWriter {
         this.reviewsIndex = new ReviewsIndex();
     }
 
-
-
     @Override
     public void process(ProductReview review) {
         this.reviewsIndex.add(review.score + "," + review.helpfulnessNumerator + "," + review.helpfulnessDenominator + "," + review.length);
