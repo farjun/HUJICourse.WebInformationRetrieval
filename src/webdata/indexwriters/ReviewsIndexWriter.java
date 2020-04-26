@@ -34,7 +34,6 @@ public class ReviewsIndexWriter extends IndexWriter {
     @Override
     public void writeProcessed() throws IOException {
         ArithmicEncoder.writeEncoded(this.reviewsIndex.toString(), this.outputStream);
-        this.outputStream.close();
         this.reviewsIndex = new ReviewsIndex();
     }
 }

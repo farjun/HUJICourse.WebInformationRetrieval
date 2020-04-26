@@ -26,6 +26,7 @@ public class ReviewsIterator implements Iterator<ProductReview> {
         return this.curLine != null;
     }
 
+
     @Override
     public ProductReview next() {
 
@@ -34,7 +35,8 @@ public class ReviewsIterator implements Iterator<ProductReview> {
             String productId = this.curLine;
             String userId = this.inputFile.readLine();
             String profileName = this.inputFile.readLine();
-            String helpfulness = this.inputFile.readLine();
+            String temp = this.inputFile.readLine();
+            String helpfulness = temp.startsWith("review/helpfulness:") ? temp : this.inputFile.readLine();
             String score = this.inputFile.readLine();
             String time = this.inputFile.readLine();
             String summary = this.inputFile.readLine();

@@ -10,6 +10,7 @@ import java.io.*;
 import java.nio.file.Paths;
 
 public class SlowIndexWriter {
+    public static final int BATCH_SIZE = 10000;
     WordsIndexWriter wordsIndexWriter;
     ReviewsIndexWriter reviewsIndexWriter;
     ProductsIndexWriter productsIndexWriter;
@@ -58,15 +59,25 @@ public class SlowIndexWriter {
         this.setWriters(dir);
         ReviewsIterator iter = new ReviewsIterator(inputFile);
         try {
+            int curIteration = 1;
+            long batchNumber = 0;
             while(iter.hasNext()) {
+                if(curIteration >= BATCH_SIZE){
+                    this.wordsIndexWriter.writeProcessed();
+                    this.reviewsIndexWriter.writeProcessed();
+                    this.productsIndexWriter.writeProcessed();
+                    curIteration = 1;
+                    batchNumber++;
+                    System.out.println("Batch number: " + String.valueOf(batchNumber) + " done");
+                    System.out.println("total reviews processed: " + String.valueOf(batchNumber * BATCH_SIZE) );
+                }
                 ProductReview review = iter.next();
                 this.wordsIndexWriter.process(review);
                 this.reviewsIndexWriter.process(review);
                 this.productsIndexWriter.process(review);
+                curIteration++;
             }
-            this.wordsIndexWriter.writeProcessed();
-            this.reviewsIndexWriter.writeProcessed();
-            this.productsIndexWriter.writeProcessed();
+            this.close();
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -74,6 +85,7 @@ public class SlowIndexWriter {
         }
 
     }
+
     /**
      * Delete all index files by removing the given directory
      */
