@@ -78,8 +78,16 @@ public class SlowIndexWriter {
      * Delete all index files by removing the given directory
      */
     public void removeIndex(String dir) {
-
+        File directory = new File(dir);
+        if(!directory.exists()) return;
+        var files = directory.listFiles();
+        if(files.length == 0){
+            directory.delete();
+        }
+        for(var f: files){
+            f.delete();
+        }
+        directory.delete();
     }
-
 
 }
