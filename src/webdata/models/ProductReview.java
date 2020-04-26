@@ -39,14 +39,10 @@ public class ProductReview implements Serializable {
         this.productId = productId.substring("product/productId: ".length());
         this.userId = userId.substring("review/userId: ".length());
         this.profileName = profileName.substring("review/profileName: ".length());
-        try{
-            String[] helpfulnessSplit = helpfulness.substring("review/helpfulness: ".length()).split("/");
-            this.helpfulnessNumerator = Integer.parseInt(helpfulnessSplit[0]);
-            this.helpfulnessDenominator = Integer.parseInt(helpfulnessSplit[1]);
-        }catch (Exception e){
-            System.out.println("helpfullness is!");
-            System.out.println(helpfulness);
-        }
+        String[] helpfulnessSplit = helpfulness.substring("review/helpfulness: ".length()).split("/");
+        this.helpfulnessNumerator = Integer.parseInt(helpfulnessSplit[0]);
+        this.helpfulnessDenominator = Integer.parseInt(helpfulnessSplit[1]);
+
         this.score = Short.parseShort(score.substring("review/score: ".length()).split(".0")[0]); // based on ex1, score is int 1-5
         this.time = time.substring("review/time: ".length());
         this.summary = summary.substring("review/summary: ".length());
