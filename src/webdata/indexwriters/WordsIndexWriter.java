@@ -35,7 +35,6 @@ public class WordsIndexWriter extends IndexWriter {
     @Override
     public void writeProcessed() throws IOException {
         ArithmicEncoder.writeEncoded(this.index.toString(), this.outputStream);
-        this.outputStream.close();
         this.index = new WordsIndex();
     }
 }

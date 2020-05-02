@@ -29,7 +29,6 @@ public class ProductsIndexWriter extends IndexWriter {
     @Override
     public void writeProcessed() throws IOException {
         ArithmicEncoder.writeEncoded(this.productToReviewsMap.toString(), this.outputStream);
-        this.outputStream.close();
         this.productToReviewsMap = new ProductsIndex();
     }
 

@@ -10,7 +10,7 @@ import java.io.*;
 import java.nio.file.Paths;
 
 public class SlowIndexWriter {
-    public static final int BATCH_SIZE = 10000;
+    public static final int BATCH_SIZE = 101;
     WordsIndexWriter wordsIndexWriter;
     ReviewsIndexWriter reviewsIndexWriter;
     ProductsIndexWriter productsIndexWriter;
@@ -20,7 +20,6 @@ public class SlowIndexWriter {
         this.wordsIndexWriter.close();
         this.productsIndexWriter.close();
         this.reviewsIndexWriter.close();
-
     }
 
 
@@ -77,6 +76,9 @@ public class SlowIndexWriter {
                 this.productsIndexWriter.process(review);
                 curIteration++;
             }
+            this.wordsIndexWriter.writeProcessed();
+            this.reviewsIndexWriter.writeProcessed();
+            this.productsIndexWriter.writeProcessed();
             this.close();
 
         } catch (IOException e) {

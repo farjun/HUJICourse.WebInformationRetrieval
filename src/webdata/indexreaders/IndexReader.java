@@ -2,13 +2,9 @@ package webdata.indexreaders;
 
 import webdata.encoders.ArithmicDecoder;
 import webdata.iostreams.AppInputStream;
-import webdata.iostreams.AppOutputStream;
-import webdata.models.ProductReview;
 import webdata.models.SymbolFreqTable;
 
 import java.io.IOException;
-import webdata.models.SymbolFreqTable;
-import webdata.encoders.ArithmicDecoder;
 
 public abstract class IndexReader {
     protected AppInputStream inputStream;

@@ -21,12 +21,16 @@ public class ReviewStore {
 //        runArithmicCompressOnEntireFile();
     }
 
+    public static void writeIndex(String reviewsFilePath){
+
+    }
+
     private static void run() {
-        String reviewsFilePath = "./src/datasets/full/foods.txt";
+//        String reviewsFilePath = "./src/datasets/full/foods.txt";
+        String reviewsFilePath = "./src/datasets/100.txt";
         String indexDir =  "./src/index";
         SlowIndexWriter writer = new SlowIndexWriter();
         writer.slowWrite(reviewsFilePath,indexDir);
-
         IndexReader reader = new IndexReader(indexDir);
         Enumeration<Integer> enumeration = reader.getProductReviews("B0009XLVG0");
 

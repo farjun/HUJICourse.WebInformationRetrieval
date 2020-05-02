@@ -32,9 +32,6 @@ public final class BitInputStream implements AutoCloseable, AppInputStream {
 	
 	// Number of remaining bits in the current byte, always between 0 and 7 (inclusive).
 	private int numBitsRemaining;
-	
-	
-	
 
 	/**
 	 * Constructs a bit input stream based on the specified byte input stream.
