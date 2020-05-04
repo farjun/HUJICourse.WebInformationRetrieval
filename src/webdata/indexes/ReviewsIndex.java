@@ -24,7 +24,7 @@ public class ReviewsIndex {
         this.reviews.addAll(Arrays.asList(serializedReviewsIndex.split("\\|")));
     }
 
-    public void add(String value){
+    public void insert(String value){
         this.reviews.add(value);
     }
 

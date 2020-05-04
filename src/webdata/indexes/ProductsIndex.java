@@ -30,7 +30,7 @@ public class ProductsIndex {
         return this.hashMap.containsKey(key);
     }
 
-    public void addTo(String key, String value){
+    public void insert(String key, String value){
         if(this.hashMap.containsKey(key)){
             this.hashMap.get(key).add(value);
         }

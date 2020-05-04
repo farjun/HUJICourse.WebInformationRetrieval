@@ -1,8 +1,6 @@
 package webdata;
 
-import webdata.indexwriters.ProductsIndexWriter;
-import webdata.indexwriters.ReviewsIndexWriter;
-import webdata.indexwriters.WordsIndexWriter;
+import webdata.indexwriters.IndexWriterImpl;
 import webdata.iterators.ReviewsIterator;
 import webdata.models.ProductReview;
 
@@ -11,15 +9,12 @@ import java.nio.file.Paths;
 
 public class SlowIndexWriter {
     public static final int BATCH_SIZE = 101;
-    WordsIndexWriter wordsIndexWriter;
-    ReviewsIndexWriter reviewsIndexWriter;
-    ProductsIndexWriter productsIndexWriter;
-
+    IndexWriterImpl indexWriter;
 
     public void close(){
-        this.wordsIndexWriter.close();
-        this.productsIndexWriter.close();
-        this.reviewsIndexWriter.close();
+        this.indexWriter.close();
+        this.indexWriter.close();
+        this.indexWriter.close();
     }
 
 
@@ -36,9 +31,11 @@ public class SlowIndexWriter {
                 }
             }
 
-            this.wordsIndexWriter = new WordsIndexWriter( Paths.get(dirPath,"words.txt").toString());
-            this.reviewsIndexWriter = new ReviewsIndexWriter( Paths.get(dirPath,"reviews.txt").toString());
-            this.productsIndexWriter = new ProductsIndexWriter( Paths.get(dirPath,"products.txt").toString());
+            var wordsPath = Paths.get(dirPath,"words.txt").toString();
+            var reviewsPath = Paths.get(dirPath,"reviews.txt").toString();
+            var productsPath = Paths.get(dirPath,"products.txt").toString();
+            this.indexWriter = new IndexWriterImpl(productsPath, reviewsPath, wordsPath);
+
 
         } catch (IOException e) {
             this.close();
@@ -62,23 +59,17 @@ public class SlowIndexWriter {
             long batchNumber = 0;
             while(iter.hasNext()) {
                 if(curIteration >= BATCH_SIZE){
-                    this.wordsIndexWriter.writeProcessed();
-                    this.reviewsIndexWriter.writeProcessed();
-                    this.productsIndexWriter.writeProcessed();
+                    this.indexWriter.writeProcessed();
                     curIteration = 1;
                     batchNumber++;
                     System.out.println("Batch number: " + String.valueOf(batchNumber) + " done");
                     System.out.println("total reviews processed: " + String.valueOf(batchNumber * BATCH_SIZE) );
                 }
                 ProductReview review = iter.next();
-                this.wordsIndexWriter.process(review);
-                this.reviewsIndexWriter.process(review);
-                this.productsIndexWriter.process(review);
+                this.indexWriter.process(review);
                 curIteration++;
             }
-            this.wordsIndexWriter.writeProcessed();
-            this.reviewsIndexWriter.writeProcessed();
-            this.productsIndexWriter.writeProcessed();
+            this.indexWriter.writeProcessed();
             this.close();
 
         } catch (IOException e) {

@@ -1,8 +1,6 @@
 package webdata;
 
-import webdata.indexreaders.ProductsIndexReader;
-import webdata.indexreaders.ReviewsIndexReader;
-import webdata.indexreaders.WordsIndexReader;
+import webdata.indexreaders.IndexReaderImpl;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -10,9 +8,8 @@ import java.util.Enumeration;
 
 public class IndexReader {
 
-    private WordsIndexReader wordsIndexReader;
-    private ReviewsIndexReader reviewsIndexReader;
-    private ProductsIndexReader productsIndexReader;
+    private IndexReaderImpl indexReader;
+
 
     /**
      * Creates an IndexReader which will read from the given directory
@@ -21,13 +18,12 @@ public class IndexReader {
     public IndexReader(String dir) {
 
         try {
-            this.wordsIndexReader = new WordsIndexReader(Paths.get(dir,"words.txt").toString());
-            this.reviewsIndexReader = new ReviewsIndexReader(Paths.get(dir,"reviews.txt").toString());
-            this.productsIndexReader = new ProductsIndexReader(Paths.get(dir,"products.txt").toString());
+            var wordsPath = Paths.get(dir,"words.txt").toString();
+            var reviewsPath = Paths.get(dir,"reviews.txt").toString();
+            var productsPath = Paths.get(dir,"products.txt").toString();
+            this.indexReader = new IndexReaderImpl(productsPath, reviewsPath, wordsPath);
 
-            this.wordsIndexReader.loadIndex();
-            this.reviewsIndexReader.loadIndex();
-            this.productsIndexReader.loadIndex();
+            this.indexReader.loadIndex();
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -49,14 +45,14 @@ public class IndexReader {
      * @return the score for a given review -1 if there is no review with the given identifier
      */
     public int getReviewScore(int reviewId) {
-        return this.reviewsIndexReader.getReviewScore(reviewId);
+        return this.indexReader.getReviewScore(reviewId);
     }
     /**
      * @param reviewId
      * @return the numerator for the helpfulness of a given review  -1 if there is no review with the given identifier
      */
     public int getReviewHelpfulnessNumerator(int reviewId) {
-        return this.reviewsIndexReader.getReviewHelpfulnessNumerator(reviewId);
+        return this.indexReader.getReviewHelpfulnessNumerator(reviewId);
     }
 
     /**
@@ -64,7 +60,7 @@ public class IndexReader {
      * @return the denominator for the helpfulness of a given review Returns -1 if there is no review with the given identifier
      */
     public int getReviewHelpfulnessDenominator(int reviewId) {
-        return this.reviewsIndexReader.getReviewHelpfulnessDenominator(reviewId);
+        return this.indexReader.getReviewHelpfulnessDenominator(reviewId);
     }
 
     /**
@@ -74,7 +70,7 @@ public class IndexReader {
      * Returns -1 if there is no review with the given identifier
      */
     public int getReviewLength(int reviewId) {
-        return this.reviewsIndexReader.getReviewLength(reviewId);
+        return this.indexReader.getReviewLength(reviewId);
     }
 
     /**
@@ -84,7 +80,7 @@ public class IndexReader {
      * Returns 0 if there are no reviews containing this token
      */
     public int getTokenFrequency(String token) {
-        return this.wordsIndexReader.getTokenFrequency(token);
+        return this.indexReader.getTokenFrequency(token);
     }
 
     /**
@@ -94,7 +90,7 @@ public class IndexReader {
      * Returns 0 if there are no reviews containing this token
      */
     public int getTokenCollectionFrequency(String token) {
-        return this.wordsIndexReader.getTokenCollectionFrequency(token);
+        return this.indexReader.getTokenCollectionFrequency(token);
     }
 
     /**
@@ -107,14 +103,14 @@ public class IndexReader {
      * Returns an empty Enumeration if there are no reviews containing this token
      */
      public Enumeration<Integer> getReviewsWithToken(String token) {
-         return this.wordsIndexReader.getReviewsWithToken(token);
+         return this.indexReader.getReviewsWithToken(token);
      }
 
     /**
      * @return  the number of product reviews available in the system
      */
     public int getNumberOfReviews() {
-        return this.reviewsIndexReader.getNumberOfReviews();
+        return this.indexReader.getNumberOfReviews();
     }
 
     /**
@@ -123,7 +119,7 @@ public class IndexReader {
      * (Tokens should be counted as many times as they appear)
      */
     public int getTokenSizeOfReviews() {
-        return this.wordsIndexReader.getTokenSizeOfReviews();
+        return this.indexReader.getTokenSizeOfReviews();
     }
 
     /**
@@ -134,7 +130,7 @@ public class IndexReader {
      * Returns an empty Enumeration if there are no reviews for this product
      */
     public Enumeration<Integer> getProductReviews(String productId) {
-        return this.productsIndexReader.getReviewsByProductId(productId);
+        return this.indexReader.getReviewsByProductId(productId);
     }
 
 }
