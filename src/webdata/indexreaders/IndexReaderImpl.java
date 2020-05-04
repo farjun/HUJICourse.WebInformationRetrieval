@@ -6,11 +6,9 @@ import webdata.indexes.ReviewsIndex;
 import webdata.indexes.WordsIndex;
 import webdata.iostreams.AppInputStream;
 import webdata.iostreams.BitInputStream;
-import webdata.iostreams.BitOutputStream;
 import webdata.models.SymbolFreqTable;
 
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -88,7 +86,7 @@ public class IndexReaderImpl {
     }
 
     public int getReviewScore(int reviewId) {
-        int[] ret = this.reviewsIndex.get(reviewId);
+        int[] ret = this.reviewsIndex.getReviewNums(reviewId);
         if(ret.length == 1){
             return -1;
         }
@@ -96,7 +94,7 @@ public class IndexReaderImpl {
     }
 
     public int getReviewHelpfulnessNumerator(int reviewId) {
-        int[] ret = this.reviewsIndex.get(reviewId);
+        int[] ret = this.reviewsIndex.getReviewNums(reviewId);
         if(ret.length == 1){
             return -1;
         }
@@ -105,16 +103,19 @@ public class IndexReaderImpl {
 
 
     public int getReviewHelpfulnessDenominator(int reviewId) {
-        int[] ret = this.reviewsIndex.get(reviewId);
+        int[] ret = this.reviewsIndex.getReviewNums(reviewId);
         if(ret.length == 1){
             return -1;
         }
         return ret[ReviewsIndex.HELPFULLNESS_DENUMERATOR];
     }
 
+    public String getProductId(int reviewId) {
+        return this.reviewsIndex.getProductId(reviewId);
+    }
 
     public int getReviewLength(int reviewId) {
-        int[] ret = this.reviewsIndex.get(reviewId);
+        int[] ret = this.reviewsIndex.getReviewNums(reviewId);
         if(ret.length == 1){
             return -1;
         }

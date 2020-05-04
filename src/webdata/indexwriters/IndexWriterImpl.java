@@ -53,7 +53,8 @@ public class IndexWriterImpl {
         var reviewIndexInp = review.score + "," +
                 review.helpfulnessNumerator + "," +
                 review.helpfulnessDenominator + "," +
-                review.length;
+                review.length + "," +
+                review.productId;
         this.reviewsIndex.insert(reviewIndexInp);
         this.wordsIndex.insert(review);
         this.productsIndex.insert(review.productId, review.getStringId());

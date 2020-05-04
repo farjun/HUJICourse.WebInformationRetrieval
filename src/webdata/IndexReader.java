@@ -37,7 +37,7 @@ public class IndexReader {
      * Returns null if there is no review with the given identifier
      */
     public String getProductId(int reviewId) {
-        return null;
+        return this.indexReader.getProductId(reviewId);
     }
 
     /**

@@ -10,6 +10,7 @@ import webdata.encoders.ConcatDecoder;
 import webdata.iostreams.BitOutputStream;
 import webdata.models.ProductReview;
 
+import java.awt.desktop.SystemSleepEvent;
 import java.io.*;
 import java.util.Enumeration;
 
@@ -50,12 +51,14 @@ public class ReviewStore {
         System.out.println("");
 
         for (int i = 0; i < 50; i++) {
+            System.out.println("---------------"+Integer.toString(i)+"---------------");
             System.out.println(reader.getReviewHelpfulnessDenominator(i));
             System.out.println(reader.getReviewHelpfulnessNumerator(i));
             System.out.println(reader.getReviewLength(i));
             System.out.println(reader.getReviewScore(i));
             System.out.println(reader.getTokenCollectionFrequency("the"));
             System.out.println(reader.getTokenFrequency("the"));
+            System.out.println(reader.getProductId(i));
         }
         System.out.print("getTokenSizeOfReviews:");
         System.out.println(reader.getTokenSizeOfReviews());
