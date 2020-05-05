@@ -7,7 +7,7 @@ import java.util.*;
 
 public class WordsIndex {
     // will host map of sort { token : {reviewId:count,...}} // HashMap<String, HashMap<Long, Integer>>
-    public final HashMap<String, TreeMap<Integer, Integer>> tokenFreq; //TODO:verify if key should be Long
+    public final HashMap<String, TreeMap<Integer, Integer>> tokenFreq;
     // will host map of sort { token : globalCounter }
     public final HashMap<String, Integer> tokenGlobalFreq;
 
@@ -37,7 +37,6 @@ public class WordsIndex {
     }
 
     public void insert(ProductReview review) {
-            //TODO: update global word stats information with review tokenStats
             var tokenStats = review.getTokenStats();
             for(var entry: tokenStats.entrySet()){
                 var token = entry.getKey();
