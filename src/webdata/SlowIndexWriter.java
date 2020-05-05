@@ -1,6 +1,6 @@
 package webdata;
 
-import webdata.indexwriters.IndexWriterImpl;
+import webdata.indexes.IndexWriterImpl;
 import webdata.iterators.ReviewsIterator;
 import webdata.models.ProductReview;
 

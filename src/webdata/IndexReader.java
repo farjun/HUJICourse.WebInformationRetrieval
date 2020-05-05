@@ -1,6 +1,6 @@
 package webdata;
 
-import webdata.indexreaders.IndexReaderImpl;
+import webdata.indexes.IndexReaderImpl;
 
 import java.io.IOException;
 import java.nio.file.Paths;

@@ -9,6 +9,7 @@ package webdata.iostreams;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.BitSet;
 
 public final class BitOutputStream implements AutoCloseable, AppOutputStream {
 
@@ -16,6 +17,7 @@ public final class BitOutputStream implements AutoCloseable, AppOutputStream {
 	private final OutputStream output;
 	private int buffer;
 	private int bufferCurCapacity;
+	BitSet bitSet;
 	
 	/**
 	 * Constructs a bit output stream based on the specified byte output stream.
@@ -25,9 +27,11 @@ public final class BitOutputStream implements AutoCloseable, AppOutputStream {
 		output = out;
 		buffer = 0;
 		bufferCurCapacity = 0;
+		bitSet = new BitSet();
 	}
 
 	public void write(int b) throws IOException {
+		bitSet.nextSetBit(bitSet.length());
 		buffer = (buffer << 1) | b;
 		bufferCurCapacity++;
 		if (bufferCurCapacity == MAX_BUFFER_SIZE) {

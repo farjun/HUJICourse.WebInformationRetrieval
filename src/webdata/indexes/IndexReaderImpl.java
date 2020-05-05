@@ -1,4 +1,4 @@
-package webdata.indexreaders;
+package webdata.indexes;
 
 import webdata.encoders.ArithmicDecoder;
 import webdata.indexes.ProductsIndex;
