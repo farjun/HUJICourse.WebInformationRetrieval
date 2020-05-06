@@ -22,7 +22,6 @@ public class IndexReader {
             var reviewsPath = Paths.get(dir,"reviews.txt").toString();
             var productsPath = Paths.get(dir,"products.txt").toString();
             this.indexReader = new IndexReaderImpl(productsPath, reviewsPath, wordsPath);
-
             this.indexReader.loadIndex();
 
         } catch (IOException e) {

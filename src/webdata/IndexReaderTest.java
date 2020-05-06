@@ -35,7 +35,7 @@ class IndexReaderTest {
     @org.junit.jupiter.api.Test
     void getProductId() {
         IndexReader reader = new IndexReader(indexDir);
-        for (int i = 1; i <= reader.getNumberOfReviews(); i++) {
+        for (int i = 1; i < reader.getNumberOfReviews(); i++) {
             System.out.println(i);
             System.out.println(reader.getProductId(i));
             Assertions.assertNotNull(reader.getProductId(i));
@@ -140,12 +140,11 @@ class IndexReaderTest {
 
     @org.junit.jupiter.api.Test
     void getProductReviews() {
-        //todo first to fix product id, then test should be working
-//        IndexReader reader = new IndexReader(indexDir);
-//        for (int i = 1; i < reader.getNumberOfReviews(); i++) {
-//            String productId = reader.getProductId(i);
-//            Enumeration<Integer> reviewIds = reader.getProductReviews(productId);
-//            Assertions.assertTrue(this.enumerationnContains(reviewIds,i));
-//        }
+        IndexReader reader = new IndexReader(indexDir);
+        for (int i = 1; i < reader.getNumberOfReviews(); i++) {
+            String productId = reader.getProductId(i);
+            Enumeration<Integer> reviewIds = reader.getProductReviews(productId);
+            Assertions.assertTrue(this.enumerationnContains(reviewIds,i));
+        }
     }
 }

@@ -42,12 +42,12 @@ public class ReviewsIndex {
 
     public String getProductId(int reviewID){
         if(this.reviews.size() <= reviewID){
-            return "";
+            return null;
         }else{
-            var entry = this.reviews.get(reviewID);
-            var idx = entry.lastIndexOf(",") ;
+            String entry = this.reviews.get(reviewID);
+            int idx = entry.lastIndexOf(",") ;
             if(idx < 0){
-                return "";
+                return null;
             }
             return entry.substring(idx + 1);
         }
@@ -60,9 +60,5 @@ public class ReviewsIndex {
     @Override
     public String toString() {
         return String.join("|", this.reviews);
-    }
-
-    public String toCompressedString() {
-        return this.toString();
     }
 }

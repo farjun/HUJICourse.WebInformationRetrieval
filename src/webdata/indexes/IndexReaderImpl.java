@@ -17,7 +17,6 @@ public class IndexReaderImpl {
     protected AppInputStream productsInputStream;
     protected AppInputStream reviewsInputStream;
     protected AppInputStream wordsInputStream;
-    protected final int DEFAULT_NUM_SYMBOLS = 257;
     private ProductsIndex productsIndex;
     private ReviewsIndex reviewsIndex;
     private WordsIndex wordsIndex;
