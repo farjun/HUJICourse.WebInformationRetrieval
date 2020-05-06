@@ -1,7 +1,6 @@
 package webdata;
 
 import org.junit.jupiter.api.Assertions;
-
 import java.util.Enumeration;
 import java.util.stream.IntStream;
 
@@ -13,6 +12,18 @@ class Constants100 {
 
     public static String[] tokensToTest = new String[]{"the", "dog", "omerfarjun", "don't"};
     public static int[] tokensToTestFrequency = IntStream.of(288,33,0,0).toArray();
+    public static int[][] tokensToTestReview = {
+            {
+                    1, 2, 3, 4, 6, 7, 8, 9, 11, 12, 13, 15, 16, 19, 21, 22, 23, 25, 27, 28, 29, 30, 31, 33, 34, 35, 36,
+                    37, 39, 41, 42, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 55, 56, 57, 59, 60, 61, 63, 64, 65, 66, 67,
+                    68, 69, 71, 72, 73, 74, 77, 78, 79, 80, 82, 83, 84, 85, 87, 89, 90, 92, 93, 94, 95, 96, 97, 98, 99
+            },
+            {
+                    1, 10, 84, 85, 87, 89, 92, 94, 96, 97, 98, 99
+            },
+            {},{}
+    };
+
 
 }
 class IndexReaderTest {
@@ -81,14 +92,13 @@ class IndexReaderTest {
 
     @org.junit.jupiter.api.Test
     void getTokenFrequency() {
-        //todo seems to not work
-//        IndexReader reader = new IndexReader(indexDir);
-//        int counter = 0;
-//        for (String token: Constants100.tokensToTest) {
-//            Assertions.assertTrue(reader.getTokenFrequency(token) > 0);
-//            Assertions.assertEquals(reader.getTokenFrequency(token), Constants100.ReviewLenght[counter]);
-//            counter++;
-//        }
+        IndexReader reader = new IndexReader(indexDir);
+        int counter = 0;
+        for (String token: Constants100.tokensToTest) {
+            Assertions.assertTrue(reader.getTokenFrequency(token) > 0);
+            Assertions.assertEquals(reader.getTokenFrequency(token), Constants100.ReviewLength[counter]);
+            counter++;
+        }
     }
 
     @org.junit.jupiter.api.Test
@@ -107,10 +117,14 @@ class IndexReaderTest {
         IndexReader reader = new IndexReader(indexDir);
         int counter = 0;
         for (String token: Constants100.tokensToTest) {
-            System.out.print(reader.getReviewsWithToken(token));
-            System.out.print(",");
-
-//            Assertions.assertEquals(reader.getTokenFrequency(token), Constants100.ReviewLenght[counter]);
+            var enumeration = reader.getReviewsWithToken(token);
+            while(enumeration.hasMoreElements()) {
+                var id = enumeration.nextElement();
+                var revs = IntStream.of(Constants100.tokensToTestReview[counter]);
+                Assertions.assertTrue(revs.anyMatch(x -> x == id));
+                var freq = enumeration.nextElement();
+                // TODO
+            }
             counter++;
         }
     }
