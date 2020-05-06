@@ -16,9 +16,12 @@ public class ProductsIndex {
         this();
         String[] keysAndValues = serializedHashMap.split("\\|");
         for (String andValue : keysAndValues) {
-
-            String[] keysAndValue = andValue.split(":");
-            this.hashMap.put(keysAndValue[0], new CompressedArrayList(keysAndValue[1]));
+            try {
+                String[] keysAndValue = andValue.split(":");
+                this.hashMap.put(keysAndValue[0], new CompressedArrayList(keysAndValue[1]));
+            }catch (Exception e){
+                System.out.println("error");
+            }
         }
     }
 

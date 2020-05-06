@@ -8,7 +8,7 @@ import java.io.*;
 import java.nio.file.Paths;
 
 public class SlowIndexWriter {
-    public static final int BATCH_SIZE = 101;
+    public static final int BATCH_SIZE = 1001;
     IndexWriterImpl indexWriter;
 
     public void close(){

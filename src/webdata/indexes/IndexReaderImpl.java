@@ -38,19 +38,17 @@ public class IndexReaderImpl {
                 new BitInputStream(new FileInputStream(wordsFilePath)));
     }
 
-    public StringBuffer decode(AppInputStream inputStream, int numSymbols) throws IOException {
-        SymbolFreqTable freqs = new SymbolFreqTable(numSymbols);
+    public StringBuffer decode(AppInputStream inputStream) throws IOException {
         ArithmicDecoder dec = new ArithmicDecoder(inputStream);
         StringBuffer sb = new StringBuffer();
 
         while (true) {
             // Decode and write one byte
-            int symbol = dec.read(freqs);
+            int symbol = dec.read();
             if (symbol == 256)  // EOF symbol
                 break;
 
             sb.append((char)symbol);
-            freqs.increment(symbol);
         }
         return sb;
     }
@@ -77,11 +75,11 @@ public class IndexReaderImpl {
 
 
     public void loadIndex() throws IOException {
-        var sb = this.decode(this.reviewsInputStream, this.DEFAULT_NUM_SYMBOLS);
+        var sb = this.decode(this.reviewsInputStream);
         this.reviewsIndex = new ReviewsIndex(sb.toString());
-        sb = this.decode(this.productsInputStream, this.DEFAULT_NUM_SYMBOLS);
+        sb = this.decode(this.productsInputStream);
         this.productsIndex = new ProductsIndex(sb.toString());
-        sb = this.decode(this.wordsInputStream, this.DEFAULT_NUM_SYMBOLS);
+        sb = this.decode(this.wordsInputStream);
         this.wordsIndex = new WordsIndex(sb.toString());
     }
 

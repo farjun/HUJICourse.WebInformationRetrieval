@@ -28,7 +28,7 @@ public class ReviewStore {
 
     private static void run() {
 //        String reviewsFilePath = "./src/datasets/full/foods.txt";
-        String reviewsFilePath = "./src/datasets/100.txt";
+        String reviewsFilePath = "./src/datasets/1000.txt";
         String indexDir =  "./src/index";
         SlowIndexWriter writer = new SlowIndexWriter();
         writer.slowWrite(reviewsFilePath,indexDir);

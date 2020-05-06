@@ -1,15 +1,16 @@
 package webdata.encoders;
 
 import webdata.iostreams.AppOutputStream;
-import webdata.iostreams.BitOutputStream;
 import webdata.models.SymbolFreqTable;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.Objects;
 
 public final class ArithmicEncoder {
-    public static final int NUM_OF_BITS_IN_INT = 32;
+    public static final int NUM_OF_BITS_IN_LONG = 32;
+    public static final int BATCH_SEPERATOR = 256;
+    public static final int NUM_OF_SYMBOLS = 257;
+
 
     protected final int numStateBits;
 
@@ -35,26 +36,25 @@ public final class ArithmicEncoder {
 
     public ArithmicEncoder(AppOutputStream out) {
         super();
-        numStateBits = NUM_OF_BITS_IN_INT;
+        numStateBits = NUM_OF_BITS_IN_LONG;
         fullRange = 1L << numStateBits;
         halfRange = fullRange >>> 1;  // Non-zero
         quarterRange = halfRange >>> 1;  // Can be zero
         stateMask = fullRange - 1;
         low = 0;
         high = stateMask;
-        this.frequencyTable = new SymbolFreqTable(257);
+        this.frequencyTable = new SymbolFreqTable(NUM_OF_SYMBOLS);
         output = Objects.requireNonNull(out);
         numUnderflow = 0;
     }
 
-    protected void writeSymbol(SymbolFreqTable freqs, int symbol) throws IOException {
+    protected void writeSymbol(int symbol) throws IOException {
         long range = high - low + 1;
 
-
         // Frequency table values check
-        long total = freqs.getTotal();
-        long symLow = freqs.getLow(symbol);
-        long symHigh = freqs.getHigh(symbol);
+        long total = this.frequencyTable.getTotal();
+        long symLow = this.frequencyTable.getLow(symbol);
+        long symHigh = this.frequencyTable.getHigh(symbol);
 
         // Update range
         long newLow  = low + symLow  * range / total;
@@ -72,14 +72,15 @@ public final class ArithmicEncoder {
         // Now low's top bit must be 0 and high's top bit must be 1
         // While low's top two bits are 01 and high's are 10, delete the second highest bit of both
         while ((low & ~high & quarterRange) != 0) {
-            underflow();
+            numUnderflow++;
             low = (low << 1) ^ halfRange;
             high = ((high ^ halfRange) << 1) | halfRange | 1;
         }
+        this.frequencyTable.increment(symbol);
     }
 
-    public void finish(SymbolFreqTable freqs) throws IOException {
-        writeSymbol(freqs, 256);
+    public void finishBatch() throws IOException {
+        writeSymbol(BATCH_SEPERATOR);
         output.write(1);
     }
 
@@ -92,19 +93,12 @@ public final class ArithmicEncoder {
             output.write(bit ^ 1);
     }
 
-
-    protected void underflow() {
-        numUnderflow++;
-    }
-
     public static void writeEncoded(String toEncode, AppOutputStream out) throws IOException {
-        SymbolFreqTable freqs = new SymbolFreqTable(257);
         ArithmicEncoder enc = new ArithmicEncoder(out);
         for (int symbol: toEncode.toCharArray()) {
-            enc.writeSymbol(freqs, symbol);
-            freqs.increment(symbol);
+            enc.writeSymbol(symbol);
         }
-        enc.finish(freqs);  // Flush remaining code bits
+        enc.finishBatch();  // Flush remaining code bits
     }
 
 }

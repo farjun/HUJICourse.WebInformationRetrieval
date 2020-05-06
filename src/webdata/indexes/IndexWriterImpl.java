@@ -1,9 +1,6 @@
 package webdata.indexes;
 
 import webdata.encoders.ArithmicEncoder;
-import webdata.indexes.ProductsIndex;
-import webdata.indexes.ReviewsIndex;
-import webdata.indexes.WordsIndex;
 import webdata.iostreams.AppOutputStream;
 import webdata.iostreams.BitOutputStream;
 import webdata.models.ProductReview;

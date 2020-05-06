@@ -5,9 +5,10 @@ import webdata.models.SymbolFreqTable;
 
 import java.io.*;
 
-public final class ArithmicDecoder {
-    public static final int NUM_OF_BITS_IN_INT = 32;
-
+public class ArithmicDecoder {
+    public static final int NUM_OF_BITS_IN_LONG = 32;
+    public static final int BATCH_SEPERATOR = 256;
+    public static final int NUM_OF_SYMBOLS = 257;
     protected final int numStateBits;
 
     /** Maximum range (high+1-low) during coding (trivial), which is 2^numStateBits = 1000...000. */
@@ -21,6 +22,7 @@ public final class ArithmicDecoder {
 
     /** Bit mask of numStateBits ones, which is 0111...111. */
     protected final long stateMask;
+    private final SymbolFreqTable frequencyTable;
 
     protected long low;
     protected long high;
@@ -30,8 +32,7 @@ public final class ArithmicDecoder {
     private long code;
 
     public ArithmicDecoder(AppInputStream in) throws IOException {
-        super();
-        numStateBits = NUM_OF_BITS_IN_INT;
+        numStateBits = NUM_OF_BITS_IN_LONG;
         fullRange = 1L << numStateBits;
         halfRange = fullRange >>> 1;  // Non-zero
         quarterRange = halfRange >>> 1;  // Can be zero
@@ -40,18 +41,19 @@ public final class ArithmicDecoder {
         high = stateMask;
         input = in;
         code = 0;
+        this.frequencyTable = new SymbolFreqTable(NUM_OF_SYMBOLS);
         for (int i = 0; i < numStateBits; i++)
             code = code << 1 | readCodeBit();
     }
 
-    protected void writeSymbol(SymbolFreqTable freqs, int symbol) throws IOException {
+    protected void writeSymbol(int symbol) throws IOException {
         long range = high - low + 1;
 
 
         // Frequency table values check
-        long total = freqs.getTotal();
-        long symLow = freqs.getLow(symbol);
-        long symHigh = freqs.getHigh(symbol);
+        long total = this.frequencyTable.getTotal();
+        long symLow = this.frequencyTable.getLow(symbol);
+        long symHigh = this.frequencyTable.getHigh(symbol);
 
         // Update range
         long newLow  = low + symLow  * range / total;
@@ -61,7 +63,7 @@ public final class ArithmicDecoder {
 
         // While low and high have the same top bit value, shift them out
         while (((low ^ high) & halfRange) == 0) {
-            shiftAndWrite();
+            code = ((code << 1) & stateMask) | readCodeBit();
             low  = ((low  << 1) & stateMask);
             high = ((high << 1) & stateMask) | 1;
         }
@@ -69,25 +71,25 @@ public final class ArithmicDecoder {
         // Now low's top bit must be 0 and high's top bit must be 1
         // While low's top two bits are 01 and high's are 10, delete the second highest bit of both
         while ((low & ~high & quarterRange) != 0) {
-            underflow();
+            code = (code & halfRange) | ((code << 1) & (stateMask >>> 1)) | readCodeBit();
             low = (low << 1) ^ halfRange;
             high = ((high ^ halfRange) << 1) | halfRange | 1;
         }
     }
 
-    public int read(SymbolFreqTable freqs) throws IOException {
+    public int read() throws IOException {
         // Translate from coding range scale to frequency table scale
-        long total = freqs.getTotal();
+        long total = this.frequencyTable.getTotal();
         long range = high - low + 1;
         long offset = code - low;
         long value = ((offset + 1) * total - 1) / range;
 
         // A kind of binary search. Find highest symbol such that freqs.getLow(symbol) <= value.
         int start = 0;
-        int end = freqs.getSymbolLimit();
+        int end = this.frequencyTable.getSymbolLimit();
         while (end - start > 1) {
             int middle = (start + end) >>> 1;
-            if (freqs.getLow(middle) > value)
+            if (this.frequencyTable.getLow(middle) > value)
                 end = middle;
             else
                 start = middle;
@@ -95,18 +97,9 @@ public final class ArithmicDecoder {
 
         int symbol = start;
 
-        writeSymbol(freqs, symbol);
+        writeSymbol(symbol);
+        this.frequencyTable.increment(symbol);
         return symbol;
-    }
-
-
-    protected void shiftAndWrite() throws IOException {
-        code = ((code << 1) & stateMask) | readCodeBit();
-    }
-
-
-    protected void underflow() throws IOException {
-        code = (code & halfRange) | ((code << 1) & (stateMask >>> 1)) | readCodeBit();
     }
 
     private int readCodeBit() throws IOException {
@@ -114,30 +107,6 @@ public final class ArithmicDecoder {
         if (temp == -1)
             temp = 0;
         return temp;
-    }
-
-
-
-    // To allow unit testing, this method is package-private instead of private.
-    public static void decompress(AppInputStream in, OutputStream out) throws IOException {
-        SymbolFreqTable freqs = new SymbolFreqTable(257);
-        ArithmicDecoder dec = new ArithmicDecoder(in);
-        while (true) {
-            // Decode and write one byte
-            int symbol = dec.read(freqs);
-            if (symbol == 256)  // EOF symbol
-                break;
-            out.write(symbol);
-            freqs.increment(symbol);
-        }
-    }
-
-    public static void main(String[] args) throws IOException{
-        // Perform file decompression
-        try (BitInputStream in = new BitInputStream(new BufferedInputStream(new FileInputStream("src\\index\\products.txt")));
-             OutputStream out = new BufferedOutputStream(new FileOutputStream("src\\index\\products-decoded.txt"))) {
-            ArithmicDecoder.decompress(in, out);
-        }
     }
 
 }

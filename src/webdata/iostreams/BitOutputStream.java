@@ -27,11 +27,10 @@ public final class BitOutputStream implements AutoCloseable, AppOutputStream {
 		output = out;
 		buffer = 0;
 		bufferCurCapacity = 0;
-		bitSet = new BitSet();
+		bitSet = new BitSet(); // will be for later use
 	}
 
 	public void write(int b) throws IOException {
-		bitSet.nextSetBit(bitSet.length());
 		buffer = (buffer << 1) | b;
 		bufferCurCapacity++;
 		if (bufferCurCapacity == MAX_BUFFER_SIZE) {
