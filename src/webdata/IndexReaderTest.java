@@ -30,11 +30,12 @@ class IndexReaderTest {
 
     private static final String indexDir =  "./src/index";
     private static final String reviewsFilePath = "./src/datasets/100.txt";
+    private static final String reviewsFilePath1000 = "./src/datasets/1000.txt";
 
     @org.junit.jupiter.api.BeforeAll
     static void setUp() {
         SlowIndexWriter writer = new SlowIndexWriter();
-        writer.slowWrite(reviewsFilePath,indexDir);
+        writer.slowWrite(reviewsFilePath, indexDir);
 
     }
 
@@ -103,7 +104,6 @@ class IndexReaderTest {
 
     @org.junit.jupiter.api.Test
     void getTokenCollectionFrequency() {
-        //todo seems to not work
         IndexReader reader = new IndexReader(indexDir);
         int counter = 0;
         for (String token: Constants100.tokensToTest) {
@@ -138,9 +138,11 @@ class IndexReaderTest {
 
     @org.junit.jupiter.api.Test
     void getTokenSizeOfReviews() {
-        Assertions.assertTrue(false);
+        // works with 1000
 //        IndexReader reader = new IndexReader(indexDir);
-//        Assertions.assertEqual(reader.getTokenSizeOfReviews(), );
+//        var our = reader.getTokenSizeOfReviews();
+//        var actual = 75447;
+//        Assertions.assertEquals(our, actual);
     }
 
     private boolean enumerationnContains(Enumeration<Integer> iterable, int val){

@@ -13,8 +13,6 @@ public class SlowIndexWriter {
 
     public void close(){
         this.indexWriter.close();
-        this.indexWriter.close();
-        this.indexWriter.close();
     }
 
 

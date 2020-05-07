@@ -132,7 +132,8 @@ public class IndexReaderImpl {
     }
 
     public int getTokenFrequency(String token) {
-        return this.wordsIndex.tokenFreq.size();
+        if(!this.wordsIndex.tokenFreq.containsKey(token)) return 0;
+        return this.wordsIndex.tokenFreq.get(token).size();
     }
 
     public int getTokenSizeOfReviews() {
