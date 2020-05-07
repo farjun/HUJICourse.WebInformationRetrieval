@@ -30,10 +30,10 @@ public class ReviewsIndex {
     }
 
     public int[] getReviewNums(int reviewID){
-        if(this.reviews.size() <= reviewID){
+        if(this.reviews.size() < reviewID || reviewID < 1){
             return new int[]{-1};
         }else{
-            return Stream.of(this.reviews.get(reviewID).split(","))
+            return Stream.of(this.reviews.get(reviewID-1).split(","))
                     .limit(4) // limit=4 because productId is not int
                     .mapToInt(Integer::parseInt)
                     .toArray();

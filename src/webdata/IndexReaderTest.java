@@ -61,34 +61,34 @@ class IndexReaderTest {
         for (int i = 1; i < reader.getNumberOfReviews(); i++) {
             Assertions.assertEquals(reader.getReviewScore(i), Constants100.ReviewScores[i]);
         }
-        Assertions.assertNull(reader.getProductId(reader.getNumberOfReviews()));
+        Assertions.assertNull(reader.getProductId(reader.getNumberOfReviews()+1));
     }
 
     @org.junit.jupiter.api.Test
     void getReviewHelpfulnessNumerator() {
         IndexReader reader = new IndexReader(indexDir);
-        for (int i = 1; i < reader.getNumberOfReviews(); i++) {
-            Assertions.assertEquals(reader.getReviewHelpfulnessNumerator(i), Constants100.HelpfulnessNominator[i]);
+        for (int i = 1; i <= reader.getNumberOfReviews(); i++) {
+            Assertions.assertEquals(reader.getReviewHelpfulnessNumerator(i), Constants100.HelpfulnessNominator[i-1]);
         }
-        Assertions.assertNull(reader.getProductId(reader.getNumberOfReviews()));
+        Assertions.assertNull(reader.getProductId(reader.getNumberOfReviews()+1));
     }
 
     @org.junit.jupiter.api.Test
     void getReviewHelpfulnessDenominator() {
         IndexReader reader = new IndexReader(indexDir);
-        for (int i = 1; i < reader.getNumberOfReviews(); i++) {
-            Assertions.assertEquals(reader.getReviewHelpfulnessDenominator(i), Constants100.HelpfulnessDenominator[i]);
+        for (int i = 1; i <= reader.getNumberOfReviews(); i++) {
+            Assertions.assertEquals(reader.getReviewHelpfulnessDenominator(i), Constants100.HelpfulnessDenominator[i-1]);
         }
-        Assertions.assertNull(reader.getProductId(reader.getNumberOfReviews()));
+        Assertions.assertNull(reader.getProductId(reader.getNumberOfReviews()+1));
     }
 
     @org.junit.jupiter.api.Test
     void getReviewLength() {
         IndexReader reader = new IndexReader(indexDir);
-        for (int i = 1; i < reader.getNumberOfReviews(); i++) {
+        for (int i = 1; i <= reader.getNumberOfReviews(); i++) {
             Assertions.assertEquals(reader.getReviewLength(i), Constants100.ReviewLength[i]);
         }
-        Assertions.assertNull(reader.getProductId(reader.getNumberOfReviews()));
+        Assertions.assertNull(reader.getProductId(reader.getNumberOfReviews()+1));
     }
 
     @org.junit.jupiter.api.Test
