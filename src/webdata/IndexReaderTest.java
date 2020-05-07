@@ -48,12 +48,11 @@ class IndexReaderTest {
     @org.junit.jupiter.api.Test
     void getProductId() {
         IndexReader reader = new IndexReader(indexDir);
-        for (int i = 1; i < reader.getNumberOfReviews(); i++) {
+        for (int i = 1; i <= reader.getNumberOfReviews(); i++) {
             System.out.println(i);
             System.out.println(reader.getProductId(i));
             Assertions.assertNotNull(reader.getProductId(i));
         }
-        Assertions.assertNull(reader.getProductId(reader.getNumberOfReviews()));
     }
 
     @org.junit.jupiter.api.Test
