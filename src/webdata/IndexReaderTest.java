@@ -11,7 +11,8 @@ class Constants100 {
     public static int[] ReviewLength = IntStream.of(93,32,93,41,27,73,50,24,26,25,150,66,79,15,21,25,42,25,132,29,44,57,27,19,60,25,17,37,94,150,93,19,199,90,95,76,44,49,100,58,118,226,33,35,46,39,47,21,50,37,19,71,226,33,68,60,34,32,26,23,31,30,17,175,57,32,140,87,42,18,72,124,74,308,15,19,95,60,24,34,37,26,442,80,63,50,82,36,127,48,38,22,37,184,24,62,164,58,77,35).toArray();
 
     public static String[] tokensToTest = new String[]{"the", "dog", "omerfarjun", "don't"};
-    public static int[] tokensToTestFrequency = IntStream.of(288,33,0,0).toArray();
+    public static int[] tokensToTestCollectionFrequency = IntStream.of(288,33,0,0).toArray();
+    public static int[] tokensToTestFrequency = IntStream.of(77,12,0,0).toArray();
     public static int[][] tokensToTestReview = {
             {
                     1, 2, 3, 4, 6, 7, 8, 9, 11, 12, 13, 15, 16, 19, 21, 22, 23, 25, 27, 28, 29, 30, 31, 33, 34, 35, 36,
@@ -96,8 +97,7 @@ class IndexReaderTest {
         IndexReader reader = new IndexReader(indexDir);
         int counter = 0;
         for (String token: Constants100.tokensToTest) {
-            Assertions.assertTrue(reader.getTokenFrequency(token) > 0);
-            Assertions.assertEquals(reader.getTokenFrequency(token), Constants100.ReviewLength[counter]);
+            Assertions.assertEquals(reader.getTokenFrequency(token), Constants100.tokensToTestFrequency[counter]);
             counter++;
         }
     }
@@ -107,7 +107,7 @@ class IndexReaderTest {
         IndexReader reader = new IndexReader(indexDir);
         int counter = 0;
         for (String token: Constants100.tokensToTest) {
-            Assertions.assertEquals(reader.getTokenCollectionFrequency(token), Constants100.tokensToTestFrequency[counter]);
+            Assertions.assertEquals(reader.getTokenCollectionFrequency(token), Constants100.tokensToTestCollectionFrequency[counter]);
             counter++;
         }
     }
