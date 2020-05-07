@@ -145,7 +145,7 @@ class IndexReaderTest {
 //        Assertions.assertEquals(our, actual);
     }
 
-    private boolean enumerationnContains(Enumeration<Integer> iterable, int val){
+    private boolean enumerationContains(Enumeration<Integer> iterable, int val){
         while(iterable.hasMoreElements()){
             if( iterable.nextElement() == val){
                 return true;
@@ -157,10 +157,10 @@ class IndexReaderTest {
     @org.junit.jupiter.api.Test
     void getProductReviews() {
         IndexReader reader = new IndexReader(indexDir);
-        for (int i = 1; i < reader.getNumberOfReviews(); i++) {
+        for (int i = 1; i <= reader.getNumberOfReviews(); i++) {
             String productId = reader.getProductId(i);
             Enumeration<Integer> reviewIds = reader.getProductReviews(productId);
-            Assertions.assertTrue(this.enumerationnContains(reviewIds,i));
+            Assertions.assertTrue(this.enumerationContains(reviewIds, i));
         }
     }
 }

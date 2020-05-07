@@ -41,10 +41,10 @@ public class ReviewsIndex {
     }
 
     public String getProductId(int reviewID){
-        if(this.reviews.size() <= reviewID){
+        if(this.reviews.size() < reviewID || reviewID < 1){
             return null;
-        }else{
-            String entry = this.reviews.get(reviewID);
+        } else {
+            String entry = this.reviews.get(reviewID-1);
             int idx = entry.lastIndexOf(",") ;
             if(idx < 0){
                 return null;
