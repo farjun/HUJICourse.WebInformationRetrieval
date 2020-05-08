@@ -13,9 +13,12 @@ import java.util.function.Function;
 import static org.junit.jupiter.api.Assertions.*;
 
 class IndexReaderTest {
-	final static String dir = "./tests";
-	final static String indexDir = dir + "\\indexFiles\\";
-	final static String inputFile =  "src\\datasets\\1000.txt";
+
+	private static final String inputFile = "./src/datasets/1000.txt";
+	private static final String indexDir =  "./src/index";
+	//	final static String dir = "./tests";
+//	final static String indexDir = dir + "\\index\\";
+//	final static String inputFile =  "src\\datasets\\1000.txt";
 	static private IndexReader indexReader;
 	static private SlowIndexWriter indexWriter;
 	private final String msgInt = "fail on input: %d";

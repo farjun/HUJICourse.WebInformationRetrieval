@@ -120,16 +120,16 @@ public class IndexReaderImpl {
     }
 
     public Enumeration<Integer> getReviewsWithToken(String token){
-        return this.wordsIndex.getReviewsWithToken(token);
+        return this.wordsIndex.getReviewsWithToken(token.toLowerCase());
     }
 
     public int getTokenCollectionFrequency(String token) {
-        return this.wordsIndex.tokenGlobalFreq.getOrDefault(token,0);
+        return this.wordsIndex.tokenGlobalFreq.getOrDefault(token.toLowerCase(),0);
     }
 
     public int getTokenFrequency(String token) {
-        if(!this.wordsIndex.tokenFreq.containsKey(token)) return 0;
-        return this.wordsIndex.tokenFreq.get(token).size();
+        if(!this.wordsIndex.tokenFreq.containsKey(token.toLowerCase())) return 0;
+        return this.wordsIndex.tokenFreq.get(token.toLowerCase()).size();
     }
 
     public int getTokenSizeOfReviews() {
