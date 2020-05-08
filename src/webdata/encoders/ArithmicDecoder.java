@@ -1,14 +1,10 @@
 package webdata.encoders;
 import webdata.iostreams.AppInputStream;
-import webdata.iostreams.BitInputStream;
-import webdata.models.SymbolFreqTable;
+import webdata.models.SymbolTable;
 
 import java.io.*;
 
 public class ArithmicDecoder {
-    public static final int NUM_OF_BITS_IN_LONG = 32;
-    public static final int BATCH_SEPERATOR = 256;
-    public static final int NUM_OF_SYMBOLS = 257;
     protected final int numStateBits;
 
     /** Maximum range (high+1-low) during coding (trivial), which is 2^numStateBits = 1000...000. */
@@ -22,7 +18,7 @@ public class ArithmicDecoder {
 
     /** Bit mask of numStateBits ones, which is 0111...111. */
     protected final long stateMask;
-    private final SymbolFreqTable frequencyTable;
+    private final SymbolTable frequencyTable;
 
     protected long low;
     protected long high;
@@ -32,7 +28,7 @@ public class ArithmicDecoder {
     private long code;
 
     public ArithmicDecoder(AppInputStream in) throws IOException {
-        numStateBits = NUM_OF_BITS_IN_LONG;
+        numStateBits = BitConstants.NUM_OF_BITS_IN_LONG;
         fullRange = 1L << numStateBits;
         halfRange = fullRange >>> 1;  // Non-zero
         quarterRange = halfRange >>> 1;  // Can be zero
@@ -41,14 +37,13 @@ public class ArithmicDecoder {
         high = stateMask;
         input = in;
         code = 0;
-        this.frequencyTable = new SymbolFreqTable(NUM_OF_SYMBOLS);
+        this.frequencyTable = new SymbolTable(BitConstants.NUM_OF_SYMBOLS);
         for (int i = 0; i < numStateBits; i++)
             code = code << 1 | readCodeBit();
     }
 
     protected void writeSymbol(int symbol) throws IOException {
         long range = high - low + 1;
-
 
         // Frequency table values check
         long total = this.frequencyTable.getTotal();

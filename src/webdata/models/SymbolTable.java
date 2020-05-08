@@ -1,12 +1,17 @@
 package webdata.models;
 
-public class SymbolFreqTable {
+import webdata.encoders.BitConstants;
+
+public class SymbolTable {
 
     private int[] frequencies;
     private int[] sumOfFrequencies;
     private int total;
 
-    public SymbolFreqTable(int numSymbols) {
+    public SymbolTable() {
+        this(BitConstants.NUM_OF_SYMBOLS);
+    }
+    public SymbolTable(int numSymbols) {
         frequencies = new int[numSymbols];
         total = 0;
         for (int i = 0; i < frequencies.length; i++) {
