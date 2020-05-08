@@ -13,9 +13,10 @@ import java.util.function.Function;
 import static org.junit.jupiter.api.Assertions.*;
 
 class IndexReaderEdgeTest {
-	final static String dir = "C:\\Users\\שגיב מיכאל\\Desktop\\WebInformationEx";
-	final static String indexDir = dir + "\\indexFiles\\";
-	final static String inputFile = "2.txt";
+	//	final static String dir = "C:\\Users\\שגיב מיכאל\\Desktop\\WebInformationEx";
+//	final static String indexDir = dir + "\\indexFiles\\";
+	final static String inputFile = "./src/tests/2.txt";
+	private static final String indexDir =  "./src/index";
 	static private IndexReader indexReader;
 	static private SlowIndexWriter indexWriter;
 	private final String msgInt = "fail on input: %d";
@@ -162,10 +163,10 @@ class IndexReaderEdgeTest {
 	/**
 	 * comment for not checking removeIndex method of slowWriter!.
 	 */
-	@AfterAll
-	static void removeDir() {
-		indexWriter.removeIndex(indexDir);
-		File directory = new File(indexDir);
-		assertFalse(directory.exists());
-	}
+//	@AfterAll
+//	static void removeDir() {
+//		indexWriter.removeIndex(indexDir);
+//		File directory = new File(indexDir);
+//		assertFalse(directory.exists());
+//	}
 }

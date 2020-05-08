@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.nio.ByteBuffer;
+import java.util.stream.Collectors;
 
 public class ProductReview implements Serializable {
     private int id;
@@ -46,10 +47,12 @@ public class ProductReview implements Serializable {
         this.score = Short.parseShort(score.substring("review/score: ".length()).split(".0")[0]); // based on ex1, score is int 1-5
         this.time = time.substring("review/time: ".length());
         this.summary = summary.substring("review/summary: ".length());
-        this.text = text.substring("review/text: ".length());
+        this.text = text.substring("review/text:".length());
 
         this.tokenStats = new HashMap<String, Integer>();
-        this.tokens = new ArrayList<>(Arrays.asList(this.text.toLowerCase().split("[^a-zA-Z0-9]+")));
+        var tokensList = this.text.toLowerCase().split("[^a-zA-Z0-9]+");
+        this.tokens = new ArrayList<String>(Arrays.asList(tokensList).stream().filter(str -> !str.isEmpty()).
+                collect(Collectors.toList()));
         this.length = this.tokens.size();
         for(var token: this.tokens){
             if(token.length()==0){
