@@ -42,7 +42,7 @@ public class ArithmicDecoder {
             code = code << 1 | readCodeBit();
     }
 
-    protected void writeSymbol(int symbol) throws IOException {
+    protected void updateHighAndLow(int symbol) throws IOException {
         long range = high - low + 1;
 
         // Frequency table values check
@@ -79,11 +79,11 @@ public class ArithmicDecoder {
         long offset = code - low;
         long value = ((offset + 1) * total - 1) / range;
 
-        // A kind of binary search. Find highest symbol such that freqs.getLow(symbol) <= value.
+        // binary search for the symbol
         int start = 0;
         int end = this.frequencyTable.getSymbolLimit();
         while (end - start > 1) {
-            int middle = (start + end) >>> 1;
+            int middle = (start + end) / 2;
             if (this.frequencyTable.getLow(middle) > value)
                 end = middle;
             else
@@ -92,7 +92,7 @@ public class ArithmicDecoder {
 
         int symbol = start;
 
-        writeSymbol(symbol);
+        updateHighAndLow(symbol);
         this.frequencyTable.increment(symbol);
         return symbol;
     }

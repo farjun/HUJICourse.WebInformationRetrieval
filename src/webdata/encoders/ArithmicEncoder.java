@@ -60,22 +60,24 @@ public final class ArithmicEncoder {
             System.err.println("Encoder Failed to write buffer to file");
         }
 
+
+        this.frequencyTable.increment(symbol);
+    }
+
+    private void writeExcessBufferBits() throws IOException{
+        // While low's and high's top bit value is the same write them to the file and shift them
+        while (((low ^ high) & halfRange) == 0) {
+            shiftAndWrite();
+            low  = ((low  << 1) & stateMask);
+            high = ((high << 1) & stateMask) | 1;
+        }
+
         // Now low's top bit must be 0 and high's top bit must be 1
         // While low's top two bits are 01 and high's are 10, delete the second highest bit of both
         while ((low & ~high & quarterRange) != 0) {
             numUnderflow++;
             low = (low << 1) ^ halfRange;
             high = ((high ^ halfRange) << 1) | halfRange | 1;
-        }
-        this.frequencyTable.increment(symbol);
-    }
-
-    private void writeExcessBufferBits() throws IOException{
-        // While low and high have the same top bit value, write them to the file
-        while (((low ^ high) & halfRange) == 0) {
-            shiftAndWrite();
-            low  = ((low  << 1) & stateMask);
-            high = ((high << 1) & stateMask) | 1;
         }
     }
 
