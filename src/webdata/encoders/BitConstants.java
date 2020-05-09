@@ -32,4 +32,12 @@ public class BitConstants {
     public static long getAllOnes(){
         return getFullRange() - 1;
     }
+
+    public static boolean bytesHaveSameTopBitValue(long byte1, long byte2){
+        return ((byte1 ^ byte2) & getHalfRange()) == 0;
+    }
+
+    public static boolean bytesHaveSameSecondBitValue(long byte1, long byte2){
+        return (byte1 & ~byte2 & getQuarterRange()) != 0;
+    }
 }

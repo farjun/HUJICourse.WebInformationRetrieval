@@ -65,20 +65,18 @@ public final class ArithmicEncoder {
     }
 
     private void writeExcessBufferBits() throws IOException{
-        // While low's and high's top bit value is the same write them to the file and shift them
-        while (((low ^ high) & halfRange) == 0) {
+        while (BitConstants.bytesHaveSameTopBitValue(low, high)) {
             shiftAndWrite();
             low  = ((low  << 1) & stateMask);
             high = ((high << 1) & stateMask) | 1;
         }
 
-        // Now low's top bit must be 0 and high's top bit must be 1
-        // While low's top two bits are 01 and high's are 10, delete the second highest bit of both
-        while ((low & ~high & quarterRange) != 0) {
-            numUnderflow++;
-            low = (low << 1) ^ halfRange;
-            high = ((high ^ halfRange) << 1) | halfRange | 1;
-        }
+        // While low= 01xxxxxxxx and high= 10xxxxxxxx, delete the second highest bit of both to make them
+//        while (BitConstants.bytesHaveSameSecondBitValue(low, high)) {
+//            numUnderflow++;
+//            low = (low << 1) ^ halfRange;
+//            high = ((high ^ halfRange) << 1) | halfRange | 1;
+//        }
     }
 
     public void finishBatch() throws IOException {
