@@ -26,19 +26,17 @@ public final class ArithmicEncoder {
 
     private final SymbolTable frequencyTable;
     private AppOutputStream output;
-    private int numUnderflow;
 
     public ArithmicEncoder(AppOutputStream out) {
         super();
-        numStateBits = BitConstants.NUM_OF_BITS_IN_LONG;
-        halfRange = BitConstants.getHalfRange();
-        quarterRange = BitConstants.getQuarterRange();  // Can be zero
-        stateMask = BitConstants.getAllOnes();
+        numStateBits = BitUtils.NUM_OF_BITS_IN_LONG;
+        halfRange = BitUtils.getHalfRange();
+        quarterRange = BitUtils.getQuarterRange();  // Can be zero
+        stateMask = BitUtils.getAllOnes();
         low = 0;
         high = stateMask;
         this.frequencyTable = new SymbolTable();
         output = Objects.requireNonNull(out);
-        numUnderflow = 0;
     }
 
     protected void writeSymbol(int symbol) {
@@ -65,15 +63,15 @@ public final class ArithmicEncoder {
     }
 
     private void writeExcessBufferBits() throws IOException{
-        while (BitConstants.bytesHaveSameTopBitValue(low, high)) {
+        while (BitUtils.bytesHaveSameTopBitValue(low, high)) {
             shiftAndWrite();
-            low  = ((low  << 1) & stateMask);
-            high = ((high << 1) & stateMask) | 1;
+            low  = BitUtils.shiftLeft(low);
+            high = BitUtils.shiftLeft(high) | 1;
         }
     }
 
     public void finishBatch() throws IOException {
-        writeSymbol(BitConstants.BATCH_SEPERATOR);
+        writeSymbol(BitUtils.BATCH_SEPERATOR);
         output.write(1);
     }
 

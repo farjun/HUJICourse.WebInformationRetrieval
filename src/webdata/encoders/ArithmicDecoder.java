@@ -13,8 +13,6 @@ public class ArithmicDecoder {
     /** The second highest bit at width numStateBits, which is 0010...000. This is zero when numStateBits=1. */
     protected final long quarterRange;
 
-    /** Bit mask of numStateBits ones, which is 0111...111. */
-    protected final long stateMask;
     private final SymbolTable frequencyTable;
 
     protected long low;
@@ -22,21 +20,22 @@ public class ArithmicDecoder {
     private AppInputStream input;
 
     // The current raw code bits being buffered, which is always in the range [low, high].
-    private long code;
+    private long curValue;
 
-    public ArithmicDecoder(AppInputStream in) throws IOException {
-        numStateBits = BitConstants.NUM_OF_BITS_IN_LONG;
-        halfRange = BitConstants.getHalfRange();  // Non-zero
-        quarterRange = BitConstants.getQuarterRange();  // Can be zero
-        stateMask = BitConstants.getAllOnes();
+    public ArithmicDecoder(AppInputStream input) throws IOException {
+        numStateBits = BitUtils.NUM_OF_BITS_IN_LONG;
+        halfRange = BitUtils.getHalfRange();
+        quarterRange = BitUtils.getQuarterRange();
         low = 0;
-        high = stateMask;
-        input = in;
-        code = 0;
-        this.frequencyTable = new SymbolTable(BitConstants.NUM_OF_SYMBOLS);
+        high = BitUtils.getAllOnes();
+        this.input = input;
+        curValue = 0;
+        this.frequencyTable = new SymbolTable(BitUtils.NUM_OF_SYMBOLS);
         for (int i = 0; i < numStateBits; i++)
-            code = code << 1 | readCodeBit();
+            curValue = curValue << 1 | readBit();
     }
+
+
 
     protected void updateHighAndLow(int symbol) throws IOException {
         long range = high - low + 1;
@@ -52,22 +51,41 @@ public class ArithmicDecoder {
         low = newLow;
         high = newHigh;
 
-        // While low and high have the same top bit value, shift them out
-        while (((low ^ high) & halfRange) == 0) {
-            code = ((code << 1) & stateMask) | readCodeBit();
-            low  = ((low  << 1) & stateMask);
-            high = ((high << 1) & stateMask) | 1;
+        while (BitUtils.bytesHaveSameTopBitValue(low, high)) {
+            curValue = BitUtils.shiftLeft(curValue) | readBit();
+            low  =  BitUtils.shiftLeft(low);
+            high =  BitUtils.shiftLeft(high) | 1;
         }
     }
 
+    private long getRange(){
+        return high - low + 1;
+    }
+
+    /***
+     * reads one symbol from the file ()
+     * @return
+     * @throws IOException
+     */
     public int read() throws IOException {
         // Translate from coding range scale to frequency table scale
         long total = this.frequencyTable.getTotal();
-        long range = high - low + 1;
-        long offset = code - low;
+        long range = this.getRange();
+        long offset = curValue - low;
         long value = ((offset + 1) * total - 1) / range;
+        int symbol = searchSymbol(value);
 
-        // binary search for the symbol
+        updateHighAndLow(symbol);
+        this.frequencyTable.increment(symbol);
+        return symbol;
+    }
+
+    /**
+     * search for the symbol by binary search for the low bound (which is always the symbol in our case - better for debug)
+     * @param value - the current value to search for it's symbol
+     * @return the start value (which is the symbol code) since that's how we chose the value eo encode in the encoder
+     */
+    private int searchSymbol(long value) {
         int start = 0;
         int end = this.frequencyTable.getSymbolLimit();
         while (end - start > 1) {
@@ -78,18 +96,14 @@ public class ArithmicDecoder {
                 start = middle;
         }
 
-        int symbol = start;
-
-        updateHighAndLow(symbol);
-        this.frequencyTable.increment(symbol);
-        return symbol;
+        return start;
     }
 
-    private int readCodeBit() throws IOException {
-        int temp = input.read();
-        if (temp == -1)
-            temp = 0;
-        return temp;
+    private int readBit() throws IOException {
+        int bitAsInt = input.read();
+        if (bitAsInt == BitUtils.END_OF_FILE)
+            bitAsInt = 0;
+        return bitAsInt;
     }
 
 }

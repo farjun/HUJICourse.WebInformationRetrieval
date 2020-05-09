@@ -1,9 +1,10 @@
 package webdata.encoders;
 
-public class BitConstants {
+public class BitUtils {
     public static final int NUM_OF_BITS_IN_LONG = 32;
     public static final int BATCH_SEPERATOR = 256;
     public static final int NUM_OF_SYMBOLS = 257;
+    public static final int END_OF_FILE = -1;
 
     /**
      * @return 100000000000000000000000
@@ -39,5 +40,9 @@ public class BitConstants {
 
     public static boolean bytesHaveSameSecondBitValue(long byte1, long byte2){
         return (byte1 & ~byte2 & getQuarterRange()) != 0;
+    }
+
+    public static long shiftLeft(long byte1){
+        return (byte1  << 1) & getAllOnes();
     }
 }

@@ -1,6 +1,6 @@
 package webdata.models;
 
-import webdata.encoders.BitConstants;
+import webdata.encoders.BitUtils;
 
 public class SymbolTable {
 
@@ -9,7 +9,7 @@ public class SymbolTable {
     private int total;
 
     public SymbolTable() {
-        this(BitConstants.NUM_OF_SYMBOLS);
+        this(BitUtils.NUM_OF_SYMBOLS);
     }
     public SymbolTable(int numSymbols) {
         frequencies = new int[numSymbols];
