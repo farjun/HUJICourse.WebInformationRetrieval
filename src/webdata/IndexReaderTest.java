@@ -8,7 +8,7 @@ class Constants100 {
     public static int[] ReviewScores = IntStream.of(5,1,4,2,5,4,5,5,5,5,5,5,1,4,5,5,2,5,5,5,5,5,5,5,5,5,1,4,5,5,5,5,4,4,5,4,5,5,4,5,5,5,5,5,5,3,5,3,4,3,1,5,4,3,4,5,5,5,5,5,3,5,1,5,5,5,5,2,3,5,5,5,5,1,2,1,5,5,3,5,5,4,5,3,3,5,5,5,5,5,5,5,5,5,5,5,5,5,5,1).toArray();
     public static int[] HelpfulnessNominator = IntStream.of(1,0,1,3,0,0,0,0,1,0,1,4,1,2,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,19,13,9,3,2,1,0,0,0,0,0,0,0,0,0,1,1,0,0,4,1,0,2,0,2,1,0,0,2,0,2,3,1,1,0,0,0,0,2,1,0,0,0,0,0,0,0,0,1,1,15,5,4,4,1,1,1,0,0,0,0,0,0,0,0,0,0,0).toArray();
     public static int[] HelpfulnessDenominator = IntStream.of(1,0,1,3,0,0,0,0,1,0,1,4,1,2,5,5,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,1,19,13,9,3,2,1,0,0,0,0,0,0,0,0,0,2,2,1,7,4,1,0,2,0,2,1,0,0,4,2,2,3,1,1,0,1,0,2,2,1,0,1,0,0,0,0,0,0,1,1,15,5,4,4,1,1,1,0,0,0,0,0,0,0,0,0,0,1).toArray();
-    public static int[] ReviewLength = IntStream.of(48,32,93,41,27,73,51,24,27,25,150,67,79,15,21,25,42,25,132,29,44,57,27,19,60,25,17,37,94,150,93,19,199,90,95,76,44,49,100,58,118,226,33,35,46,39,47,21,50,37,19,71,226,33,68,60,34,32,26,23,31,30,17,175,57,32,140,87,42,18,72,124,74,308,15,19,95,60,24,34,37,26,442,80,63,50,82,36,127,48,38,22,37,184,24,62,164,58,77,35).toArray();
+    public static int[] ReviewLength = IntStream.of(48,32,93,41,27,73,51,24,27,25,154,67,80,15,21,26,42,25,132,29,48,57,29,19,61,25,17,37,99,154,94,19,206,93,99,81,45,50,100,61,122,233,34,36,48,42,48,21,52,37,20,71,233,34,69,61,35,32,26,23,31,30,17,178,57,33,143,94,44,18,74,125,75,314,15,19,97,60,24,34,38,26,447,80,64,50,83,37,130,49,38,22,37,186,25,64,169,58,78,37).toArray();
 
     public static String[] tokensToTest = new String[]{"the", "dog", "omerfarjun", "don't"};
     public static int[] tokensToTestCollectionFrequency = IntStream.of(288,33,0,0).toArray();
@@ -30,8 +30,8 @@ class Constants100 {
 class IndexReaderTest {
 
     private static final String indexDir =  "./src/index";
-    private static final String reviewsFilePath = "./src/datasets/100.txt";
-    private static final String reviewsFilePath1000 = "./src/datasets/1000.txt";
+    private static final String reviewsFilePath = "./datasets/100.txt";
+    private static final String reviewsFilePath1000 = "./datasets/1000.txt";
 
     @org.junit.jupiter.api.BeforeAll
     static void setUp() {

@@ -58,14 +58,6 @@ public class ArithmicDecoder {
             low  = ((low  << 1) & stateMask);
             high = ((high << 1) & stateMask) | 1;
         }
-
-        // Now low's top bit must be 0 and high's top bit must be 1
-        // While low's top two bits are 01 and high's are 10, delete the second highest bit of both
-//        while ((low & ~high & quarterRange) != 0) {
-//            code = (code & halfRange) | ((code << 1) & (stateMask >>> 1)) | readCodeBit();
-//            low = (low << 1) ^ halfRange;
-//            high = ((high ^ halfRange) << 1) | halfRange | 1;
-//        }
     }
 
     public int read() throws IOException {

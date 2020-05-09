@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class IndexReaderTest {
 
-	private static final String inputFile = "./src/datasets/1000.txt";
+	private static final String inputFile = "./datasets/1000.txt";
 	private static final String indexDir =  "./src/index";
 	//	final static String dir = "./tests";
 //	final static String indexDir = dir + "\\index\\";

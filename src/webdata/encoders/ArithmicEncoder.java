@@ -70,13 +70,6 @@ public final class ArithmicEncoder {
             low  = ((low  << 1) & stateMask);
             high = ((high << 1) & stateMask) | 1;
         }
-
-        // While low= 01xxxxxxxx and high= 10xxxxxxxx, delete the second highest bit of both to make them
-//        while (BitConstants.bytesHaveSameSecondBitValue(low, high)) {
-//            numUnderflow++;
-//            low = (low << 1) ^ halfRange;
-//            high = ((high ^ halfRange) << 1) | halfRange | 1;
-//        }
     }
 
     public void finishBatch() throws IOException {
@@ -87,9 +80,6 @@ public final class ArithmicEncoder {
     protected void shiftAndWrite() throws IOException {
         int bit = (int)(low >>> (numStateBits - 1));
         output.write(bit);
-
-        for (; numUnderflow > 0; numUnderflow--)
-            output.write(bit ^ 1);
     }
 
     public static void writeEncoded(String toEncode, AppOutputStream out) throws IOException {
