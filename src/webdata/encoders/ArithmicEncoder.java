@@ -42,12 +42,11 @@ public final class ArithmicEncoder {
     protected void writeSymbol(int symbol) {
         long range = high - low + 1;
         long total = this.frequencyTable.getTotal();
-        long symLow = this.frequencyTable.getLow(symbol);
-        long symHigh = this.frequencyTable.getHigh(symbol);
 
         // Update range
-        long newLow  = low + symLow  * range / total;
-        long newHigh = low + symHigh * range / total - 1; // Tamer: the minus one because the range is [,) in the algo
+        long newLow  = low + this.frequencyTable.getLow(symbol)  * range / total;
+        // Tamer: the minus one because the range is [,) in the algo
+        long newHigh = low + this.frequencyTable.getHigh(symbol) * range / total - 1;
         low = newLow;
         high = newHigh;
 

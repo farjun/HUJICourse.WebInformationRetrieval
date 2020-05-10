@@ -1,6 +1,9 @@
-package webdata;
+package tests;
 
 import org.junit.jupiter.api.Assertions;
+import webdata.IndexReader;
+import webdata.SlowIndexWriter;
+
 import java.util.Enumeration;
 import java.util.stream.IntStream;
 
