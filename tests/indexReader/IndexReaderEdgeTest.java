@@ -1,10 +1,9 @@
-package tests;
+package indexReader;
 
 import org.junit.jupiter.api.*;
 import webdata.IndexReader;
 import webdata.SlowIndexWriter;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;

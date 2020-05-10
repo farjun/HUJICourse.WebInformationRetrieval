@@ -1,4 +1,4 @@
-package tests;
+package indexReader;
 
 import org.junit.jupiter.api.*;
 import webdata.IndexReader;
