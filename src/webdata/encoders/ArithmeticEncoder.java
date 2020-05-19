@@ -6,20 +6,7 @@ import webdata.models.SymbolTable;
 import java.io.*;
 import java.util.Objects;
 
-public final class ArithmicEncoder {
-
-
-
-    protected final int numStateBits;
-
-    /** The top bit at width numStateBits, which is 0100...000. */
-    protected final long halfRange;
-
-    /** The second highest bit at width numStateBits, which is 0010...000. This is zero when numStateBits=1. */
-    protected final long quarterRange;
-
-    /** Bit mask of numStateBits ones, which is 0111...111. */
-    protected final long stateMask;
+public final class ArithmeticEncoder {
 
     protected long low;
     protected long high;
@@ -27,21 +14,17 @@ public final class ArithmicEncoder {
     private final SymbolTable frequencyTable;
     private AppOutputStream output;
 
-    public ArithmicEncoder(AppOutputStream out) {
+    public ArithmeticEncoder(AppOutputStream out) {
         super();
-        numStateBits = BitUtils.NUM_OF_BITS_IN_LONG;
-        halfRange = BitUtils.getHalfRange();
-        quarterRange = BitUtils.getQuarterRange();  // Can be zero
-        stateMask = BitUtils.getAllOnes();
         low = 0;
-        high = stateMask;
+        high = BitUtils.getAllOnes();
         this.frequencyTable = new SymbolTable();
         output = Objects.requireNonNull(out);
     }
 
     protected void writeSymbol(int symbol) {
         long range = high - low + 1;
-        long total = this.frequencyTable.getTotal();
+        long total = this.frequencyTable.getTotalNumOfSymbolsFrequencies();
 
         // Update range
         long newLow  = low + this.frequencyTable.getLow(symbol)  * range / total;
@@ -58,7 +41,7 @@ public final class ArithmicEncoder {
         }
 
 
-        this.frequencyTable.increment(symbol);
+        this.frequencyTable.incrementSymbolCounter(symbol);
     }
 
     private void writeExcessBufferBits() throws IOException{
@@ -75,12 +58,12 @@ public final class ArithmicEncoder {
     }
 
     protected void shiftAndWrite() throws IOException {
-        int bit = (int)(low >>> (numStateBits - 1));
+        int bit = (int)(low >>> (BitUtils.NUM_OF_BITS_IN_LONG - 1));
         output.write(bit);
     }
 
     public static void writeEncoded(String toEncode, AppOutputStream out) throws IOException {
-        ArithmicEncoder enc = new ArithmicEncoder(out);
+        ArithmeticEncoder enc = new ArithmeticEncoder(out);
         for (int symbol: toEncode.toCharArray()) {
             enc.writeSymbol(symbol);
         }

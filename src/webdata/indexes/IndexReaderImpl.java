@@ -1,6 +1,6 @@
 package webdata.indexes;
 
-import webdata.encoders.ArithmicDecoder;
+import webdata.encoders.ArithmeticDecoder;
 import webdata.iostreams.AppInputStream;
 import webdata.iostreams.BitInputStream;
 
@@ -34,7 +34,7 @@ public class IndexReaderImpl {
     }
 
     public StringBuffer decode(AppInputStream inputStream) throws IOException {
-        ArithmicDecoder dec = new ArithmicDecoder(inputStream);
+        ArithmeticDecoder dec = new ArithmeticDecoder(inputStream);
         StringBuffer sb = new StringBuffer();
 
         while (true) {

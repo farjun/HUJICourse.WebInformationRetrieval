@@ -1,6 +1,6 @@
 package webdata.indexes;
 
-import webdata.encoders.ArithmicEncoder;
+import webdata.encoders.ArithmeticEncoder;
 import webdata.iostreams.AppOutputStream;
 import webdata.iostreams.BitOutputStream;
 import webdata.models.ProductReview;
@@ -58,9 +58,9 @@ public class IndexWriterImpl {
     }
 
     public void writeProcessed() throws IOException {
-        ArithmicEncoder.writeEncoded(this.productsIndex.toString(), this.productsOutputStream);
-        ArithmicEncoder.writeEncoded(this.reviewsIndex.toString(), this.reviewsOutputStream);
-        ArithmicEncoder.writeEncoded(this.wordsIndex.toString(), this.wordsOutputStream);
+        ArithmeticEncoder.writeEncoded(this.productsIndex.toString(), this.productsOutputStream);
+        ArithmeticEncoder.writeEncoded(this.reviewsIndex.toString(), this.reviewsOutputStream);
+        ArithmeticEncoder.writeEncoded(this.wordsIndex.toString(), this.wordsOutputStream);
 
         this.reviewsIndex = new ReviewsIndex();
         this.productsIndex = new ProductsIndex();

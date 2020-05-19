@@ -1,6 +1,9 @@
 package indexReader;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import webdata.IndexReader;
 import webdata.SlowIndexWriter;
 
@@ -9,10 +12,11 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.function.Function;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class IndexReaderEdgeTest {
-	final static String inputFile = "tests\\2.txt";
+class IndexReadeBigInputTest {
+	private static final String inputFile = "./datasets/full/foods.txt";
 	private static final String indexDir =  "./src/index";
 	static private IndexReader indexReader;
 	static private SlowIndexWriter indexWriter;
