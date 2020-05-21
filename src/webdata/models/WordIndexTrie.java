@@ -151,12 +151,7 @@ public class WordIndexTrie {
 
         for (level = 0; level < length; level++) {
             var chr = key.charAt(level);
-            if (chr >= '0' && chr <= '9'){
-                index = chr - '0' + TrieNode.ALPHABET_SIZE;
-            }
-            else {
-                index = chr - 'a';
-            }
+            index = toIndex(chr);
             if (crawler.children[index] == null)
                 return null;
 
