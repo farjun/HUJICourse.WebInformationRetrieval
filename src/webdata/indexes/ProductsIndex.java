@@ -2,10 +2,12 @@ package webdata.indexes;
 
 import webdata.models.CompressedArrayList;
 
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 
-public class ProductsIndex {
+public class ProductsIndex extends Index {
+    private static final int NUM_OF_PRODUCTS_IN_BLOCK = 200;
     private final HashMap<String, CompressedArrayList> hashMap;
 
     public ProductsIndex(){
@@ -14,7 +16,11 @@ public class ProductsIndex {
 
     public ProductsIndex(String serializedHashMap){
         this();
-        String[] keysAndValues = serializedHashMap.split("\\|");
+        this.loadData(serializedHashMap);
+    }
+
+    public void loadData(String rawIndex){
+        String[] keysAndValues = rawIndex.split("\\|");
         for (String andValue : keysAndValues) {
             try {
                 String[] keysAndValue = andValue.split(":");
@@ -56,6 +62,27 @@ public class ProductsIndex {
         }
         sb.deleteCharAt(sb.length()-1);
         return sb.toString();
+    }
+
+    public String[] toStringBlocks() {
+        StringBuilder sb = new StringBuilder();
+        String[] productsBlocks = new String[(this.hashMap.size() / NUM_OF_PRODUCTS_IN_BLOCK) + 1];
+        int curNumOfProducts = 0;
+        int curBlock = 0;
+        for (String key: this.hashMap.keySet()) {
+            sb.append(key).append(":").append(this.hashMap.get(key)).append("|");
+            curNumOfProducts++;
+            if( curNumOfProducts >= NUM_OF_PRODUCTS_IN_BLOCK){
+                productsBlocks[curBlock] = sb.toString();
+                sb = new StringBuilder();
+                curNumOfProducts = 0;
+                curBlock++;
+            }
+        }
+        sb.deleteCharAt(sb.length()-1);
+        productsBlocks[curBlock] = sb.toString();
+
+        return productsBlocks;
     }
 
     public String toCompressedString() {

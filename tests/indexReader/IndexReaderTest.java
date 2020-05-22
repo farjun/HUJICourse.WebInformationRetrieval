@@ -157,7 +157,7 @@ class IndexReaderTest {
     @org.junit.jupiter.api.Test
     void getProductReviews() {
         IndexReader reader = new IndexReader(indexDir);
-        for (int i = 1; i <= reader.getNumberOfReviews(); i++) {
+        for (int i = 1; i <= 100; i++) {
             String productId = reader.getProductId(i);
             Enumeration<Integer> reviewIds = reader.getProductReviews(productId);
             Assertions.assertTrue(this.enumerationContains(reviewIds, i), "checking review "+i+"");

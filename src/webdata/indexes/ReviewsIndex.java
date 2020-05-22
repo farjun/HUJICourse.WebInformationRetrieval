@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
-public class ReviewsIndex {
+public class ReviewsIndex extends Index {
     private final ArrayList<String> reviews;
     public static final int SCORE = 0;
     public static final int HELPFULLNESS_NUMERATOR = 1;
@@ -22,7 +22,11 @@ public class ReviewsIndex {
      */
     public ReviewsIndex(String serializedReviewsIndex){
         this();
-        this.reviews.addAll(Arrays.asList(serializedReviewsIndex.split("\\|")));
+        this.loadData(serializedReviewsIndex);
+    }
+
+    public void loadData(String rawIndex){
+        this.reviews.addAll(Arrays.asList(rawIndex.split("\\|")));
     }
 
     public void insert(String value){

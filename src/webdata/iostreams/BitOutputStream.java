@@ -7,6 +7,9 @@
  */
 package webdata.iostreams;
 
+import webdata.encoders.BitUtils;
+import webdata.models.SymbolTable;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.BitSet;
@@ -17,7 +20,7 @@ public final class BitOutputStream implements AutoCloseable, AppOutputStream {
 	private final OutputStream output;
 	private int buffer;
 	private int bufferCurCapacity;
-	BitSet bitSet;
+	public int numOfBytesWritten;
 	
 	/**
 	 * Constructs a bit output stream based on the specified byte output stream.
@@ -27,7 +30,8 @@ public final class BitOutputStream implements AutoCloseable, AppOutputStream {
 		output = out;
 		buffer = 0;
 		bufferCurCapacity = 0;
-		bitSet = new BitSet(); // will be for later use
+		numOfBytesWritten = 0;
+
 	}
 
 	public void write(int b) throws IOException {
@@ -42,8 +46,12 @@ public final class BitOutputStream implements AutoCloseable, AppOutputStream {
 		output.write(buffer);
 		buffer = 0;
 		bufferCurCapacity = 0;
+		numOfBytesWritten++;
 	}
 
+	public int getNumOfBytesWritten(){
+		return numOfBytesWritten;
+	}
 
 	public void close() throws IOException {
 		while (bufferCurCapacity != 0)
@@ -51,6 +59,13 @@ public final class BitOutputStream implements AutoCloseable, AppOutputStream {
 		if(output != null) {
 			output.close();
 		}
+	}
+
+	public int setCheckpoint() throws IOException{
+		flush();
+		int temp = numOfBytesWritten;
+		numOfBytesWritten =0;
+		return temp;
 	}
 
 	@Override

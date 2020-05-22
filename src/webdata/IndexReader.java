@@ -18,11 +18,10 @@ public class IndexReader {
     public IndexReader(String dir) {
 
         try {
-            var wordsPath = Paths.get(dir,"words.txt").toString();
-            var reviewsPath = Paths.get(dir,"reviews.txt").toString();
-            var productsPath = Paths.get(dir,"products.txt").toString();
+            var wordsPath = Paths.get(dir,"words").toString();
+            var reviewsPath = Paths.get(dir,"reviews").toString();
+            var productsPath = Paths.get(dir,"products").toString();
             this.indexReader = new IndexReaderImpl(productsPath, reviewsPath, wordsPath);
-            this.indexReader.loadIndex();
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -129,7 +128,7 @@ public class IndexReader {
      * Returns an empty Enumeration if there are no reviews for this product
      */
     public Enumeration<Integer> getProductReviews(String productId) {
-        return this.indexReader.getReviewsByProductId(productId);
+        return this.indexReader.getProductReviews(productId);
     }
 
 }

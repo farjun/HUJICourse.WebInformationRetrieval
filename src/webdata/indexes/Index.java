@@ -1,4 +1,9 @@
 package webdata.indexes;
 
-public interface Index {
+public class Index {
+    private static final int BLOCK_SIZE = 200;
+
+    public void loadData(String rawIndex){
+
+    }
 }

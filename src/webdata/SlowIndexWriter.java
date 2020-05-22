@@ -1,11 +1,14 @@
 package webdata;
 
+import org.junit.jupiter.api.Assertions;
 import webdata.indexes.IndexWriterImpl;
 import webdata.iterators.ReviewsIterator;
 import webdata.models.ProductReview;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Enumeration;
 
 public class SlowIndexWriter {
     public static final int BATCH_SIZE = 1001;
@@ -29,9 +32,9 @@ public class SlowIndexWriter {
                 }
             }
 
-            var wordsPath = Paths.get(dirPath,"words.txt").toString();
-            var reviewsPath = Paths.get(dirPath,"reviews.txt").toString();
-            var productsPath = Paths.get(dirPath,"products.txt").toString();
+            var wordsPath = Paths.get(dirPath,"words").toString();
+            var reviewsPath = Paths.get(dirPath,"reviews").toString();
+            var productsPath = Paths.get(dirPath,"products").toString();
             this.indexWriter = new IndexWriterImpl(productsPath, reviewsPath, wordsPath);
 
 
@@ -93,4 +96,26 @@ public class SlowIndexWriter {
         directory.delete();
     }
 
+    private static boolean enumerationContains(Enumeration<Integer> iterable, int val){
+        while(iterable.hasMoreElements()){
+            if( iterable.nextElement() == val){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static void main(String[] args) {
+        String indexDir =  "./src/index";
+        String reviewsFilePath = "./datasets/1000.txt";
+        SlowIndexWriter writer = new SlowIndexWriter();
+        writer.slowWrite(reviewsFilePath, indexDir);
+        IndexReader reader = new IndexReader(indexDir);
+        for (int i = 1; i <= 100; i++) {
+            String productId = reader.getProductId(i);
+            Enumeration<Integer> reviewIds = reader.getProductReviews(productId);
+            Assertions.assertTrue(enumerationContains(reviewIds, i), "checking review "+i+"");
+        }
+
+    }
 }

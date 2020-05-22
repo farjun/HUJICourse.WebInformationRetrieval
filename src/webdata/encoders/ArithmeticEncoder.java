@@ -10,19 +10,21 @@ public final class ArithmeticEncoder {
 
     protected long low;
     protected long high;
+    protected long numOfBytsWritten;
 
-    private final SymbolTable frequencyTable;
+    private SymbolTable frequencyTable;
     private AppOutputStream output;
 
     public ArithmeticEncoder(AppOutputStream out) {
-        super();
         low = 0;
         high = BitUtils.getAllOnes();
         this.frequencyTable = new SymbolTable();
         output = Objects.requireNonNull(out);
+        numOfBytsWritten = 0;
+
     }
 
-    protected void writeSymbol(int symbol) {
+    public void writeSymbol(int symbol) {
         long range = high - low + 1;
         long total = this.frequencyTable.getTotalNumOfSymbolsFrequencies();
 
@@ -40,7 +42,6 @@ public final class ArithmeticEncoder {
             System.err.println("Encoder Failed to write buffer to file");
         }
 
-
         this.frequencyTable.incrementSymbolCounter(symbol);
     }
 
@@ -52,22 +53,18 @@ public final class ArithmeticEncoder {
         }
     }
 
-    public void finishBatch() throws IOException {
+    public void finish() throws IOException {
         writeSymbol(BitUtils.BATCH_SEPERATOR);
         output.write(1);
     }
+
+
 
     protected void shiftAndWrite() throws IOException {
         int bit = (int)(low >>> (BitUtils.NUM_OF_BITS_IN_LONG - 1));
         output.write(bit);
     }
 
-    public static void writeEncoded(String toEncode, AppOutputStream out) throws IOException {
-        ArithmeticEncoder enc = new ArithmeticEncoder(out);
-        for (int symbol: toEncode.toCharArray()) {
-            enc.writeSymbol(symbol);
-        }
-        enc.finishBatch();  // Flush remaining code bits
-    }
+
 
 }
