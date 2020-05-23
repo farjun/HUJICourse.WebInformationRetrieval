@@ -3,15 +3,13 @@ package webdata.iostreams;
 import java.io.*;
 import java.util.ArrayList;
 
-import static webdata.encoders.BitUtils.END_OF_FILE;
-
 public class BitRandomAccessInputStream implements AppInputStream {
 
     private final RandomAccessFile randomAccessFile;
     private int curBlockNumOfBytes;
     private int numOfBytesRead;
 
-    private int currentByte;
+    private int byteBuffer;
 
     private int numBitsRemaining;
     private final ArrayList<Integer> blockSizes;
@@ -22,7 +20,7 @@ public class BitRandomAccessInputStream implements AppInputStream {
      */
     public BitRandomAccessInputStream(File in, ArrayList<Integer> blockSizes) throws IOException  {
         randomAccessFile = new RandomAccessFile(in, "r");
-        currentByte = 0;
+        byteBuffer = 0;
         numBitsRemaining = 0;
 
         numOfBytesRead = 0;
@@ -34,6 +32,9 @@ public class BitRandomAccessInputStream implements AppInputStream {
         return curBlockNumOfBytes <= numOfBytesRead && numBitsRemaining == 0;
     }
 
+    public boolean hasMoreInput(){
+        return !this.blockFinished();
+    }
     /**
      * Reads a bit from this stream. Returns 0 or 1 if a bit is available, or -1 if
      * the end of stream is reached. The end of stream always occurs on a byte boundary.
@@ -47,16 +48,16 @@ public class BitRandomAccessInputStream implements AppInputStream {
             readByte();
             // if we reach the end of this block we will stop reading and return end of stream
             if(curBlockNumOfBytes <= numOfBytesRead) {
-                currentByte = -1;
+                byteBuffer = -1;
                 return -1; // or 11111111111111
             }
         }
         numBitsRemaining--;
-        return (currentByte >>> numBitsRemaining) & 1;
+        return (byteBuffer >>> numBitsRemaining) & 1;
     }
 
     private void readByte() throws IOException {
-        currentByte = randomAccessFile.read();
+        byteBuffer = randomAccessFile.read();
         numBitsRemaining = 8;
         numOfBytesRead++;
     }
@@ -72,7 +73,7 @@ public class BitRandomAccessInputStream implements AppInputStream {
             randomAccessFile.skipBytes(blockSizes.get(i));
         }
         curBlockNumOfBytes = blockSizes.get(blockNumber);
-        currentByte = 0;
+        byteBuffer = 0;
         numOfBytesRead = 0;
     }
 
@@ -84,7 +85,7 @@ public class BitRandomAccessInputStream implements AppInputStream {
      */
     public void close() throws IOException {
         randomAccessFile.close();
-        currentByte = -1;
+        byteBuffer = -1;
         numBitsRemaining = 0;
     }
 

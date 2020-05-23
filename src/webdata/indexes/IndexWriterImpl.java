@@ -61,18 +61,20 @@ public class IndexWriterImpl {
         enc.finish();  // Flush remaining code bits
     }
 
-    public void writeEncoded(String[] toEncodeArr, AppOutputStream out, BlockSizesFile blockSizesFile) throws IOException {
+    public void writeEncoded(String[] blocksToEncode, AppOutputStream out, BlockSizesFile blockSizesFile) throws IOException {
         ArithmeticEncoder enc = new ArithmeticEncoder(out);
-        for (String toEncode: toEncodeArr ) {
-            for (int symbol: toEncode.toCharArray()) {
+        for (String curBlockToEncode: blocksToEncode ) {
+            for (int symbol: curBlockToEncode.toCharArray()) {
                 enc.writeSymbol(symbol);
             }
             int numOfBytesWritten = out.setCheckpoint();
             enc = new ArithmeticEncoder(out);
             blockSizesFile.addBlockSize(numOfBytesWritten);
         }
-        enc.finish();  // Flush remaining code bits
+        // Flush remaining code bits
+        enc.finish();
         blockSizesFile.flush();
+        out.flush();
     }
 
     public void writeProcessed() throws IOException {

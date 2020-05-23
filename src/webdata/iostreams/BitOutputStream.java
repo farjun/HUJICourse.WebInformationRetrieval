@@ -49,10 +49,6 @@ public final class BitOutputStream implements AutoCloseable, AppOutputStream {
 		numOfBytesWritten++;
 	}
 
-	public int getNumOfBytesWritten(){
-		return numOfBytesWritten;
-	}
-
 	public void close() throws IOException {
 		while (bufferCurCapacity != 0)
 			write(0);

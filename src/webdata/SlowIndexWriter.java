@@ -113,7 +113,7 @@ public class SlowIndexWriter {
         IndexReader reader = new IndexReader(indexDir);
         for (int i = 1; i <= 100; i++) {
             String productId = reader.getProductId(i);
-            Enumeration<Integer> reviewIds = reader.getProductReviews(productId);
+            Enumeration<Integer> reviewIds = reader.getProductReviews("B00067AD4U");
             Assertions.assertTrue(enumerationContains(reviewIds, i), "checking review "+i+"");
         }
 

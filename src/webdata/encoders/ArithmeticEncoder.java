@@ -11,6 +11,7 @@ public final class ArithmeticEncoder {
     protected long low;
     protected long high;
     protected long numOfBytsWritten;
+    private int numUnderflow;
 
     private SymbolTable frequencyTable;
     private AppOutputStream output;
@@ -21,6 +22,7 @@ public final class ArithmeticEncoder {
         this.frequencyTable = new SymbolTable();
         output = Objects.requireNonNull(out);
         numOfBytsWritten = 0;
+        numUnderflow=0;
 
     }
 
@@ -51,6 +53,12 @@ public final class ArithmeticEncoder {
             low  = BitUtils.shiftLeft(low);
             high = BitUtils.shiftLeft(high) | 1;
         }
+
+        while ((low & ~high & BitUtils.getQuarterRange()) != 0) {
+            numUnderflow++;
+            low = (low << 1) ^ BitUtils.getHalfRange();
+            high = ((high ^ BitUtils.getHalfRange()) << 1) | BitUtils.getHalfRange() | 1;
+        }
     }
 
     public void finish() throws IOException {
@@ -63,6 +71,10 @@ public final class ArithmeticEncoder {
     protected void shiftAndWrite() throws IOException {
         int bit = (int)(low >>> (BitUtils.NUM_OF_BITS_IN_LONG - 1));
         output.write(bit);
+
+        // Write out the saved underflow bits
+        for (; numUnderflow > 0; numUnderflow--)
+            output.write(bit ^ 1);
     }
 
 

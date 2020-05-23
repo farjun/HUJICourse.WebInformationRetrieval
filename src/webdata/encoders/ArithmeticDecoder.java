@@ -1,5 +1,6 @@
 package webdata.encoders;
 import webdata.iostreams.AppInputStream;
+import webdata.iostreams.OutOfBitsException;
 import webdata.models.SymbolTable;
 
 import java.io.*;
@@ -23,7 +24,7 @@ public class ArithmeticDecoder {
             bitBuffer = bitBuffer << 1 | readBit();
     }
 
-    protected void updateHighAndLow(int symbol)  {
+    protected void updateHighAndLow(int symbol)  throws IOException{
         long range = high - low + 1;
 
         long total = this.frequencyTable.getTotalNumOfSymbolsFrequencies();
@@ -33,12 +34,8 @@ public class ArithmeticDecoder {
         low = newLow;
         high = newHigh;
 
-        try {
-            readExcessBufferBits();
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.err.println("Decoder Failed reading to buffer from file");
-        }
+        readExcessBufferBits();
+
     }
 
     private void readExcessBufferBits() throws IOException{
@@ -48,12 +45,20 @@ public class ArithmeticDecoder {
             low  =  BitUtils.shiftLeft(low);
             high =  BitUtils.shiftLeft(high) | 1;
         }
+
+        // Now low's top bit must be 0 and high's top bit must be 1
+        // While low's top two bits are 01 and high's are 10, delete the second highest bit of both
+        while ((low & ~high & BitUtils.getQuarterRange()) != 0) {
+            bitBuffer = (bitBuffer & BitUtils.getHalfRange()) | ((bitBuffer << 1) & (BitUtils.getAllOnes() >>> 1)) | readBit();
+            low = (low << 1) ^ BitUtils.getHalfRange();
+            high = ((high ^ BitUtils.getHalfRange()) << 1) | BitUtils.getHalfRange() | 1;
+        }
     }
 
     /***
      * reads one symbol from the file ( and decodes it )
      */
-    public int read(){
+    public int read() throws IOException{
         // Translate from coding range scale to frequency table scale
         long total = this.frequencyTable.getTotalNumOfSymbolsFrequencies();
         long offset = bitBuffer - low;
@@ -94,10 +99,11 @@ public class ArithmeticDecoder {
      * @throws IOException
      */
     private int readBit() throws IOException {
-        int bitAsInt = input.read();
-        if (bitAsInt == BitUtils.END_OF_FILE)
-            bitAsInt = 0;
-        return bitAsInt;
+        if(input.hasMoreInput()){
+            return input.read();
+        }
+
+        throw new OutOfBitsException();
     }
 
 }

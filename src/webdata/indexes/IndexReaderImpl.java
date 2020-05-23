@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Enumeration;
 
+import static webdata.encoders.BitUtils.BATCH_SEPERATOR;
 import static webdata.encoders.BitUtils.END_OF_FILE;
 
 public class IndexReaderImpl {
@@ -54,11 +55,12 @@ public class IndexReaderImpl {
 
         while (true) {
             // Decode and write one byte
-            int symbol = dec.read();
-            if (symbol == END_OF_FILE)  // EOF symbol
+            try {
+                int symbol = dec.read();
+                sb.append((char)symbol);
+            }catch (IOException e){
                 break;
-
-            sb.append((char)symbol);
+            }
         }
         return sb;
     }
@@ -97,7 +99,7 @@ public class IndexReaderImpl {
 
     public Enumeration<Integer> getProductReviews(String productId){
 
-        this.loadBlock(this.productsInputStream, this.productsIndex, 1);
+        this.loadBlock(this.productsInputStream, this.productsIndex, 0);
         if (this.productsIndex.contains(productId)) {
             return this.productsIndex.get(productId);
         }

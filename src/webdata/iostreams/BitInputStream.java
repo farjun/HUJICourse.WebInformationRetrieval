@@ -60,8 +60,13 @@ public final class BitInputStream implements AutoCloseable, AppInputStream {
 		numBitsRemaining--;
 		return (currentByte >>> numBitsRemaining) & 1;
 	}
-	
-	
+
+	@Override
+	public boolean hasMoreInput() {
+		return currentByte == -1;
+	}
+
+
 	/**
 	 * Closes this stream and the underlying input stream.
 	 * @throws IOException if an I/O exception occurred
