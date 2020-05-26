@@ -10,6 +10,8 @@ public class Merger {
     StringBuilder[] decodedBlocks;
     int[] ptrs;
 
+    int ccc;
+
     public StringBuilder getMergedBlock() {
         return mergedBlock;
     }
@@ -20,6 +22,7 @@ public class Merger {
 
 
     public Merger(){
+        ccc = 0;
         ptrs = new int[K-1];
         decodedBlocks = new StringBuilder[K - 1];
         for (int i = 0; i<decodedBlocks.length; i++) {
@@ -54,21 +57,24 @@ public class Merger {
     }
 
 
-    public void cleanBlockAndFetchNew(int blockIndex){
+    public boolean cleanBlockAndFetchNew(int blockIndex){
         this.cleanBlock(blockIndex);
-        // TODO: fetch new to decodedBlocks[blockIndex]
-        // mocking for now
-        decodedBlocks[blockIndex].append("zzzzz|1|{2:30}");
-        return;
+        // TODO: fetch new decoded block and insert into decodedBlocks[blockIndex]
+        // MOKCKING for now
+        decodedBlocks[blockIndex].append("instant"+ccc+"|1|{2:30};");
+        decodedBlocks[blockIndex].append("zzzzz"+ccc+"|1|{2:30};");
+        ccc++;
+        if(ccc>3) return false; //
+        return true;
     }
 
-    public void mergeIter(){
+    public boolean mergeIter(){
          // init to zeros by default
         int ptrInMin = ptrs[0];
         int blockMinIndex = 0;
         int tokenEndIndex = decodedBlocks[0].substring(ptrs[0]).indexOf("|");
         String minToken = decodedBlocks[0].substring(ptrs[0], ptrs[0]+tokenEndIndex);
-        for(int i=1;i<K-1;i++){
+        for(int i=1;i<decodedBlocks.length;i++){
             tokenEndIndex = decodedBlocks[i].substring(ptrs[i]).indexOf("|");
             if(tokenEndIndex<0) continue;
             String token = decodedBlocks[i].substring(ptrs[i], ptrs[i]+tokenEndIndex);
@@ -87,11 +93,16 @@ public class Merger {
             curr++;
         }
         ptrs[blockMinIndex] = ++curr;
+        var toContinue = true;
         if(curr >= decodedBlocks[blockMinIndex].length()){
             ptrs[blockMinIndex] = 0;
-            cleanBlockAndFetchNew(blockMinIndex);
+            toContinue = cleanBlockAndFetchNew(blockMinIndex);
         }
         mergedBlock.append(';');
+        return toContinue;
+    }
 
+    public void externalMerge(){
+        while (mergeIter());
     }
 }

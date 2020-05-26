@@ -27,15 +27,18 @@ public class ReviewStore {
     private static void runMerger() {
         var s = "a|2|{997:1,999:1};all|2|{997:1,999:1};bomb|2|{997:1,999:1};"+
         "almost|2|{997:1,999:1};bottles|2|{997:1,999:1};different|2|{997:1,999:1};"+
-                "can|2|{997:1,999:1};cool|2|{997:1,999:1};";
+                "can|2|{997:1,999:1};cool|2|{997:1,999:1};mdu|6|{1:1};";
         var mrgr = new Merger(s);
-        for(int i=0;i<13;i++){
-            mrgr.mergeIter();
-            System.out.println(
+//        for(int i=0;i<12;i++){
+//            mrgr.mergeIter();
+//            System.out.println(
+//                    mrgr.getMergedBlock().toString()
+//            );
+//        }
+        mrgr.externalMerge();
+        System.out.println(
                     mrgr.getMergedBlock().toString()
             );
-        }
-
     }
     private static void runTrie() {
 
