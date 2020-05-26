@@ -154,21 +154,21 @@ public class IndexReaderImpl {
     }
 
     public int getTokenCollectionFrequency(String token) {
-        return this.wordsIndex.tokenGlobalFreq.getOrDefault(token.toLowerCase(),0);
+        var terminalNode = this.wordsIndex.trie.getTerminalNode(token.toLowerCase());
+        if(terminalNode == null)
+            return 0;
+        return terminalNode.getTokenGlobalFreq();
     }
 
     public int getTokenFrequency(String token) {
-        if(!this.wordsIndex.tokenFreq.containsKey(token.toLowerCase())) return 0;
-        return this.wordsIndex.tokenFreq.get(token.toLowerCase()).size();
+        var terminalNode = this.wordsIndex.trie.getTerminalNode(token.toLowerCase());
+        if(terminalNode == null) return 0;
+        return terminalNode.getTokenFreq().size();
     }
 
     public int getTokenSizeOfReviews() {
-        if(this.wordsIndex.tokenGlobalFreq.isEmpty()) return 0;
-        return this.wordsIndex.tokenGlobalFreq
-                .values()
-                .stream()
-                .mapToInt(Integer::valueOf)
-                .sum();
+        if(this.wordsIndex.trie.isEmpty()) return 0;
+        return this.wordsIndex.trie.getGlobalFreqSum();
     }
 
 }

@@ -2,69 +2,41 @@ package webdata.models;
 
 import java.util.TreeMap;
 
-class TrieNode {
-    static final int ALPHABET_SIZE = 26;
-    static final int NUMBERS = 26;
-    static final int SIZE = NUMBERS + ALPHABET_SIZE;
-    TrieNode[] children = new TrieNode[SIZE];
-    int tokenRank;
-    // isEndOfWord is true if the node represents
-    // end of a word
-    boolean isEndOfWord;
-    int tokenGlobalFreq;
-    TreeMap<Integer, Integer> tokenFreq;
-
-    TrieNode() {
-        tokenRank = -1;
-        isEndOfWord = false;
-        tokenGlobalFreq = 0;
-        tokenFreq = null;
-        for (int i = 0; i < SIZE; i++)
-            children[i] = null;
-    }
-
-    public StringBuilder serialize(String prefixTillNode) {
-        //prefixTillNode is the token
-        StringBuilder serializedEntry = new StringBuilder();
-        serializedEntry.append(prefixTillNode);
-        serializedEntry.append("|");
-        serializedEntry.append(tokenGlobalFreq);
-        serializedEntry.append("|");
-        // replace "=" coming from toString of HashMap with ":" to make it JSON-like
-        serializedEntry.append(tokenFreq.toString()
-                .replace("=",":").replace(" ", ""));
-        serializedEntry.append(";"); // terminate line
-        return serializedEntry;
-    }
-}
-
 public class WordIndexTrie {
 
-    public TrieNode getRoot() {
+    public WordTrieNode getRoot() {
         return root;
     }
 
-    private TrieNode root;
-    private int counter; // not sure we need it
+    private WordTrieNode root;
+    private int counter;
     private StringBuilder serialized;
 
+    public int getGlobalFreqSum() {
+        return globalFreqSum;
+    }
+
+    private int globalFreqSum;
+
+
     public WordIndexTrie(){
-        this.root = new TrieNode();
+        this.root = new WordTrieNode();
+        this.globalFreqSum = 0;
         this.counter = 0;
         this.serialized = new StringBuilder();
     }
 
-    public TrieNode insert(String key) {
+    public WordTrieNode insert(String key) {
         int level;
         int length = key.length();
         int index;
 
-        TrieNode crawler = root;
+        WordTrieNode crawler = root;
 
         for (level = 0; level < length; level++) {
             index = toIndex(key.charAt(level));
             if (crawler.children[index] == null)
-                crawler.children[index] = new TrieNode();
+                crawler.children[index] = new WordTrieNode();
 
             crawler = crawler.children[index];
         }
@@ -77,6 +49,8 @@ public class WordIndexTrie {
             crawler.tokenRank = counter;
             counter++;
         }
+//        var rt = Runtime.getRuntime();
+//        if(rt.totalMemory() > memoryThreshold)
         return crawler;
     }
 
@@ -89,6 +63,7 @@ public class WordIndexTrie {
             var tokenTerminalNode = insert(token);
             tokenTerminalNode.tokenFreq.put(reviewId, countInReview);
             tokenTerminalNode.tokenGlobalFreq += countInReview;
+            globalFreqSum += countInReview;
         }
     }
 
@@ -96,38 +71,42 @@ public class WordIndexTrie {
         int plusA =  index + 'a';
         if (plusA <= 'z') return (char)plusA;
         //otherwise its a number
-        return (char) ('0' + index - TrieNode.ALPHABET_SIZE);
+        return (char) ('0' + index - WordTrieNode.ALPHABET_SIZE);
     }
 
     private int toIndex(char chr){
         if (chr <= 'z' &&  chr >= 'a')
             return (int) chr - 'a';
         //otherwise its a number
-        return (chr - '0' + TrieNode.ALPHABET_SIZE);
+        return (chr - '0' + WordTrieNode.ALPHABET_SIZE);
     }
 
-    public void traversePreorder(){
-        traversePreorder(this.root,"");
+
+    public void commit(){
+        commit(this.root,"");
     }
-    private void traversePreorder(TrieNode node, String prefix)
+
+    private void commit(WordTrieNode node, String prefix)
     {
         if (node == null)
         {
             return;
         }
         if (node.isEndOfWord){
-            System.out.println("-------------------------------------");
-            System.out.println(prefix);
-            System.out.println(node.tokenRank);
-            System.out.println(node.tokenFreq);
-            System.out.println(node.tokenGlobalFreq);
+//            System.out.println("-------------------------------------");
+//            System.out.println(prefix);
+//            System.out.println(node.tokenRank);
+//            System.out.println(node.tokenFreq);
+//            System.out.println(node.tokenGlobalFreq);
             //serialize..
             this.serialized.append(node.serialize(prefix));
         }
         for (int i = 0; i < node.children.length;i++)
         {
-            var chr = toChar(i);
-            traversePreorder(node.children[i], prefix + chr);
+            if(node.children[i] != null) {
+                var chr = toChar(i);
+                commit(node.children[i], prefix + chr);
+            }
         }
     }
 
@@ -137,18 +116,31 @@ public class WordIndexTrie {
         return this.serialized.toString();
     }
 
-    // Returns true if key presents in trie, else false
-    boolean contains(String key) {
+    public void flush(){
+        for(int i=0;i<root.children.length;i++){
+            // pruning children
+            this.root.children[i] = null;
+        }
+        this.serialized = new StringBuilder();
+        // explicitly trigger GC
+        Runtime.getRuntime().gc();
+    }
+
+//     Returns true if key presents in trie, else false
+    public boolean contains(String key) {
         var node = getTerminalNode(key);
         return (node != null && node.isEndOfWord);
     }
 
-    public TrieNode getTerminalNode(String key) {
+    public boolean isEmpty(){
+        return counter > 0;
+    }
+
+    public WordTrieNode getTerminalNode(String key) {
         int level;
         int length = key.length();
         int index;
-        TrieNode crawler = root;
-
+        WordTrieNode crawler = root;
         for (level = 0; level < length; level++) {
             var chr = key.charAt(level);
             index = toIndex(chr);

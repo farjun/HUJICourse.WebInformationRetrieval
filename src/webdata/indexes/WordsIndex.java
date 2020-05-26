@@ -2,18 +2,16 @@ package webdata.indexes;
 
 import webdata.models.ProductReview;
 import webdata.models.TokenFreqEnumeration;
+import webdata.models.WordIndexTrie;
+
 import java.util.*;
 
 
 public class WordsIndex extends Index {
-    // will host map of sort { token : {reviewId:count,...}} // HashMap<String, HashMap<Long, Integer>>
-    public final HashMap<String, TreeMap<Integer, Integer>> tokenFreq;
-    // will host map of sort { token : globalCounter }
-    public final HashMap<String, Integer> tokenGlobalFreq;
+    public final WordIndexTrie trie;
 
     public WordsIndex(){
-        this.tokenFreq = new HashMap<>();
-        this.tokenGlobalFreq = new HashMap<>();
+        this.trie = new WordIndexTrie();
     }
 
     public WordsIndex(String serializedWordEntry){
@@ -29,35 +27,21 @@ public class WordsIndex extends Index {
             var key = cols[0];
             var globFreq = cols[1];
             var freqJSON = cols[2];
-            this.tokenGlobalFreq.put(key, Integer.parseInt(globFreq));
-            this.tokenFreq.put(key, this.loadJSON(freqJSON));
+            var terminalNode = this.trie.insert(key);
+            terminalNode.setTokenGlobalFreq(Integer.parseInt(globFreq));
+            terminalNode.setTokenFreq(this.loadJSON(freqJSON));
         }
     }
 
     public Enumeration<Integer> getReviewsWithToken(String token){
-        if(!this.tokenGlobalFreq.containsKey(token)) return Collections.enumeration(Collections.emptyList());
-        var tokenFreqMap = this.tokenFreq.get(token);
+        if(!this.trie.contains(token)) return Collections.enumeration(Collections.emptyList());
+        var terminalNode = this.trie.getTerminalNode(token);
+        var tokenFreqMap = terminalNode.getTokenFreq();
         return new TokenFreqEnumeration(tokenFreqMap);
     }
 
     public void insert(ProductReview review) {
-            var tokenStats = review.getTokenStats();
-            for(var entry: tokenStats.entrySet()){
-                var token = entry.getKey();
-                var countInReview = entry.getValue();
-                var reviewId = review.getId();
-                if (!this.tokenFreq.containsKey(token)){
-                    var tokenReviewFreqMap =  new TreeMap<Integer, Integer>();
-                    tokenReviewFreqMap.put(reviewId, countInReview);
-                    this.tokenFreq.put(token, tokenReviewFreqMap);
-                }
-                else {
-                    this.tokenFreq.get(token).put(reviewId, countInReview);
-                }
-                var tokenGlobFreq = this.tokenGlobalFreq.getOrDefault(token, 0);
-                this.tokenGlobalFreq.put(token, tokenGlobFreq+countInReview);
-            }
-//        System.out.println("Global Freq Map:" + this.tokenGlobalFreq.toString());
+        this.trie.insert(review);
     }
 
     /* parses JSON from "{a:b,c:d}" to ["a:b","c:d"] */
@@ -85,19 +69,8 @@ public class WordsIndex extends Index {
 
     @Override
     public String toString() {
-        StringBuilder serialized = new StringBuilder();
-        for(var entry: this.tokenGlobalFreq.entrySet()){
-            var token = entry.getKey();
-            var globalFreq = entry.getValue();
-            var freqMap = this.tokenFreq.get(token);
-            var serializedEntry = token + "|";
-            serializedEntry += globalFreq.toString() + "|";
-            // replace "=" coming from toString of HashMap with ":" to make it JSON-like
-            serializedEntry += freqMap.toString().replace("=",":").replace(" ", "");
-            serializedEntry += ";"; // terminate line
-            serialized.append(serializedEntry);
-        }
-        return serialized.toString();
+        trie.commit(); // fills buffer
+        return trie.toString();
     }
 
 }

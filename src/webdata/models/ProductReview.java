@@ -94,6 +94,7 @@ public class ProductReview implements Serializable {
 
     private void readObject(ObjectInputStream aInputStream) throws ClassNotFoundException, IOException
     {
+        // not related to ex1
         byte[] entryBytesArr = aInputStream.readAllBytes();
         ByteBuffer entryBuffer = ByteBuffer.wrap(entryBytesArr);
         entryBuffer.rewind();
@@ -106,7 +107,7 @@ public class ProductReview implements Serializable {
 
     private void writeObject(ObjectOutputStream aOutputStream) throws IOException
     {
-        // TODO: use for encoder performance comparison
+        // not related to ex1
         // fixed len for now. it will then use a compression method
         ByteBuffer entryBuffer = ByteBuffer.allocate(this.TOTAL_SIZE);
         entryBuffer.putInt(this.id);

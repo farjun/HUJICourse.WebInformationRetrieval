@@ -1,18 +1,12 @@
 package webdata;
 
-import webdata.IndexReader;
-import webdata.iostreams.BitInputStream;
-import webdata.SlowIndexWriter;
-
 //to manually test serialization
 import webdata.encoders.ConcatEncoder;
 import webdata.encoders.ConcatDecoder;
-import webdata.iostreams.BitOutputStream;
-import webdata.models.ProductReview;
+        import webdata.models.ProductReview;
 import webdata.models.WordIndexTrie;
 
-import java.awt.desktop.SystemSleepEvent;
-import java.io.*;
+        import java.io.*;
 import java.util.Enumeration;
 
 public class ReviewStore {
@@ -54,7 +48,7 @@ public class ReviewStore {
         WordIndexTrie tree = new WordIndexTrie();
         tree.insert(rev1);
         tree.insert(rev2);
-        tree.traversePreorder();
+        tree.commit();
         System.out.println(tree.toString());
     }
     private static void run() {
