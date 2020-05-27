@@ -10,25 +10,28 @@ public class Merger {
     StringBuilder[] decodedBlocks;
     int[] ptrs;
 
-    int ccc;
+    int ccc; //for the mocked data
+    StringBuilder diskMock;
 
     public StringBuilder getMergedBlock() {
         return mergedBlock;
     }
-
+    int entryCountInMergedBlock;
     StringBuilder mergedBlock;
     static final int K = 5; // number of blocks to use for merge in RAM
     static final int blockLength = 3; // number of entries in each block TODO: discuss whether it needs to be byte wise.
 
 
     public Merger(){
+        diskMock = new StringBuilder();
         ccc = 0;
+
         ptrs = new int[K-1];
         decodedBlocks = new StringBuilder[K - 1];
         for (int i = 0; i<decodedBlocks.length; i++) {
             decodedBlocks[i] = new StringBuilder();
         }
-
+        entryCountInMergedBlock = 0;
         mergedBlock = new StringBuilder();
     }
 
@@ -68,6 +71,14 @@ public class Merger {
         return true;
     }
 
+    private int countInStringBuilder(StringBuilder str, char chr){
+        int count = 0;
+        for (int i=0;i<str.length();i++) {
+            if(str.charAt(i) == chr) count++;
+        }
+        return count;
+    }
+    
     public boolean mergeIter(){
          // init to zeros by default
         int ptrInMin = ptrs[0];
@@ -92,6 +103,11 @@ public class Merger {
             mergedBlock.append(decodedBlocks[blockMinIndex].charAt(curr));
             curr++;
         }
+        entryCountInMergedBlock++;
+        if(entryCountInMergedBlock >= blockLength){
+            writeToDisk();
+            entryCountInMergedBlock = 0;
+        }
         ptrs[blockMinIndex] = ++curr;
         var toContinue = true;
         if(curr >= decodedBlocks[blockMinIndex].length()){
@@ -100,6 +116,13 @@ public class Merger {
         }
         mergedBlock.append(';');
         return toContinue;
+    }
+
+    private void writeToDisk() {
+        diskMock.append(mergedBlock);
+        mergedBlock.setLength(0);
+        System.out.println("DISK CONTENT:");
+        System.out.println(diskMock);
     }
 
     public void externalMerge(){
