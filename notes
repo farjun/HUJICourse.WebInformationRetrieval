@@ -1,0 +1,17 @@
+step 1:
+
+for review in reviewBatch:
+    index.proccessReview(review)
+
+
+Index.flushReviews()
+
+def proccessReview(review):
+    Trie.insert(token)
+    proccess review...
+
+def flushReviews():
+    index.flush()
+
+
+

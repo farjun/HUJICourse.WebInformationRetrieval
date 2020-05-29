@@ -1,21 +1,86 @@
 package webdata;
 
 import org.junit.jupiter.api.Assertions;
-import webdata.indexes.IndexWriterImpl;
+import webdata.encoders.ArithmeticEncoder;
+import webdata.indexes.BlockSizesFile;
+import webdata.indexes.ProductsIndex;
+import webdata.indexes.ReviewsIndex;
+import webdata.indexes.WordsIndex;
+import webdata.iostreams.AppOutputStream;
+import webdata.iostreams.BitOutputStream;
 import webdata.iterators.ReviewsIterator;
 import webdata.models.ProductReview;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Enumeration;
 
 public class SlowIndexWriter {
-    public static final int BATCH_SIZE = 1001;
-    IndexWriterImpl indexWriter;
+    public static final int BATCH_SIZE = 500;
+    private BlockSizesFile productsBlockSizesFile;
+    protected AppOutputStream productsOutputStream;
+
+    protected AppOutputStream reviewsOutputStream;
+    private BlockSizesFile reviewsBlockSizesFile;
+
+    protected AppOutputStream wordsOutputStream;
+    private ProductsIndex productsIndex;
+    private ReviewsIndex reviewsIndex;
+    private WordsIndex wordsIndex;
 
     public void close(){
-        this.indexWriter.close();
+        try {
+            this.productsOutputStream.close();
+            this.reviewsOutputStream.close();
+            this.wordsOutputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void process(ProductReview review) {
+        var reviewIndexInp = review.score + "," +
+                review.helpfulnessNumerator + "," +
+                review.helpfulnessDenominator + "," +
+                review.length + "," +
+                review.productId;
+        this.reviewsIndex.insert(reviewIndexInp);
+        this.wordsIndex.insert(review);
+        this.productsIndex.insert(review.productId, review.getStringId());
+    }
+
+    public void writeEncoded(String toEncode, AppOutputStream out) throws IOException {
+        ArithmeticEncoder enc = new ArithmeticEncoder(out);
+        for (int symbol: toEncode.toCharArray()) {
+            enc.writeSymbol(symbol);
+        }
+        enc.finish();  // Flush remaining code bits
+    }
+
+    public void writeEncoded(String[] blocksToEncode, AppOutputStream out, BlockSizesFile blockSizesFile) throws IOException {
+        ArithmeticEncoder enc = new ArithmeticEncoder(out);
+        for (String curBlockToEncode: blocksToEncode ) {
+            for (int symbol: curBlockToEncode.toCharArray()) {
+                enc.writeSymbol(symbol);
+            }
+            int numOfBytesWritten = out.setCheckpoint();
+            enc = new ArithmeticEncoder(out);
+            blockSizesFile.addBlockSize(numOfBytesWritten);
+        }
+        // Flush remaining code bits
+        enc.finish();
+        blockSizesFile.flush();
+        out.flush();
+    }
+
+    public void writeProcessed( boolean lastBatch ) throws IOException {
+        writeEncoded(this.productsIndex.toStringBlocks(lastBatch), this.productsOutputStream, this.productsBlockSizesFile);
+        writeEncoded(this.reviewsIndex.toStringBlocks(lastBatch), this.reviewsOutputStream, this.reviewsBlockSizesFile );
+        writeEncoded(this.wordsIndex.toString(), this.wordsOutputStream);
+
     }
 
 
@@ -35,8 +100,17 @@ public class SlowIndexWriter {
             var wordsPath = Paths.get(dirPath,"words").toString();
             var reviewsPath = Paths.get(dirPath,"reviews").toString();
             var productsPath = Paths.get(dirPath,"products").toString();
-            this.indexWriter = new IndexWriterImpl(productsPath, reviewsPath, wordsPath);
 
+            this.productsOutputStream = new BitOutputStream(new FileOutputStream(productsPath));
+            this.productsIndex = new ProductsIndex();
+            this.productsBlockSizesFile = new BlockSizesFile(new FileWriter(productsPath.concat("block_sizes")));
+
+            this.reviewsOutputStream = new BitOutputStream(new FileOutputStream(reviewsPath));
+            this.reviewsBlockSizesFile = new BlockSizesFile(new FileWriter(reviewsPath.concat("block_sizes")));
+            this.reviewsIndex = new ReviewsIndex();
+
+            this.wordsOutputStream =  new BitOutputStream(new FileOutputStream(wordsPath));
+            this.wordsIndex = new WordsIndex();
 
         } catch (IOException e) {
             this.close();
@@ -60,17 +134,17 @@ public class SlowIndexWriter {
             long batchNumber = 0;
             while(iter.hasNext()) {
                 if(curIteration >= BATCH_SIZE){
-                    this.indexWriter.writeProcessed();
+                    this.writeProcessed(false);
                     curIteration = 1;
                     batchNumber++;
                     System.out.println("Batch number: " + String.valueOf(batchNumber) + " done");
                     System.out.println("total reviews processed: " + String.valueOf(batchNumber * BATCH_SIZE) );
                 }
                 ProductReview review = iter.next();
-                this.indexWriter.process(review);
+                this.process(review);
                 curIteration++;
             }
-            this.indexWriter.writeProcessed();
+            this.writeProcessed(true);
             this.close();
 
         } catch (IOException e) {

@@ -4,6 +4,7 @@ import webdata.encoders.ArithmeticDecoder;
 import webdata.iostreams.AppInputStream;
 import webdata.iostreams.BitInputStream;
 import webdata.iostreams.BitRandomAccessInputStream;
+import webdata.iostreams.OutOfBlocksException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,98 +18,52 @@ import static webdata.encoders.BitUtils.END_OF_FILE;
 
 public class IndexReaderImpl {
     protected BitRandomAccessInputStream productsInputStream;
-    protected AppInputStream reviewsInputStream;
+    protected BitRandomAccessInputStream reviewsInputStream;
     protected AppInputStream wordsInputStream;
     private ProductsIndex productsIndex;
     private ReviewsIndex reviewsIndex;
     private WordsIndex wordsIndex;
 
     public IndexReaderImpl(String productFilePath, String reviewsFilePath, String wordsFilePath) throws IOException {
-        BlockSizesFile bsf = new BlockSizesFile(new FileReader(productFilePath.concat("block_sizes")));
-        this.productsInputStream = new BitRandomAccessInputStream(new File(productFilePath), bsf.getBlockSizes());
-        this.reviewsInputStream = new BitInputStream(new FileInputStream(reviewsFilePath));
+        BlockSizesFile productsBsf = new BlockSizesFile(new FileReader(productFilePath.concat("block_sizes")));
+        this.productsInputStream = new BitRandomAccessInputStream(new File(productFilePath), productsBsf.getBlockSizes());
+        BlockSizesFile reviewsBsf = new BlockSizesFile(new FileReader(reviewsFilePath.concat("block_sizes")));
+
+        this.reviewsInputStream = new BitRandomAccessInputStream(new File(reviewsFilePath), reviewsBsf.getBlockSizes());
         this.wordsInputStream = new BitInputStream(new FileInputStream(wordsFilePath));
         this.reviewsIndex = new ReviewsIndex();
         this.wordsIndex = new WordsIndex();
         this.productsIndex = new ProductsIndex();
     }
 
-    public StringBuffer decode(AppInputStream inputStream) throws IOException {
-        ArithmeticDecoder dec = new ArithmeticDecoder(inputStream);
-        StringBuffer sb = new StringBuffer();
-
-        while (true) {
-            // Decode and write one byte
-            int symbol = dec.read();
-            if (symbol == 256)  // EOF symbol
-                break;
-
-            sb.append((char)symbol);
-        }
-        return sb;
-    }
-
-    public StringBuffer decodeBlock(BitRandomAccessInputStream inputStream, int blockNum) throws IOException {
-        inputStream.setPointerToBlock(blockNum);
-        ArithmeticDecoder dec = new ArithmeticDecoder(inputStream);
-        StringBuffer sb = new StringBuffer();
-
-        while (true) {
-            // Decode and write one byte
-            try {
-                int symbol = dec.read();
-                sb.append((char)symbol);
-            }catch (IOException e){
-                break;
-            }
-        }
-        return sb;
-    }
-
-    public void close(){
-        try {
-            this.productsInputStream.close();
-            this.wordsInputStream.close();
-            this.reviewsInputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-//    public void loadIndex() throws IOException {
-//        var sb = this.decode(this.reviewsInputStream);
-//        this.reviewsIndex = new ReviewsIndex(sb.toString());
-//        sb = this.decode(this.productsInputStream);
-//        this.productsIndex = new ProductsIndex(sb.toString());
-//        sb = this.decode(this.wordsInputStream);
-//        this.wordsIndex = new WordsIndex(sb.toString());
-//    }
-
-    public void loadBlock(BitRandomAccessInputStream inputStream, Index index, int blockNum) {
-        try{
-            StringBuffer sb = this.decodeBlock(inputStream, blockNum);
-            index.loadData(sb.toString());
-
-        }catch (IOException e){
-            System.err.println("could not load block!");
-            e.printStackTrace();
-        }
-    }
 
     /*API Section*/
-
     public Enumeration<Integer> getProductReviews(String productId){
-
-        this.loadBlock(this.productsInputStream, this.productsIndex, 0);
-        if (this.productsIndex.contains(productId)) {
-            return this.productsIndex.get(productId);
-        }
-        else{
-            return Collections.enumeration(Collections.emptyList());
+        try{
+            this.productsIndex.loadBlock(this.productsInputStream, productsIndex.getBlockNum(productId));
+            if (this.productsIndex.contains(productId)) {
+                return this.productsIndex.get(productId);
+            }
+            else{
+                return Collections.enumeration(Collections.emptyList());
+            }
+        }catch (OutOfBlocksException e){
+            return null;
+        }catch (IOException e){
+            System.err.println("Exception was raised in getProductReviews");
+            return null;
         }
     }
 
     public int getReviewScore(int reviewId) {
+        try {
+            this.reviewsIndex.loadBlock(this.reviewsInputStream, this.reviewsIndex.getBlockNum(reviewId));
+        }catch (OutOfBlocksException e){
+            return -1;
+        }catch (IOException e){
+            System.err.println("Exception was raised in getProductReviews");
+        }
+
         int[] ret = this.reviewsIndex.getReviewNums(reviewId);
         if(ret.length == 1){
             return -1;
@@ -117,6 +72,14 @@ public class IndexReaderImpl {
     }
 
     public int getReviewHelpfulnessNumerator(int reviewId) {
+        try {
+            this.reviewsIndex.loadBlock(this.reviewsInputStream, this.reviewsIndex.getBlockNum(reviewId));
+        }catch (OutOfBlocksException e){
+            return -1;
+        }catch (IOException e){
+            System.err.println("Exception was raised in getProductReviews");
+        }
+
         int[] ret = this.reviewsIndex.getReviewNums(reviewId);
         if(ret.length == 1){
             return -1;
@@ -134,6 +97,13 @@ public class IndexReaderImpl {
     }
 
     public String getProductId(int reviewId) {
+        try {
+            this.reviewsIndex.loadBlock(this.reviewsInputStream, this.reviewsIndex.getBlockNum(reviewId));
+        }catch (OutOfBlocksException e){
+            return null;
+        }catch (IOException e){
+            System.err.println("Exception was raised in getProductReviews");
+        }
         return this.reviewsIndex.getProductId(reviewId);
     }
 

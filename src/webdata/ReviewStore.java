@@ -13,8 +13,8 @@ import java.util.Enumeration;
 public class ReviewStore {
 
     public static void main(String[] args) throws Exception {
-        runMerger();
-//        runTrie();
+//        runMerger();
+        runTrie();
 //        run();
 //        runConcatEncoder();
 //        runArithmicCompressOnEntireFile();

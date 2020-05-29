@@ -2,13 +2,14 @@ package webdata.indexes;
 
 import webdata.models.CompressedArrayList;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 
 public class ProductsIndex extends Index {
     private static final int NUM_OF_PRODUCTS_IN_BLOCK = 200;
-    private final HashMap<String, CompressedArrayList> hashMap;
+    private HashMap<String, CompressedArrayList> hashMap;
 
     public ProductsIndex(){
         this.hashMap = new HashMap<>();
@@ -64,9 +65,13 @@ public class ProductsIndex extends Index {
         return sb.toString();
     }
 
-    public String[] toStringBlocks() {
+    public String[] toStringBlocks(boolean lastBatch) {
         StringBuilder sb = new StringBuilder();
-        String[] productsBlocks = new String[(this.hashMap.size() / NUM_OF_PRODUCTS_IN_BLOCK) + 1];
+        int numOfBlocks = (this.hashMap.size() / NUM_OF_PRODUCTS_IN_BLOCK);
+        if(lastBatch && Math.floor((double)this.hashMap.size() / NUM_OF_PRODUCTS_IN_BLOCK) < (double)this.hashMap.size() / NUM_OF_PRODUCTS_IN_BLOCK )
+            numOfBlocks++;
+
+        String[] productsBlocks = new String[numOfBlocks];
         int curNumOfProducts = 0;
         int curBlock = 0;
         for (String key: this.hashMap.keySet()) {
@@ -79,8 +84,16 @@ public class ProductsIndex extends Index {
                 curBlock++;
             }
         }
-        sb.deleteCharAt(sb.length()-1);
-        productsBlocks[curBlock] = sb.toString();
+        if(lastBatch) {
+            String lastBlock = sb.toString();
+            if (!lastBlock.equals("")) {
+                sb.deleteCharAt(sb.length() - 1);
+                productsBlocks[curBlock] = lastBlock;
+            }
+        }else{
+            this.hashMap = new HashMap<>();
+            this.loadData(sb.toString());
+        }
 
         return productsBlocks;
     }

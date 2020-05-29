@@ -66,6 +66,11 @@ public class WordsIndex extends Index {
         return result;
     }
 
+    public String[] toStringBlocks() {
+        StringBuilder sb = new StringBuilder();
+        return null;
+    }
+
 
     @Override
     public String toString() {

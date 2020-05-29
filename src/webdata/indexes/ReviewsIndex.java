@@ -5,12 +5,12 @@ import java.util.Arrays;
 import java.util.stream.Stream;
 
 public class ReviewsIndex extends Index {
-    private final ArrayList<String> reviews;
+    private ArrayList<String> reviews;
     public static final int SCORE = 0;
     public static final int HELPFULLNESS_NUMERATOR = 1;
     public static final int HELPFULLNESS_DENUMERATOR = 2;
     public static final int LENGHT = 3;
-    public static final int PRODUCT_ID = 4;
+    private static final int NUM_OF_REVIEWS_IN_BLOCK = 200;
 
     public ReviewsIndex(){
         this.reviews = new ArrayList<>();
@@ -34,6 +34,7 @@ public class ReviewsIndex extends Index {
     }
 
     public int[] getReviewNums(int reviewID){
+        
         if(this.reviews.size() < reviewID || reviewID < 1){
             return new int[]{-1};
         }else{
@@ -64,5 +65,41 @@ public class ReviewsIndex extends Index {
     @Override
     public String toString() {
         return String.join("|", this.reviews);
+    }
+
+
+    public String[] toStringBlocks(boolean lastBatch) {
+        StringBuilder sb = new StringBuilder();
+        int curNumOfReviews = 0;
+        int curBlock = 0;
+        int numOfBlocks = (int)Math.floor(this.reviews.size() / NUM_OF_REVIEWS_IN_BLOCK);
+        if(lastBatch && Math.floor(this.reviews.size() / NUM_OF_REVIEWS_IN_BLOCK) < (double)this.reviews.size() / NUM_OF_REVIEWS_IN_BLOCK )
+            numOfBlocks++;
+        String[] reviewsInBlocks = new String[numOfBlocks];
+        for (String key: this.reviews) {
+            sb.append(key).append("|");
+            curNumOfReviews++;
+            if( curNumOfReviews >= NUM_OF_REVIEWS_IN_BLOCK){
+                reviewsInBlocks[curBlock] = sb.toString();
+                sb = new StringBuilder();
+                curNumOfReviews = 0;
+                curBlock++;
+            }
+        }
+        if(lastBatch) {
+            String lastBlock = sb.toString();
+            if (!lastBlock.equals("")) {
+                sb.deleteCharAt(sb.length() - 1);
+                reviewsInBlocks[curBlock] = lastBlock;
+            }
+        }else{
+            this.reviews = new ArrayList<>();
+            this.loadData(sb.toString());
+        }
+        return reviewsInBlocks;
+    }
+
+    public int getBlockNum(long reviewId){
+        return (int) reviewId / NUM_OF_REVIEWS_IN_BLOCK;
     }
 }

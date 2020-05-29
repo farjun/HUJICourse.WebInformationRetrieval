@@ -68,6 +68,9 @@ public class BitRandomAccessInputStream implements AppInputStream {
      * @return the next bit of 0 or 1, or -1 for the end of stream
      */
     public void setPointerToBlock(int blockNumber) throws IOException {
+        if(blockNumber >= blockSizes.size()){
+            throw new OutOfBlocksException();
+        }
         randomAccessFile.seek(0);
         for (int i = 0; i < blockNumber; i++) {
             randomAccessFile.skipBytes(blockSizes.get(i));
