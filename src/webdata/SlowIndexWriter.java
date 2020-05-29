@@ -52,15 +52,19 @@ public class SlowIndexWriter {
         this.productsIndex.insert(review.productId, review.getStringId());
     }
 
-    public void writeEncoded(String toEncode, AppOutputStream out) throws IOException {
+    public void writeEncoded(String toEncode, AppOutputStream out, boolean lastBatch) throws IOException {
         ArithmeticEncoder enc = new ArithmeticEncoder(out);
         for (int symbol: toEncode.toCharArray()) {
             enc.writeSymbol(symbol);
         }
-        enc.finish();  // Flush remaining code bits
+        // Flush remaining code bits
+        if(lastBatch){
+            enc.finish();
+            out.flush();
+        }
     }
 
-    public void writeEncoded(String[] blocksToEncode, AppOutputStream out, BlockSizesFile blockSizesFile) throws IOException {
+    public void writeEncoded(String[] blocksToEncode, AppOutputStream out, BlockSizesFile blockSizesFile, boolean lastBatch) throws IOException {
         ArithmeticEncoder enc = new ArithmeticEncoder(out);
         for (String curBlockToEncode: blocksToEncode ) {
             for (int symbol: curBlockToEncode.toCharArray()) {
@@ -71,15 +75,17 @@ public class SlowIndexWriter {
             blockSizesFile.addBlockSize(numOfBytesWritten);
         }
         // Flush remaining code bits
-        enc.finish();
-        blockSizesFile.flush();
-        out.flush();
+        if(lastBatch){
+            enc.finish();
+            blockSizesFile.flush();
+            out.flush();
+        }
     }
 
     public void writeProcessed( boolean lastBatch ) throws IOException {
-        writeEncoded(this.productsIndex.toStringBlocks(lastBatch), this.productsOutputStream, this.productsBlockSizesFile);
-        writeEncoded(this.reviewsIndex.toStringBlocks(lastBatch), this.reviewsOutputStream, this.reviewsBlockSizesFile );
-        writeEncoded(this.wordsIndex.toString(), this.wordsOutputStream);
+        writeEncoded(this.productsIndex.toStringBlocks(lastBatch), this.productsOutputStream, this.productsBlockSizesFile, lastBatch);
+        writeEncoded(this.reviewsIndex.toStringBlocks(lastBatch), this.reviewsOutputStream, this.reviewsBlockSizesFile,lastBatch );
+        writeEncoded(this.wordsIndex.toString(), this.wordsOutputStream, lastBatch);
 
     }
 

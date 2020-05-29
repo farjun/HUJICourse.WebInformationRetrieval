@@ -21,6 +21,7 @@ public class ProductsIndex extends Index {
     }
 
     public void loadData(String rawIndex){
+        this.hashMap = new HashMap<>();
         String[] keysAndValues = rawIndex.split("\\|");
         for (String andValue : keysAndValues) {
             try {
@@ -91,7 +92,6 @@ public class ProductsIndex extends Index {
                 productsBlocks[curBlock] = lastBlock;
             }
         }else{
-            this.hashMap = new HashMap<>();
             this.loadData(sb.toString());
         }
 

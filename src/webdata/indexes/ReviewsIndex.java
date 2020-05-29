@@ -26,6 +26,7 @@ public class ReviewsIndex extends Index {
     }
 
     public void loadData(String rawIndex){
+        this.reviews = new ArrayList<>();
         this.reviews.addAll(Arrays.asList(rawIndex.split("\\|")));
     }
 
@@ -46,10 +47,11 @@ public class ReviewsIndex extends Index {
     }
 
     public String getProductId(int reviewID){
-        if(this.reviews.size() < reviewID || reviewID < 1){
+        int inBlockReviewId = (reviewID-1) % NUM_OF_REVIEWS_IN_BLOCK;
+        if(this.reviews.size() <= inBlockReviewId || reviewID < 1){
             return null;
         } else {
-            String entry = this.reviews.get(reviewID-1);
+            String entry = this.reviews.get(inBlockReviewId);
             int idx = entry.lastIndexOf(",") ;
             if(idx < 0){
                 return null;
@@ -93,13 +95,12 @@ public class ReviewsIndex extends Index {
                 reviewsInBlocks[curBlock] = lastBlock;
             }
         }else{
-            this.reviews = new ArrayList<>();
             this.loadData(sb.toString());
         }
         return reviewsInBlocks;
     }
 
     public int getBlockNum(long reviewId){
-        return (int) reviewId / NUM_OF_REVIEWS_IN_BLOCK;
+        return (int) (reviewId -1) / NUM_OF_REVIEWS_IN_BLOCK;
     }
 }
