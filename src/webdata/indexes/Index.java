@@ -23,25 +23,8 @@ public class Index {
 
     }
 
-    public IndexValuesIterator valuesIterator(BitRandomAccessInputStream inputStream, int blockNum, char seperator) throws IOException  {
-        inputStream.setPointerToBlock(blockNum);
-        ArithmeticDecoder dec = new ArithmeticDecoder(inputStream);
-        StringBuffer sb = new StringBuffer();
-
-        while (true) {
-            // Decode and write one byte
-            try {
-                int symbol = dec.read();
-                if(symbol == seperator){
-                    return null;
-                }
-                sb.append((char)symbol);
-
-            }catch (IOException e){
-                break;
-            }
-        }
-        return null;
+    public IndexValuesIterator valuesIterator(BitRandomAccessInputStream inputStream, char seperator, int maxNumOfElementsInBuffer) throws IOException  {
+       return new IndexValuesIterator(inputStream,seperator,  maxNumOfElementsInBuffer);
     }
 
     public StringBuffer decodeBlock(BitRandomAccessInputStream inputStream, int blockNum) throws IOException {

@@ -14,8 +14,8 @@ public class ReviewStore {
 
     public static void main(String[] args) throws Exception {
 //        runMerger();
-        runTrie();
-//        run();
+//        runTrie();
+        run();
 //        runConcatEncoder();
 //        runArithmicCompressOnEntireFile();
     }

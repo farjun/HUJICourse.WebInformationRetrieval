@@ -5,7 +5,7 @@ import java.util.Objects;
 public class SortableNode{
     private String rawValue;
 
-    SortableNode(String rawValue){
+    public SortableNode(String rawValue){
         this.rawValue = rawValue;
     }
 

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 public class BitRandomAccessInputStream implements AppInputStream {
 
     private final RandomAccessFile randomAccessFile;
+    private final int curBlockReading;
     private int curBlockNumOfBytes;
     private int numOfBytesRead;
 
@@ -25,6 +26,7 @@ public class BitRandomAccessInputStream implements AppInputStream {
 
         numOfBytesRead = 0;
         curBlockNumOfBytes = 0;
+        curBlockReading = -1;
         this.blockSizes = blockSizes;
     }
 
@@ -35,6 +37,11 @@ public class BitRandomAccessInputStream implements AppInputStream {
     public boolean hasMoreInput(){
         return !this.blockFinished();
     }
+
+    public int getNumOfBlocks(){
+        return this.blockSizes.size();
+    }
+
     /**
      * Reads a bit from this stream. Returns 0 or 1 if a bit is available, or -1 if
      * the end of stream is reached. The end of stream always occurs on a byte boundary.
@@ -71,6 +78,7 @@ public class BitRandomAccessInputStream implements AppInputStream {
         if(blockNumber >= blockSizes.size()){
             throw new OutOfBlocksException();
         }
+
         randomAccessFile.seek(0);
         for (int i = 0; i < blockNumber; i++) {
             randomAccessFile.skipBytes(blockSizes.get(i));
