@@ -2,46 +2,65 @@ package webdata.indexes;
 
 import webdata.models.ProductReview;
 import webdata.models.TokenFreqEnumeration;
-import webdata.models.WordIndexTrie;
-
 import java.util.*;
 
 
-public class WordsIndex extends Index {
-    public final WordIndexTrie trie;
+public class WordsIndex {
+    // will host map of sort { token : {reviewId:count,...}} // TreeMap<String, TreeMap<Long, Integer>>
+    public final TreeMap<String, TreeMap<Integer, Integer>> tokenFreq;
+    // will host map of sort { token : globalCounter }
+    public final TreeMap<String, Integer> tokenGlobalFreq;
+
+    public final int NUM_OF_ENTRIES_IN_BLOCK = 3; //TODO : increase
 
     public WordsIndex(){
-        this.trie = new WordIndexTrie();
+        this.tokenFreq = new TreeMap<>();
+        this.tokenGlobalFreq = new TreeMap<>();
     }
 
     public WordsIndex(String serializedWordEntry){
         // parse entries "phone|4353|{ 56 : 100 , 79 : 23 };"
         this();
-        loadData(serializedWordEntry);
+        this.loadSerializedData(serializedWordEntry);
     }
 
-    public void loadData(String rawIndex){
-        String[] rows = rawIndex.split(";"); // Assume ";" is the terminal
+    public void loadSerializedData(String serializedWordEntry){
+        // parse entries "phone|4353|{ 56 : 100 , 79 : 23 };"
+        String[] rows = serializedWordEntry.split(";"); // Assume ";" is the terminal
         for (String row : rows) {
             String[] cols = row.split("\\|");
             var key = cols[0];
             var globFreq = cols[1];
             var freqJSON = cols[2];
-            var terminalNode = this.trie.insert(key);
-            terminalNode.setTokenGlobalFreq(Integer.parseInt(globFreq));
-            terminalNode.setTokenFreq(this.loadJSON(freqJSON));
+            this.tokenGlobalFreq.put(key, Integer.parseInt(globFreq));
+            this.tokenFreq.put(key, this.loadJSON(freqJSON));
         }
     }
 
     public Enumeration<Integer> getReviewsWithToken(String token){
-        if(!this.trie.contains(token)) return Collections.enumeration(Collections.emptyList());
-        var terminalNode = this.trie.getTerminalNode(token);
-        var tokenFreqMap = terminalNode.getTokenFreq();
+        if(!this.tokenGlobalFreq.containsKey(token)) return Collections.enumeration(Collections.emptyList());
+        var tokenFreqMap = this.tokenFreq.get(token);
         return new TokenFreqEnumeration(tokenFreqMap);
     }
 
     public void insert(ProductReview review) {
-        this.trie.insert(review);
+        var tokenStats = review.getTokenStats();
+        for(var entry: tokenStats.entrySet()){
+            var token = entry.getKey();
+            var countInReview = entry.getValue();
+            var reviewId = review.getId();
+            if (!this.tokenFreq.containsKey(token)){
+                var tokenReviewFreqMap =  new TreeMap<Integer, Integer>();
+                tokenReviewFreqMap.put(reviewId, countInReview);
+                this.tokenFreq.put(token, tokenReviewFreqMap);
+            }
+            else {
+                this.tokenFreq.get(token).put(reviewId, countInReview);
+            }
+            var tokenGlobFreq = this.tokenGlobalFreq.getOrDefault(token, 0);
+            this.tokenGlobalFreq.put(token, tokenGlobFreq+countInReview);
+        }
+//        System.out.println("Global Freq Map:" + this.tokenGlobalFreq.toString());
     }
 
     /* parses JSON from "{a:b,c:d}" to ["a:b","c:d"] */
@@ -66,17 +85,70 @@ public class WordsIndex extends Index {
         return result;
     }
 
-    public String[] toStringBlocks() {
-        StringBuilder sb = new StringBuilder();
-        return null;
-    }
-
 
     @Override
     public String toString() {
-        trie.commit(); // fills buffer
-        return trie.toString();
+        StringBuilder serialized = new StringBuilder();
+        for(var entry: this.tokenGlobalFreq.entrySet()){
+            var token = entry.getKey();
+            var globalFreq = entry.getValue();
+            var freqMap = this.tokenFreq.get(token);
+            var serializedEntry = token + "|";
+            serializedEntry += globalFreq.toString() + "|";
+            // replace "=" coming from toString of TreeMap with ":" to make it JSON-like
+            serializedEntry += freqMap.toString().replace("=",":").replace(" ", "");
+            serializedEntry += ";"; // terminate line
+            serialized.append(serializedEntry);
+        }
+        return serialized.toString();
     }
+
+
+    public String[] toStringBlocks(boolean lastBatch) {
+        StringBuilder serialized = new StringBuilder();
+        int numOfBlocks = (this.tokenGlobalFreq.size() / NUM_OF_ENTRIES_IN_BLOCK);
+        var floored = Math.floor((double)this.tokenGlobalFreq.size() / NUM_OF_ENTRIES_IN_BLOCK);
+        if(lastBatch &&  floored < (double)this.tokenGlobalFreq.size() / NUM_OF_ENTRIES_IN_BLOCK )
+            numOfBlocks++;
+
+        String[] productsBlocks = new String[numOfBlocks];
+        int curNumOfEntries = 0;
+        int curBlock = 0;
+
+        for(var entry: this.tokenGlobalFreq.entrySet()){
+            var token = entry.getKey();
+            var globalFreq = entry.getValue();
+            var freqMap = this.tokenFreq.get(token);
+            var serializedEntry = new StringBuilder();
+            serializedEntry.append(token).append('|');
+            serializedEntry.append(globalFreq.toString()).append('|');
+            // replace "=" coming from toString of TreeMap with ":" to make it JSON-like
+            serializedEntry.append(freqMap.toString().
+                    replace("=",":").
+                    replace(" ", ""));
+            serializedEntry.append(';'); // terminate line
+            serialized.append(serializedEntry);
+            curNumOfEntries++;
+            if( curNumOfEntries >= NUM_OF_ENTRIES_IN_BLOCK){
+                productsBlocks[curBlock] = serialized.toString();
+                serialized = new StringBuilder();
+                curNumOfEntries = 0;
+                curBlock++;
+            }
+        }
+
+        if(lastBatch) {
+            String lastBlock = serialized.toString();
+            if (!lastBlock.equals("")) {
+                productsBlocks[curBlock] = lastBlock;
+            }
+        }else{
+            this.loadSerializedData(serialized.toString());
+        }
+
+        return productsBlocks;
+    }
+
 
 }
 

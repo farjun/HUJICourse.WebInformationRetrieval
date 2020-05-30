@@ -107,7 +107,8 @@ class IndexReaderTest {
         IndexReader reader = new IndexReader(indexDir);
         int counter = 0;
         for (String token: Constants100.tokensToTest) {
-            Assertions.assertEquals(reader.getTokenCollectionFrequency(token), Constants100.tokensToTestCollectionFrequency[counter]);
+            Assertions.assertEquals(reader.getTokenCollectionFrequency(token),
+                    Constants100.tokensToTestCollectionFrequency[counter]);
             counter++;
         }
     }

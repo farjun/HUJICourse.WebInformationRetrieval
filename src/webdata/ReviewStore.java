@@ -69,6 +69,12 @@ public class ReviewStore {
         tree.insert(rev2);
         tree.commit();
         System.out.println(tree.toString());
+
+        var terminalNode = tree.getTerminalNode("Can".toLowerCase());
+        System.out.println(terminalNode.getTokenGlobalFreq());
+
+        terminalNode = tree.getTerminalNode("what".toLowerCase());
+        System.out.println(terminalNode.getTokenFreq().size());
     }
     private static void run() {
 //        String reviewsFilePath = "./src/datasets/full/foods.txt";
