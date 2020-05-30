@@ -69,13 +69,14 @@ public class ReviewsIndex extends Index {
         return String.join("|", this.reviews);
     }
 
-
     public String[] toStringBlocks(boolean lastBatch) {
         StringBuilder sb = new StringBuilder();
         int curNumOfReviews = 0;
         int curBlock = 0;
         int numOfBlocks = (int)Math.floor(this.reviews.size() / NUM_OF_REVIEWS_IN_BLOCK);
-        if(lastBatch && Math.floor(this.reviews.size() / NUM_OF_REVIEWS_IN_BLOCK) < (double)this.reviews.size() / NUM_OF_REVIEWS_IN_BLOCK )
+        double blocksToReviewSizeRatio =  (double)this.reviews.size() / NUM_OF_REVIEWS_IN_BLOCK;
+
+        if(lastBatch && numOfBlocks < blocksToReviewSizeRatio )
             numOfBlocks++;
         String[] reviewsInBlocks = new String[numOfBlocks];
         for (String key: this.reviews) {

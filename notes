@@ -15,3 +15,17 @@ def flushReviews():
 
 
 
+
+
+iter1
+iter2
+
+out
+while(iter1.isnotEmpty and iter2...)
+    sortableNode1 = iter1.next()
+    sortableNode2 = iter2.next()
+    if(sortableNode1 == sortableNode2 ){
+        sortableNode1.merge(sortableNode2)
+    }
+
+    if()

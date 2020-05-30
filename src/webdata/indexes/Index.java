@@ -2,6 +2,7 @@ package webdata.indexes;
 
 import webdata.encoders.ArithmeticDecoder;
 import webdata.iostreams.BitRandomAccessInputStream;
+import webdata.iterators.IndexValuesIterator;
 
 import java.io.IOException;
 
@@ -22,7 +23,7 @@ public class Index {
 
     }
 
-    public void valuesIterator(BitRandomAccessInputStream inputStream,int blockNum, char seperator) throws IOException  {
+    public IndexValuesIterator valuesIterator(BitRandomAccessInputStream inputStream, int blockNum, char seperator) throws IOException  {
         inputStream.setPointerToBlock(blockNum);
         ArithmeticDecoder dec = new ArithmeticDecoder(inputStream);
         StringBuffer sb = new StringBuffer();
@@ -32,7 +33,7 @@ public class Index {
             try {
                 int symbol = dec.read();
                 if(symbol == seperator){
-                    return ;
+                    return null;
                 }
                 sb.append((char)symbol);
 
@@ -40,6 +41,7 @@ public class Index {
                 break;
             }
         }
+        return null;
     }
 
     public StringBuffer decodeBlock(BitRandomAccessInputStream inputStream, int blockNum) throws IOException {
