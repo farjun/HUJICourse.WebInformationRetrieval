@@ -57,6 +57,7 @@ public class IndexValuesIterator implements Iterator<SortableNode> {
             }catch (OutOfBitsException e){
                 curBlockNum++;
                 inputStream.setPointerToBlock(curBlockNum);
+                this.dec = new ArithmeticDecoder(inputStream);
                 break;
             }
         }
