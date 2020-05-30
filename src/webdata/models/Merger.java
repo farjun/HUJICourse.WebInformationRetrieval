@@ -1,14 +1,17 @@
 package webdata.models;
 
-import webdata.iostreams.AppInputStream;
+import webdata.iostreams.BitRandomAccessInputStream;
+import webdata.iterators.IndexValuesIterator;
+
+import java.io.IOException;
 
 public class Merger {
 
     // external merge:
     // given k-1 sorted blocks merge them strict to the Kth block capacity and commit to disk
     // then replace the used block with new
-    StringBuilder[] decodedBlocks;
-    int[] ptrs;
+    SortableNode[] decodedEntries;
+    IndexValuesIterator[] iters;
 
     int ccc; //for the mocked data
     StringBuilder diskMock;
@@ -18,56 +21,38 @@ public class Merger {
     }
     int entryCountInMergedBlock;
     StringBuilder mergedBlock;
-    static final int K = 5; // number of blocks to use for merge in RAM
-    static final int blockLength = 3; // number of entries in each block TODO: discuss whether it needs to be byte wise.
+    static final int K = 10; // number of blocks to use for merge in RAM
+    static final int blockLength = 50; // number of entries in each block
+    char separator;
 
 
-    public Merger(){
+    public Merger(char separator){
+        this.separator = separator;
         diskMock = new StringBuilder();
         ccc = 0;
 
-        ptrs = new int[K-1];
-        decodedBlocks = new StringBuilder[K - 1];
-        for (int i = 0; i<decodedBlocks.length; i++) {
-            decodedBlocks[i] = new StringBuilder();
-        }
+
+        decodedEntries = new SortableNode[K - 1];
         entryCountInMergedBlock = 0;
         mergedBlock = new StringBuilder();
     }
 
-    public Merger(AppInputStream input){
-        this();
-    }
-
-    public Merger(String input){
-        this();
-        int c = 0;
-        String[] split = input.split(";");
-        if(split.length==0) return;
-        for(int i=0;i<decodedBlocks.length;i++) {
-            for(int j=0;j<blockLength;j++){
-                if(c >= split.length) break;
-                decodedBlocks[i].append(split[c]);
-                decodedBlocks[i].append(';');
-                c++;
-            }
+    public Merger(BitRandomAccessInputStream input, char separator) throws IOException {
+        this(separator);
+        iters = new IndexValuesIterator[K - 1];
+        for(int i = 0; i<iters.length; i++) {
+            iters[i] = new IndexValuesIterator(input, separator);
         }
-    }
-
-    public void cleanBlock(int blockIndex){
-        if(blockIndex >= decodedBlocks.length || blockIndex<0) return;
-        decodedBlocks[blockIndex].setLength(0);
+        for(int i=0;i<decodedEntries.length;i++){
+            this.cleanBlockAndFetchNew(i);
+        }
     }
 
 
     public boolean cleanBlockAndFetchNew(int blockIndex){
-        this.cleanBlock(blockIndex);
-        // TODO: fetch new decoded block and insert into decodedBlocks[blockIndex]
-        // MOKCKING for now
-        decodedBlocks[blockIndex].append("instant"+ccc+"|1|{2:30};");
-        decodedBlocks[blockIndex].append("zzzzz"+ccc+"|1|{2:30};");
-        ccc++;
-        if(ccc>3) return false; //
+        if(blockIndex >= decodedEntries.length || blockIndex<0) return false;
+        if(!iters[blockIndex].hasNext()) return false;
+        decodedEntries[blockIndex] = iters[blockIndex].next();
         return true;
     }
 
@@ -81,46 +66,41 @@ public class Merger {
     
     public boolean mergeIter(){
          // init to zeros by default
-        int ptrInMin = ptrs[0];
         int blockMinIndex = 0;
-        int tokenEndIndex = decodedBlocks[0].substring(ptrs[0]).indexOf("|");
-        String minToken = decodedBlocks[0].substring(ptrs[0], ptrs[0]+tokenEndIndex);
-        for(int i=1;i<decodedBlocks.length;i++){
-            tokenEndIndex = decodedBlocks[i].substring(ptrs[i]).indexOf("|");
-            if(tokenEndIndex<0) continue;
-            String token = decodedBlocks[i].substring(ptrs[i], ptrs[i]+tokenEndIndex);
-            if(minToken.compareTo(token) > 0){
-                minToken = token;
-                ptrInMin = ptrs[i];
-                blockMinIndex = i;
+        if(!this.cleanBlockAndFetchNew(0))
+            return false;
+        var minEntry = decodedEntries[0];
+        for(int i=1;i<iters.length;i++){
+            if(this.cleanBlockAndFetchNew(i)){
+                var compRes = minEntry.compare(decodedEntries[i]);
+                if(compRes < 0){
+                    minEntry = decodedEntries[i];
+                    blockMinIndex = i;
+                }
+                else if(compRes == 0){
+                    decodedEntries[i].merge(minEntry);
+                    minEntry = decodedEntries[i];
+                }
             }
         }
         // append min token whole entry to merged
-        int curr = ptrInMin;
-        while(curr<decodedBlocks[blockMinIndex].length()
-                &&
-                decodedBlocks[blockMinIndex].charAt(curr) != ';'){
-            mergedBlock.append(decodedBlocks[blockMinIndex].charAt(curr));
-            curr++;
-        }
+        mergedBlock.append(decodedEntries[blockMinIndex].toString());
+
         entryCountInMergedBlock++;
         if(entryCountInMergedBlock >= blockLength){
             writeToDisk();
             entryCountInMergedBlock = 0;
         }
-        ptrs[blockMinIndex] = ++curr;
-        var toContinue = true;
-        if(curr >= decodedBlocks[blockMinIndex].length()){
-            ptrs[blockMinIndex] = 0;
-            toContinue = cleanBlockAndFetchNew(blockMinIndex);
-        }
-        mergedBlock.append(';');
+
+        var toContinue = this.cleanBlockAndFetchNew(blockMinIndex);
+//        mergedBlock.append(this.separator);
         return toContinue;
     }
 
     private void writeToDisk() {
         diskMock.append(mergedBlock);
         mergedBlock.setLength(0);
+
         System.out.println("DISK CONTENT:");
         System.out.println(diskMock);
     }

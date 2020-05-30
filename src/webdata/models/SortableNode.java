@@ -3,7 +3,7 @@ package webdata.models;
 import java.util.Objects;
 
 public class SortableNode{
-    private String rawValue;
+    protected String rawValue;
 
     public SortableNode(String rawValue){
         this.rawValue = rawValue;
@@ -20,6 +20,11 @@ public class SortableNode{
     @Override
     public int hashCode() {
         return Objects.hash(rawValue);
+    }
+
+    @Override
+    public String toString(){
+        return rawValue;
     }
 
 }

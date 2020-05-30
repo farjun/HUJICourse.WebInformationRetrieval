@@ -26,6 +26,8 @@ public class WordsIndex {
 
     public void loadSerializedData(String serializedWordEntry){
         // parse entries "phone|4353|{ 56 : 100 , 79 : 23 };"
+        this.tokenFreq.clear();
+        this.tokenGlobalFreq.clear();
         String[] rows = serializedWordEntry.split(";"); // Assume ";" is the terminal
         for (String row : rows) {
             String[] cols = row.split("\\|");

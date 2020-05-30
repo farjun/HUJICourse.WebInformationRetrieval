@@ -27,10 +27,13 @@ public class IndexReaderImpl {
     public IndexReaderImpl(String productFilePath, String reviewsFilePath, String wordsFilePath) throws IOException {
         BlockSizesFile productsBsf = new BlockSizesFile(new FileReader(productFilePath.concat("block_sizes")));
         this.productsInputStream = new BitRandomAccessInputStream(new File(productFilePath), productsBsf.getBlockSizes());
-        BlockSizesFile reviewsBsf = new BlockSizesFile(new FileReader(reviewsFilePath.concat("block_sizes")));
 
+        BlockSizesFile reviewsBsf = new BlockSizesFile(new FileReader(reviewsFilePath.concat("block_sizes")));
         this.reviewsInputStream = new BitRandomAccessInputStream(new File(reviewsFilePath), reviewsBsf.getBlockSizes());
-        this.wordsInputStream = new BitInputStream(new FileInputStream(wordsFilePath));
+
+        BlockSizesFile wordsBsf = new BlockSizesFile(new FileReader(wordsFilePath.concat("block_sizes")));
+        this.wordsInputStream = new BitRandomAccessInputStream(new File(wordsFilePath), wordsBsf.getBlockSizes());
+
         this.reviewsIndex = new ReviewsIndex();
         this.wordsIndex = new WordsIndex();
         this.productsIndex = new ProductsIndex();
