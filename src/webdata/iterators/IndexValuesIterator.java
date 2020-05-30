@@ -44,7 +44,7 @@ public class IndexValuesIterator implements Iterator<SortableNode> {
 
     private void fillBuffer() throws IOException {
         StringBuilder sb = new StringBuilder();
-        while (true) {
+        while (curNodesInBuffer.size() < maxBufferSize) {
             try {
             // Decode and write one byte
                 int symbol = dec.read();
