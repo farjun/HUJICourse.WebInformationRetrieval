@@ -54,18 +54,18 @@ public class SlowIndexWriter {
         this.wordsIndex.insert(review);
         this.productsIndex.insert(review.productId, review.getStringId());
     }
-
-    public void writeEncoded(String toEncode, AppOutputStream out, boolean lastBatch) throws IOException {
-        ArithmeticEncoder enc = new ArithmeticEncoder(out);
-        for (int symbol: toEncode.toCharArray()) {
-            enc.writeSymbol(symbol);
-        }
-        // Flush remaining code bits
-        if(lastBatch){
-            enc.finish();
-            out.flush();
-        }
-    }
+//
+//    public void writeEncoded(String toEncode, AppOutputStream out, boolean lastBatch) throws IOException {
+//        ArithmeticEncoder enc = new ArithmeticEncoder(out);
+//        for (int symbol: toEncode.toCharArray()) {
+//            enc.writeSymbol(symbol);
+//        }
+//        // Flush remaining code bits
+//        if(lastBatch){
+//            enc.finish();
+//            out.flush();
+//        }
+//    }
 
     public void writeEncoded(String[] blocksToEncode, AppOutputStream out, BlockSizesFile blockSizesFile,
                              boolean lastBatch) throws IOException {
@@ -85,8 +85,9 @@ public class SlowIndexWriter {
             blockSizesFile.addBlockSize(numOfBytesWritten);
         }
 
-        if(lastBatch)
+        if(lastBatch) {
             blockSizesFile.flush();
+        }
     }
 
     public void writeProcessed( boolean lastBatch ) throws IOException {
@@ -172,7 +173,8 @@ public class SlowIndexWriter {
         try {
             var wordsInp = new BitRandomAccessInputStream(new File(wordsPath), wordsBlockSizesFile.getBlockSizes());
             var wordsOut = new BitOutputStream(new FileOutputStream(this.sortedWordsPath));
-            Merger m = new Merger(wordsInp, wordsOut, mergeWordsBlockSizesFile, ';', true);
+            Merger m = new Merger(wordsInp, wordsOut, wordsBlockSizesFile, mergeWordsBlockSizesFile, ';', true);
+            m.externalMerge();
         }
         catch (IOException e){
             e.printStackTrace();

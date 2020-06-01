@@ -8,6 +8,7 @@ import webdata.iostreams.BitRandomAccessInputStream;
 import webdata.iterators.IndexValuesIterator;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class Merger {
 
@@ -24,35 +25,40 @@ public class Merger {
     }
     int entryCountInMergedBlock;
     StringBuilder mergedBlock;
-    static final int K = 10; // number of blocks to use for merge in RAM
+    int numOfBlocks; // number of blocks to use for merge in RAM
     static final int blockLength = 50; // number of entries in each block
     char separator;
     AppOutputStream output;
-    BlockSizesFile blockSizesFile;
+    BlockSizesFile inBlockSizesFile;
+    BlockSizesFile outBlockSizesFile;
     boolean isWordsMerger;
 
     public Merger(char separator, boolean isWordsMerger){
         this.diskMock = new StringBuilder();
 
         this.separator = separator;
-        this.decodedEntries = new SortableNode[K - 1];
         this.entryCountInMergedBlock = 0;
         this.mergedBlock = new StringBuilder();
         this.isWordsMerger = isWordsMerger;
+
     }
 
-    public Merger(BitRandomAccessInputStream input, AppOutputStream output,
-                  BlockSizesFile blockSizesFile, char separator, boolean isWordsMerger) throws IOException {
+    public Merger(BitRandomAccessInputStream input, AppOutputStream output, BlockSizesFile inBlockSizesFile,
+                  BlockSizesFile outBlockSizesFile, char separator, boolean isWordsMerger) throws IOException {
         this(separator, isWordsMerger);
-        iters = new IndexValuesIterator[K - 1];
+        this.output = output;
+        this.inBlockSizesFile = inBlockSizesFile;
+        this.outBlockSizesFile = outBlockSizesFile;
+        ArrayList inBlockSizes = this.inBlockSizesFile.getBlockSizes();
+        this.numOfBlocks = inBlockSizes.size();
+        this.decodedEntries = new SortableNode[numOfBlocks];
+        iters = new IndexValuesIterator[numOfBlocks];
         for(int i = 0; i<iters.length; i++) {
-            iters[i] = new IndexValuesIterator(input, separator); // TODO:integrate Omer addition
+            iters[i] = new IndexValuesIterator(input, separator,30, i); // TODO: check with Omer
         }
         for(int i=0;i<decodedEntries.length;i++){
             this.cleanBlockAndFetchNew(i);
         }
-        this.output = output;
-        this.blockSizesFile = blockSizesFile;
     }
 
 
@@ -115,13 +121,13 @@ public class Merger {
         int numOfBytesWritten = this.output.setCheckpoint();
         enc = new ArithmeticEncoder(this.output);
         var firstTokenEnd = blockToEncode.indexOf("|");
-        var blockSizesFile = (WordsBlockSizesFile)this.blockSizesFile; // down cast to WordsBlockSizesFile
-        blockSizesFile.addBlockDetails(numOfBytesWritten, blockToEncode.substring(0,firstTokenEnd));
+        WordsBlockSizesFile outBlockSizesFile = (WordsBlockSizesFile)this.outBlockSizesFile; // down cast to WordsBlockSizesFile
+        outBlockSizesFile.addBlockDetails(numOfBytesWritten, blockToEncode.substring(0,firstTokenEnd));
 
         // Flush remaining code bits
         if(lastBatch){
             enc.finish();
-            blockSizesFile.flush();
+            outBlockSizesFile.flush();
             this.output.flush();
         }
 
@@ -134,12 +140,12 @@ public class Merger {
         }
         int numOfBytesWritten = this.output.setCheckpoint();
         enc = new ArithmeticEncoder(this.output);
-        this.blockSizesFile.addBlockSize(numOfBytesWritten);
+        this.outBlockSizesFile.addBlockSize(numOfBytesWritten);
 
         // Flush remaining code bits
         if(lastBatch){
             enc.finish();
-            this.blockSizesFile.flush();
+            this.outBlockSizesFile.flush();
             this.output.flush();
         }
 

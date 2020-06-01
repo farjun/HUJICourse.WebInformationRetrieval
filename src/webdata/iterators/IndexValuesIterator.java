@@ -26,17 +26,17 @@ public class IndexValuesIterator implements Iterator<SortableNode> {
     }
 
     public IndexValuesIterator(BitRandomAccessInputStream inputStream, char seperator, int maxBufferSize, int blockNum) throws IOException{
+        inputStream.setPointerToBlock(blockNum);
         this.dec = new ArithmeticDecoder(inputStream);
         this.inputStream = inputStream;
         this.seperator = seperator;
         this.maxBufferSize = maxBufferSize;
         this.curNodesInBuffer = new LinkedList<>();
-        inputStream.setPointerToBlock(blockNum);
     }
 
     @Override
     public boolean hasNext() {
-        return this.curNodesInBuffer.size() > 0 ||  !inputStream.hasMoreInput();
+        return this.curNodesInBuffer.size() > 0 || inputStream.hasMoreInput();
     }
 
     private void fillBuffer() throws IOException {
