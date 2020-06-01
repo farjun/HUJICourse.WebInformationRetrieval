@@ -70,20 +70,23 @@ public class SlowIndexWriter {
     public void writeEncoded(String[] blocksToEncode, AppOutputStream out, BlockSizesFile blockSizesFile,
                              boolean lastBatch) throws IOException {
         ArithmeticEncoder enc = new ArithmeticEncoder(out);
-        for (String curBlockToEncode: blocksToEncode ) {
-            for (int symbol: curBlockToEncode.toCharArray()) {
+        for (int i = 0; i < blocksToEncode.length; i++) {
+            String curBlockToEncode = blocksToEncode[i];
+            char[] symbols = curBlockToEncode.toCharArray();
+            for (int symbol : symbols) {
                 enc.writeSymbol(symbol);
+            }
+            // Flush remaining code bits
+            if(lastBatch && i == blocksToEncode.length - 1){ // last block of last batch
+                enc.finish();
             }
             int numOfBytesWritten = out.setCheckpoint();
             enc = new ArithmeticEncoder(out);
             blockSizesFile.addBlockSize(numOfBytesWritten);
         }
-        // Flush remaining code bits
-        if(lastBatch){
-            enc.finish();
+
+        if(lastBatch)
             blockSizesFile.flush();
-            out.flush();
-        }
     }
 
     public void writeProcessed( boolean lastBatch ) throws IOException {
@@ -161,7 +164,6 @@ public class SlowIndexWriter {
 
         } catch (IOException e) {
             e.printStackTrace();
-
         }
 
     }

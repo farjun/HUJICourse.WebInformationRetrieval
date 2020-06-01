@@ -90,10 +90,10 @@ public class ReviewStore {
     }
     private static void run() {
 //        String reviewsFilePath = "./src/datasets/full/foods.txt";
-        String reviewsFilePath = "./src/datasets/1000.txt";
+        String reviewsFilePath = "./datasets/1000.txt";
         String indexDir =  "./src/index";
         SlowIndexWriter writer = new SlowIndexWriter();
-        writer.slowWrite(reviewsFilePath,indexDir);
+//        writer.slowWrite(reviewsFilePath,indexDir);
         IndexReader reader = new IndexReader(indexDir);
         Enumeration<Integer> enumeration = reader.getProductReviews("B0009XLVG0");
 
@@ -112,7 +112,7 @@ public class ReviewStore {
         }
         System.out.println("");
 
-        for (int i = 0; i < 50; i++) {
+        for (int i = 950; i <= 1001; i++) {
             System.out.println("---------------"+Integer.toString(i)+"---------------");
             System.out.println(reader.getReviewHelpfulnessDenominator(i));
             System.out.println(reader.getReviewHelpfulnessNumerator(i));

@@ -8,7 +8,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 
 public class ProductsIndex extends Index {
-    private static final int NUM_OF_PRODUCTS_IN_BLOCK = 200;
+    private static final int NUM_OF_PRODUCTS_IN_BLOCK = 300;
     private HashMap<String, CompressedArrayList> hashMap;
 
     public ProductsIndex(){

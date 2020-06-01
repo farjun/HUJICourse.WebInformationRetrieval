@@ -23,7 +23,6 @@ public final class ArithmeticEncoder {
         output = Objects.requireNonNull(out);
         numOfBytsWritten = 0;
         numUnderflow=0;
-
     }
 
     public void writeSymbol(int symbol) {
