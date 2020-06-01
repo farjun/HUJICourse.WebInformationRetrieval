@@ -20,48 +20,37 @@ public class IndexValuesIterator implements Iterator<SortableNode> {
     private int maxBufferSize;
     ArithmeticDecoder dec;
     private Deque<String> curNodesInBuffer;
-    public int curBlockNum;
 
     public IndexValuesIterator(BitRandomAccessInputStream inputStream, char seperator) throws IOException{
-        this(inputStream, seperator, 30);
-
+        this(inputStream, seperator, 30, 0);
     }
 
-    public IndexValuesIterator(BitRandomAccessInputStream inputStream, char seperator, int maxBufferSize) throws IOException{
+    public IndexValuesIterator(BitRandomAccessInputStream inputStream, char seperator, int maxBufferSize, int blockNum) throws IOException{
         this.dec = new ArithmeticDecoder(inputStream);
         this.inputStream = inputStream;
         this.seperator = seperator;
         this.maxBufferSize = maxBufferSize;
         this.curNodesInBuffer = new LinkedList<>();
-        this.curBlockNum = 0;
-        inputStream.setPointerToBlock(curBlockNum);
+        inputStream.setPointerToBlock(blockNum);
     }
 
     @Override
     public boolean hasNext() {
-        return inputStream.getNumOfBlocks() == curBlockNum && !inputStream.hasMoreInput();
+        return this.curNodesInBuffer.size() > 0 ||  !inputStream.hasMoreInput();
     }
 
     private void fillBuffer() throws IOException {
         StringBuilder sb = new StringBuilder();
         while (curNodesInBuffer.size() < maxBufferSize) {
-            try {
             // Decode and write one byte
-                int symbol = dec.read();
-                if(symbol != seperator){
-                    sb.append((char)symbol);
-                }
-                else{
-                    curNodesInBuffer.add(sb.toString());
-                }
-            }catch (OutOfBitsException e){
-                curBlockNum++;
-                inputStream.setPointerToBlock(curBlockNum);
-                this.dec = new ArithmeticDecoder(inputStream);
-                break;
+            int symbol = dec.read();
+            if(symbol != seperator){
+                sb.append((char)symbol);
+            }
+            else{
+                curNodesInBuffer.add(sb.toString());
             }
         }
-
     }
 
     @Override
@@ -72,7 +61,7 @@ public class IndexValuesIterator implements Iterator<SortableNode> {
         else{
             try {
                 this.fillBuffer();
-            }catch (OutOfBlocksException exception){
+            }catch (OutOfBitsException exception){
                 return null;
             }catch (IOException exception){
                 System.err.println("Exception in iterator");

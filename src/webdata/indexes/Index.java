@@ -23,8 +23,8 @@ public class Index {
 
     }
 
-    public IndexValuesIterator valuesIterator(BitRandomAccessInputStream inputStream, char seperator, int maxNumOfElementsInBuffer) throws IOException  {
-       return new IndexValuesIterator(inputStream,seperator,  maxNumOfElementsInBuffer);
+    public IndexValuesIterator valuesIterator(BitRandomAccessInputStream inputStream, char seperator, int maxNumOfElementsInBuffer, int blobkNum) throws IOException  {
+       return new IndexValuesIterator(inputStream, seperator,  maxNumOfElementsInBuffer, blobkNum);
     }
 
     public StringBuffer decodeBlock(BitRandomAccessInputStream inputStream, int blockNum) throws IOException {
