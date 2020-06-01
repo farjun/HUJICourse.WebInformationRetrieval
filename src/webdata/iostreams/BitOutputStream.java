@@ -60,7 +60,7 @@ public final class BitOutputStream implements AutoCloseable, AppOutputStream {
 	public int setCheckpoint() throws IOException{
 		flush();
 		int temp = numOfBytesWritten;
-		numOfBytesWritten =0;
+		numOfBytesWritten = 0;
 		return temp;
 	}
 

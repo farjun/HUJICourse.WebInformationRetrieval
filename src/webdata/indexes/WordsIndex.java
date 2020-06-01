@@ -5,7 +5,7 @@ import webdata.models.TokenFreqEnumeration;
 import java.util.*;
 
 
-public class WordsIndex {
+public class WordsIndex extends Index {
     // will host map of sort { token : {reviewId:count,...}} // TreeMap<String, TreeMap<Long, Integer>>
     public final TreeMap<String, TreeMap<Integer, Integer>> tokenFreq;
     // will host map of sort { token : globalCounter }
@@ -24,12 +24,13 @@ public class WordsIndex {
         this.loadSerializedData(serializedWordEntry);
     }
 
-    public void loadSerializedData(String serializedWordEntry){
-        // parse entries "phone|4353|{ 56 : 100 , 79 : 23 };"
+    public void loadSerializedData(String serializedWordEntries){
+        // parse entries "phone|4353|{56:100,79:23};"
         this.tokenFreq.clear();
         this.tokenGlobalFreq.clear();
-        String[] rows = serializedWordEntry.split(";"); // Assume ";" is the terminal
+        String[] rows = serializedWordEntries.split(";"); // Assume ";" is the terminal
         for (String row : rows) {
+            if(row.length()<=0) continue;
             String[] cols = row.split("\\|");
             var key = cols[0];
             var globFreq = cols[1];
@@ -150,6 +151,9 @@ public class WordsIndex {
 
         return productsBlocks;
     }
+
+
+
 
 
 }

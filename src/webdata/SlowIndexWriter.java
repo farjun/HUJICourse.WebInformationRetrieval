@@ -2,19 +2,16 @@ package webdata;
 
 import org.junit.jupiter.api.Assertions;
 import webdata.encoders.ArithmeticEncoder;
-import webdata.indexes.BlockSizesFile;
-import webdata.indexes.ProductsIndex;
-import webdata.indexes.ReviewsIndex;
-import webdata.indexes.WordsIndex;
+import webdata.indexes.*;
 import webdata.iostreams.AppOutputStream;
+import webdata.iostreams.BitInputStream;
 import webdata.iostreams.BitOutputStream;
+import webdata.iostreams.BitRandomAccessInputStream;
 import webdata.iterators.ReviewsIterator;
+import webdata.models.Merger;
 import webdata.models.ProductReview;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Paths;
 import java.util.Enumeration;
 
@@ -27,9 +24,15 @@ public class SlowIndexWriter {
     private BlockSizesFile reviewsBlockSizesFile;
 
     protected AppOutputStream wordsOutputStream;
+    private BlockSizesFile wordsBlockSizesFile;
+    private WordsBlockSizesFile mergeWordsBlockSizesFile;
+
     private ProductsIndex productsIndex;
     private ReviewsIndex reviewsIndex;
     private WordsIndex wordsIndex;
+
+    private String wordsPath;
+    private String sortedWordsPath;
 
     public void close(){
         try {
@@ -64,7 +67,8 @@ public class SlowIndexWriter {
         }
     }
 
-    public void writeEncoded(String[] blocksToEncode, AppOutputStream out, BlockSizesFile blockSizesFile, boolean lastBatch) throws IOException {
+    public void writeEncoded(String[] blocksToEncode, AppOutputStream out, BlockSizesFile blockSizesFile,
+                             boolean lastBatch) throws IOException {
         ArithmeticEncoder enc = new ArithmeticEncoder(out);
         for (String curBlockToEncode: blocksToEncode ) {
             for (int symbol: curBlockToEncode.toCharArray()) {
@@ -85,8 +89,7 @@ public class SlowIndexWriter {
     public void writeProcessed( boolean lastBatch ) throws IOException {
         writeEncoded(this.productsIndex.toStringBlocks(lastBatch), this.productsOutputStream, this.productsBlockSizesFile, lastBatch);
         writeEncoded(this.reviewsIndex.toStringBlocks(lastBatch), this.reviewsOutputStream, this.reviewsBlockSizesFile,lastBatch );
-        writeEncoded(this.wordsIndex.toString(), this.wordsOutputStream, lastBatch);
-
+        writeEncoded(this.wordsIndex.toStringBlocks(lastBatch), this.wordsOutputStream, this.wordsBlockSizesFile, lastBatch);
     }
 
 
@@ -103,7 +106,8 @@ public class SlowIndexWriter {
                 }
             }
 
-            var wordsPath = Paths.get(dirPath,"words").toString();
+            wordsPath = Paths.get(dirPath,"words").toString();
+            sortedWordsPath = wordsPath.concat("_sorted");
             var reviewsPath = Paths.get(dirPath,"reviews").toString();
             var productsPath = Paths.get(dirPath,"products").toString();
 
@@ -116,6 +120,8 @@ public class SlowIndexWriter {
             this.reviewsIndex = new ReviewsIndex();
 
             this.wordsOutputStream =  new BitOutputStream(new FileOutputStream(wordsPath));
+            this.wordsBlockSizesFile = new BlockSizesFile(new FileWriter(wordsPath.concat("block_sizes")));
+            this.mergeWordsBlockSizesFile = new WordsBlockSizesFile(new FileWriter(wordsPath.concat("block_sizes_merge")));
             this.wordsIndex = new WordsIndex();
 
         } catch (IOException e) {
@@ -160,6 +166,18 @@ public class SlowIndexWriter {
 
     }
 
+    public void sort(){
+        try {
+            var wordsInp = new BitRandomAccessInputStream(new File(wordsPath), wordsBlockSizesFile.getBlockSizes());
+            var wordsOut = new BitOutputStream(new FileOutputStream(this.sortedWordsPath));
+            Merger m = new Merger(wordsInp, wordsOut, mergeWordsBlockSizesFile, ';', true);
+        }
+        catch (IOException e){
+            e.printStackTrace();
+            System.err.println(e);
+        }
+    }
+
     /**
      * Delete all index files by removing the given directory
      */
@@ -190,12 +208,13 @@ public class SlowIndexWriter {
         String reviewsFilePath = "./datasets/1000.txt";
         SlowIndexWriter writer = new SlowIndexWriter();
         writer.slowWrite(reviewsFilePath, indexDir);
+        writer.sort();
         IndexReader reader = new IndexReader(indexDir);
-        for (int i = 1; i <= 100; i++) {
-            String productId = reader.getProductId(i);
-            Enumeration<Integer> reviewIds = reader.getProductReviews("B00067AD4U");
-            Assertions.assertTrue(enumerationContains(reviewIds, i), "checking review "+i+"");
-        }
+//        for (int i = 1; i <= 100; i++) {
+//            String productId = reader.getProductId(i);
+//            Enumeration<Integer> reviewIds = reader.getProductReviews("B00067AD4U");
+//            Assertions.assertTrue(enumerationContains(reviewIds, i), "checking review "+i+"");
+//        }
 
     }
 }

@@ -1,6 +1,7 @@
 package webdata;
 
 //to manually test serialization
+import org.junit.jupiter.api.Assertions;
 import webdata.encoders.ConcatEncoder;
 import webdata.encoders.ConcatDecoder;
 import webdata.models.Merger;
@@ -25,20 +26,31 @@ public class ReviewStore {
     }
 
     private static void runMerger() {
-        var s = "a|2|{997:1,999:1};all|2|{997:1,999:1};bomb|2|{997:1,999:1};"+
-        "almost|2|{997:1,999:1};bottles|2|{997:1,999:1};different|2|{997:1,999:1};"+
-                "can|2|{997:1,999:1};cool|2|{997:1,999:1};mdu|6|{1:1};";
-        var mrgr = new Merger(s);
-//        for(int i=0;i<12;i++){
-//            mrgr.mergeIter();
-//            System.out.println(
+
+//        var s = "a|2|{997:1,999:1};all|2|{997:1,999:1};bomb|2|{997:1,999:1};"+
+//        "almost|2|{997:1,999:1};bottles|2|{997:1,999:1};different|2|{997:1,999:1};"+
+//                "can|2|{997:1,999:1};cool|2|{997:1,999:1};mdu|6|{1:1};";
+//        var mrgr = new Merger(s);
+////        for(int i=0;i<12;i++){
+////            mrgr.mergeIter();
+////            System.out.println(
+////                    mrgr.getMergedBlock().toString()
+////            );
+////        }
+//        mrgr.externalMerge();
+//        System.out.println(
 //                    mrgr.getMergedBlock().toString()
 //            );
-//        }
-        mrgr.externalMerge();
-        System.out.println(
-                    mrgr.getMergedBlock().toString()
-            );
+        String indexDir =  "./src/index";
+        String reviewsFilePath = "./datasets/1000.txt";
+        SlowIndexWriter writer = new SlowIndexWriter();
+        writer.slowWrite(reviewsFilePath, indexDir);
+        IndexReader reader = new IndexReader(indexDir);
+        for (int i = 1; i <= 100; i++) {
+            String productId = reader.getProductId(i);
+            Enumeration<Integer> reviewIds = reader.getProductReviews("B00067AD4U");
+        }
+
     }
     private static void runTrie() {
 

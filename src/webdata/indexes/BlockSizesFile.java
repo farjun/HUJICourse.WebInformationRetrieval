@@ -4,17 +4,19 @@ import java.io.*;
 import java.util.ArrayList;
 
 public class BlockSizesFile {
-    private BufferedWriter out;
-    private final ArrayList<Integer> blockSizes;
+    protected BufferedWriter out;
+    protected BufferedReader in;
+    protected final ArrayList<Integer> blockSizes;
+
+    public BlockSizesFile(){blockSizes = new ArrayList<>();}
 
     public BlockSizesFile(FileWriter filename) throws IOException{
+        this();
         out = new BufferedWriter(filename);
-        blockSizes = new ArrayList<>();
     }
-
     public BlockSizesFile(FileReader filename) throws IOException{
-        BufferedReader in = new BufferedReader(filename);
-        blockSizes = new ArrayList<>();
+        this();
+        in = new BufferedReader(filename);
 
         String line;
         while ((line = in.readLine()) != null){

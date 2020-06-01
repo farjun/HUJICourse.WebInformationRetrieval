@@ -19,7 +19,7 @@ import static webdata.encoders.BitUtils.END_OF_FILE;
 public class IndexReaderImpl {
     protected BitRandomAccessInputStream productsInputStream;
     protected BitRandomAccessInputStream reviewsInputStream;
-    protected AppInputStream wordsInputStream;
+    protected BitRandomAccessInputStream wordsInputStream;
     private ProductsIndex productsIndex;
     private ReviewsIndex reviewsIndex;
     private WordsIndex wordsIndex;
@@ -59,7 +59,7 @@ public class IndexReaderImpl {
     }
 
     public int getReviewScore(int reviewId) {
-        try {
+        try{
             this.reviewsIndex.loadBlock(this.reviewsInputStream, this.reviewsIndex.getBlockNum(reviewId));
         }catch (OutOfBlocksException e){
             return -1;
@@ -127,6 +127,13 @@ public class IndexReaderImpl {
     }
 
     public int getTokenCollectionFrequency(String token) {
+        try {
+            this.wordsIndex.loadBlock(this.reviewsInputStream, this.wordsIndex.getBlockNum(token));
+        }catch (OutOfBlocksException e){
+            return -1;
+        }catch (IOException e){
+            System.err.println("Exception was raised in getTokenCollectionFrequency");
+        }
         return this.wordsIndex.tokenGlobalFreq.getOrDefault(token.toLowerCase(),0);
     }
 
