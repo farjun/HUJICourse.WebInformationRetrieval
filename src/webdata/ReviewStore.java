@@ -114,13 +114,13 @@ public class ReviewStore {
 
         for (int i = 199; i < 201; i++) {
             System.out.println("---------------"+Integer.toString(i)+"---------------");
-            System.out.println(reader.getReviewHelpfulnessDenominator(i));
-            System.out.println(reader.getReviewHelpfulnessNumerator(i));
-            System.out.println(reader.getReviewLength(i));
-            System.out.println(reader.getReviewScore(i));
+//            System.out.println(reader.getReviewHelpfulnessDenominator(i));
+//            System.out.println(reader.getReviewHelpfulnessNumerator(i));
+//            System.out.println(reader.getReviewLength(i));
+//            System.out.println(reader.getReviewScore(i));
             System.out.println(reader.getTokenCollectionFrequency("the"));
-            System.out.println(reader.getTokenFrequency("the"));
-            System.out.println(reader.getProductId(i));
+//            System.out.println(reader.getTokenFrequency("the"));
+//            System.out.println(reader.getProductId(i));
         }
         System.out.print("getTokenSizeOfReviews:");
         System.out.println(reader.getTokenSizeOfReviews());

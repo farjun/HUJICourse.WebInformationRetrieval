@@ -39,7 +39,7 @@ public class Index {
                 sb.append((char)symbol);
             }catch (IOException e){
                 assert symbol == '$';
-                sb.deleteCharAt(sb.length() -1);
+                sb.deleteCharAt(sb.length() - 1);
                 break;
             }
         }

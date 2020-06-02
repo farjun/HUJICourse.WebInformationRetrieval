@@ -12,7 +12,7 @@ public class WordsIndex extends Index {
     public final TreeMap<String, Integer> tokenGlobalFreq;
 
     private StringBuilder leftOverFromLastBlock;
-    public final int NUM_OF_ENTRIES_IN_BLOCK = 50; //TODO : increase
+    public final int NUM_OF_ENTRIES_IN_BLOCK = 10; //TODO : increase
     private int mockedCounter;
 
     public WordsIndex(){
@@ -41,14 +41,14 @@ public class WordsIndex extends Index {
         String[] rows = serializedWordEntries.split(";"); // Assume ";" is the terminal
         for (String row : rows) {
             if(row.length()<=0) continue;
-            if(leftOverFromLastBlock.length()!=0){
-                row = leftOverFromLastBlock.toString().concat(row);
-                leftOverFromLastBlock.setLength(0);//empty
-            }
-            if(row.lastIndexOf('}') == -1){
-                leftOverFromLastBlock.append(row);
-                continue;
-            }
+//            if(leftOverFromLastBlock.length()!=0){
+//                row = leftOverFromLastBlock.toString().concat(row);
+//                leftOverFromLastBlock.setLength(0);//empty
+//            }
+//            if(row.lastIndexOf('}') == -1){
+//                leftOverFromLastBlock.append(row);
+//                continue;
+//            }
             String[] cols = row.split("\\|");
             var key = cols[0];
             var globFreq = cols[1];

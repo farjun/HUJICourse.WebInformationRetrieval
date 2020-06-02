@@ -26,7 +26,7 @@ public class Merger {
     int entryCountInMergedBlock;
     StringBuilder mergedBlock;
     int numOfBlocks; // number of blocks to use for merge in RAM
-    static final int blockLength = 50; // number of entries in each block
+    static final int blockLength = 5; // number of entries in each block
     char separator;
     AppOutputStream output;
     BlockSizesFile inBlockSizesFile;
@@ -54,7 +54,7 @@ public class Merger {
         this.decodedEntries = new SortableNode[numOfBlocks];
         iters = new IndexValuesIterator[numOfBlocks];
         for(int i = 0; i<iters.length; i++) {
-            iters[i] = new IndexValuesIterator(input, separator,30, i); // TODO: check with Omer
+            iters[i] = new IndexValuesIterator(new BitRandomAccessInputStream(input), separator,30, i); // TODO: check with Omer
         }
         for(int i=0;i<decodedEntries.length;i++){
             this.cleanBlockAndFetchNew(i);
@@ -86,7 +86,7 @@ public class Merger {
         for(int i=1;i<iters.length;i++){
             if(this.cleanBlockAndFetchNew(i)){
                 var compRes = minEntry.compare(decodedEntries[i]);
-                if(compRes < 0){
+                if(compRes > 0){
                     minEntry = decodedEntries[i];
                     blockMinIndex = i;
                 }
@@ -108,7 +108,7 @@ public class Merger {
             entryCountInMergedBlock = 0;
         }
 
-        var shouldContinue = this.cleanBlockAndFetchNew(blockMinIndex);
+        boolean shouldContinue = this.cleanBlockAndFetchNew(blockMinIndex);
 //        mergedBlock.append(this.separator);
         return shouldContinue;
     }

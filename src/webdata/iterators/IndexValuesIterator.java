@@ -18,6 +18,7 @@ public class IndexValuesIterator implements Iterator<SortableNode> {
     private final BitRandomAccessInputStream inputStream;
     private final char seperator;
     private int maxBufferSize;
+    private int blockNum; // TODO for debugging purposes at least
     ArithmeticDecoder dec;
     private Deque<String> curNodesInBuffer;
 
@@ -32,6 +33,7 @@ public class IndexValuesIterator implements Iterator<SortableNode> {
         this.seperator = seperator;
         this.maxBufferSize = maxBufferSize;
         this.curNodesInBuffer = new LinkedList<>();
+        this.blockNum = blockNum;
     }
 
     @Override
@@ -48,7 +50,10 @@ public class IndexValuesIterator implements Iterator<SortableNode> {
                 sb.append((char)symbol);
             }
             else{
+                if((char)seperator == ';')
+                    sb.append(';'); // in case of words index entries
                 curNodesInBuffer.add(sb.toString());
+                sb = new StringBuilder();
             }
         }
     }

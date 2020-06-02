@@ -15,16 +15,20 @@ public class BitRandomAccessInputStream implements AppInputStream {
 
     private int byteBuffer;
 
-    private int numBitsRemaining;
-    private final ArrayList<Integer> blockSizes;
+    private File input;
 
+    private int numBitsRemaining;
+
+    private final ArrayList<Integer> blockSizes;
     private int numOfBytsInDecoderBuffer;
+
     /**
      * Constructs a bit input stream based on the specified byte input stream.
-     * @param in the byte input stream
+     * @param input the byte input stream
      */
-    public BitRandomAccessInputStream(File in, ArrayList<Integer> blockSizes) throws IOException  {
-        randomAccessFile = new RandomAccessFile(in, "r");
+    public BitRandomAccessInputStream(File input, ArrayList<Integer> blockSizes) throws IOException  {
+        this.input = input;
+        randomAccessFile = new RandomAccessFile(input, "r");
         byteBuffer = 0;
         numBitsRemaining = 0;
 
@@ -33,6 +37,14 @@ public class BitRandomAccessInputStream implements AppInputStream {
         curBlockReading = -1;
         numOfBytsInDecoderBuffer = NUM_OF_BYTES_IN_DECODER_BUFFER ;
         this.blockSizes = blockSizes;
+    }
+    // copy constructor
+
+    public BitRandomAccessInputStream(BitRandomAccessInputStream bitRandomAccessInputStream) throws IOException  {
+        this(new File(bitRandomAccessInputStream.getInputPath()), bitRandomAccessInputStream.blockSizes);
+    }
+    public String getInputPath() {
+        return input.getAbsolutePath();
     }
 
     public boolean blockFinished(){
