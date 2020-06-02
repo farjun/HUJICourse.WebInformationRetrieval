@@ -1,5 +1,6 @@
 package webdata.encoders;
 import webdata.iostreams.AppInputStream;
+import webdata.iostreams.BitRandomAccessInputStream;
 import webdata.iostreams.OutOfBitsException;
 import webdata.models.SymbolTable;
 
@@ -9,12 +10,12 @@ public class ArithmeticDecoder {
     private final SymbolTable frequencyTable;
     protected long low;
     protected long high;
-    private AppInputStream input;
+    private BitRandomAccessInputStream input;
 
     // The current raw code bits being buffered.
     private long bitBuffer;
 
-    public ArithmeticDecoder(AppInputStream input) throws IOException {
+    public ArithmeticDecoder(BitRandomAccessInputStream input) throws IOException {
         low = 0;
         high = BitUtils.getAllOnes();
         this.input = input;
@@ -66,7 +67,6 @@ public class ArithmeticDecoder {
 
         long value = ((offset + 1) * total - 1) / range;
         int symbol = searchSymbol(value);
-
         updateHighAndLow(symbol);
         this.frequencyTable.incrementSymbolCounter(symbol);
         return symbol;
@@ -102,7 +102,6 @@ public class ArithmeticDecoder {
         if(input.hasMoreInput()){
             return input.read();
         }
-
         throw new OutOfBitsException();
     }
 

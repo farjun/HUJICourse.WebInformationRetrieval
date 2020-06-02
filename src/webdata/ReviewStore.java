@@ -44,7 +44,7 @@ public class ReviewStore {
         String indexDir =  "./src/index";
         String reviewsFilePath = "./datasets/1000.txt";
         SlowIndexWriter writer = new SlowIndexWriter();
-        writer.slowWrite(reviewsFilePath, indexDir);
+//        writer.slowWrite(reviewsFilePath, indexDir);
         IndexReader reader = new IndexReader(indexDir);
         for (int i = 1; i <= 100; i++) {
             String productId = reader.getProductId(i);
@@ -93,26 +93,26 @@ public class ReviewStore {
         String reviewsFilePath = "./datasets/1000.txt";
         String indexDir =  "./src/index";
         SlowIndexWriter writer = new SlowIndexWriter();
-//        writer.slowWrite(reviewsFilePath,indexDir);
+        writer.slowWrite(reviewsFilePath,indexDir);
         IndexReader reader = new IndexReader(indexDir);
-        Enumeration<Integer> enumeration = reader.getProductReviews("B0009XLVG0");
+//        Enumeration<Integer> enumeration = reader.getProductReviews("B0009XLVG0");
+//
+//        System.out.println("getProductReviews:");
+//        while (enumeration.hasMoreElements()){
+//            System.out.print(enumeration.nextElement());
+//            System.out.print(",");
+//        }
+//
+//        System.out.println("");
+//        System.out.println("getReviewsWithToken:");
+//        Enumeration<Integer> revWithTokenEnumeration = reader.getReviewsWithToken("the");
+//        while (revWithTokenEnumeration.hasMoreElements()){
+//            System.out.print(revWithTokenEnumeration.nextElement());
+//            System.out.print(",");
+//        }
+//        System.out.println("");
 
-        System.out.println("getProductReviews:");
-        while (enumeration.hasMoreElements()){
-            System.out.print(enumeration.nextElement());
-            System.out.print(",");
-        }
-
-        System.out.println("");
-        System.out.println("getReviewsWithToken:");
-        Enumeration<Integer> revWithTokenEnumeration = reader.getReviewsWithToken("the");
-        while (revWithTokenEnumeration.hasMoreElements()){
-            System.out.print(revWithTokenEnumeration.nextElement());
-            System.out.print(",");
-        }
-        System.out.println("");
-
-        for (int i = 950; i <= 1001; i++) {
+        for (int i = 199; i < 201; i++) {
             System.out.println("---------------"+Integer.toString(i)+"---------------");
             System.out.println(reader.getReviewHelpfulnessDenominator(i));
             System.out.println(reader.getReviewHelpfulnessNumerator(i));

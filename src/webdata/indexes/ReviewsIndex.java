@@ -92,7 +92,6 @@ public class ReviewsIndex extends Index {
         if(lastBatch) {
             String lastBlock = sb.toString();
             if (!lastBlock.equals("")) {
-                sb.deleteCharAt(sb.length() - 1);
                 reviewsInBlocks[curBlock] = lastBlock;
             }
         }else{

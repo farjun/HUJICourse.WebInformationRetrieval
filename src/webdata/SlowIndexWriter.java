@@ -55,18 +55,6 @@ public class SlowIndexWriter {
         this.productsIndex.insert(review.productId, review.getStringId());
     }
 
-    public void writeEncoded(String toEncode, AppOutputStream out, boolean lastBatch) throws IOException {
-        ArithmeticEncoder enc = new ArithmeticEncoder(out);
-        for (int symbol: toEncode.toCharArray()) {
-            enc.writeSymbol(symbol);
-        }
-        // Flush remaining code bits
-        if(lastBatch){
-            enc.finish();
-            out.flush();
-        }
-    }
-
     public void writeEncoded(String[] blocksToEncode, AppOutputStream out, BlockSizesFile blockSizesFile,
                              boolean lastBatch) throws IOException {
         ArithmeticEncoder enc = new ArithmeticEncoder(out);
@@ -76,6 +64,7 @@ public class SlowIndexWriter {
             for (int symbol : symbols) {
                 enc.writeSymbol(symbol);
             }
+            enc.writeSymbol('$');
             // Flush remaining code bits
             if(lastBatch && i == blocksToEncode.length - 1){ // last block of last batch
                 enc.finish();
@@ -84,7 +73,6 @@ public class SlowIndexWriter {
             enc = new ArithmeticEncoder(out);
             blockSizesFile.addBlockSize(numOfBytesWritten);
         }
-
         if(lastBatch)
             blockSizesFile.flush();
     }

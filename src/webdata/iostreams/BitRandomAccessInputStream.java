@@ -1,10 +1,13 @@
 package webdata.iostreams;
 
+import webdata.encoders.BitUtils;
+
 import java.io.*;
 import java.util.ArrayList;
 
 public class BitRandomAccessInputStream implements AppInputStream {
 
+    public static final int NUM_OF_BYTES_IN_DECODER_BUFFER = 3;
     private final RandomAccessFile randomAccessFile;
     private final int curBlockReading;
     private int curBlockNumOfBytes;
@@ -15,6 +18,7 @@ public class BitRandomAccessInputStream implements AppInputStream {
     private int numBitsRemaining;
     private final ArrayList<Integer> blockSizes;
 
+    private int numOfBytsInDecoderBuffer;
     /**
      * Constructs a bit input stream based on the specified byte input stream.
      * @param in the byte input stream
@@ -27,15 +31,19 @@ public class BitRandomAccessInputStream implements AppInputStream {
         numOfBytesRead = 0;
         curBlockNumOfBytes = 0;
         curBlockReading = -1;
+        numOfBytsInDecoderBuffer = NUM_OF_BYTES_IN_DECODER_BUFFER ;
         this.blockSizes = blockSizes;
     }
 
-    private boolean blockFinished(){
-        return curBlockNumOfBytes <= numOfBytesRead && numBitsRemaining == 0;
+    public boolean blockFinished(){
+//        if(curBlockNumOfBytes < numOfBytesRead + 1 ){
+//            System.out.println("omer");
+//        }
+        return curBlockNumOfBytes == numOfBytesRead && numBitsRemaining == 0 || curBlockNumOfBytes < numOfBytesRead;
     }
 
     public boolean hasMoreInput(){
-        return !this.blockFinished();
+        return !this.blockFinished() || numOfBytsInDecoderBuffer >= 0;
     }
 
     public int getNumOfBlocks(){
@@ -48,25 +56,23 @@ public class BitRandomAccessInputStream implements AppInputStream {
      * @return the next bit of 0 or 1, or -1 for the end of stream
      */
     public int read() throws IOException {
-        if (blockFinished())
-            return -1;
-
         if (numBitsRemaining == 0) {
             readByte();
-            // if we reach the end of this block we will stop reading and return end of stream
-            if(curBlockNumOfBytes <= numOfBytesRead) {
-                byteBuffer = -1;
-                return -1; // or 11111111111111
-            }
         }
         numBitsRemaining--;
         return (byteBuffer >>> numBitsRemaining) & 1;
     }
 
     private void readByte() throws IOException {
-        byteBuffer = randomAccessFile.read();
+        if (blockFinished()) {
+            byteBuffer =  -1;
+            numOfBytsInDecoderBuffer--;
+        }else {
+            byteBuffer = randomAccessFile.read();
+            numOfBytesRead++;
+        }
         numBitsRemaining = 8;
-        numOfBytesRead++;
+
     }
 
     /**
@@ -86,6 +92,8 @@ public class BitRandomAccessInputStream implements AppInputStream {
         curBlockNumOfBytes = blockSizes.get(blockNumber);
         byteBuffer = 0;
         numOfBytesRead = 0;
+        numOfBytsInDecoderBuffer = NUM_OF_BYTES_IN_DECODER_BUFFER;
+
     }
 
 

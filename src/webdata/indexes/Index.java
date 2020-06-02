@@ -31,13 +31,15 @@ public class Index {
         inputStream.setPointerToBlock(blockNum);
         ArithmeticDecoder dec = new ArithmeticDecoder(inputStream);
         StringBuffer sb = new StringBuffer();
-
+        int symbol = 0;
         while (true) {
             // Decode and write one byte
             try {
-                int symbol = dec.read();
+                symbol = dec.read();
                 sb.append((char)symbol);
             }catch (IOException e){
+                assert symbol == '$';
+                sb.deleteCharAt(sb.length() -1);
                 break;
             }
         }
