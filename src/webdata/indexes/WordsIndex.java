@@ -11,26 +11,44 @@ public class WordsIndex extends Index {
     // will host map of sort { token : globalCounter }
     public final TreeMap<String, Integer> tokenGlobalFreq;
 
-    public final int NUM_OF_ENTRIES_IN_BLOCK = 3; //TODO : increase
+    private StringBuilder leftOverFromLastBlock;
+    public final int NUM_OF_ENTRIES_IN_BLOCK = 50; //TODO : increase
+    private int mockedCounter;
 
     public WordsIndex(){
         this.tokenFreq = new TreeMap<>();
         this.tokenGlobalFreq = new TreeMap<>();
+        this.leftOverFromLastBlock = new StringBuilder();
+        this.mockedCounter = 0;
     }
 
     public WordsIndex(String serializedWordEntry){
         // parse entries "phone|4353|{ 56 : 100 , 79 : 23 };"
         this();
-        this.loadSerializedData(serializedWordEntry);
+        this.loadData(serializedWordEntry);
     }
 
-    public void loadSerializedData(String serializedWordEntries){
+
+    public int getBlockNum(String token){
+        return mockedCounter++; //TODO
+    }
+
+    @Override
+    public void loadData(String serializedWordEntries){
         // parse entries "phone|4353|{56:100,79:23};"
         this.tokenFreq.clear();
         this.tokenGlobalFreq.clear();
         String[] rows = serializedWordEntries.split(";"); // Assume ";" is the terminal
         for (String row : rows) {
             if(row.length()<=0) continue;
+            if(leftOverFromLastBlock.length()!=0){
+                row = leftOverFromLastBlock.toString().concat(row);
+                leftOverFromLastBlock.setLength(0);//empty
+            }
+            if(row.lastIndexOf('}') == -1){
+                leftOverFromLastBlock.append(row);
+                continue;
+            }
             String[] cols = row.split("\\|");
             var key = cols[0];
             var globFreq = cols[1];
@@ -114,15 +132,15 @@ public class WordsIndex extends Index {
         if(lastBatch &&  floored < (double)this.tokenGlobalFreq.size() / NUM_OF_ENTRIES_IN_BLOCK )
             numOfBlocks++;
 
-        String[] productsBlocks = new String[numOfBlocks];
+        String[] wordsBlocks = new String[numOfBlocks];
         int curNumOfEntries = 0;
         int curBlock = 0;
 
         for(var entry: this.tokenGlobalFreq.entrySet()){
-            var token = entry.getKey();
-            var globalFreq = entry.getValue();
-            var freqMap = this.tokenFreq.get(token);
-            var serializedEntry = new StringBuilder();
+            String token = entry.getKey();
+            Integer globalFreq = entry.getValue();
+            TreeMap freqMap = this.tokenFreq.get(token);
+            StringBuilder serializedEntry = new StringBuilder();
             serializedEntry.append(token).append('|');
             serializedEntry.append(globalFreq.toString()).append('|');
             // replace "=" coming from toString of TreeMap with ":" to make it JSON-like
@@ -133,7 +151,7 @@ public class WordsIndex extends Index {
             serialized.append(serializedEntry);
             curNumOfEntries++;
             if( curNumOfEntries >= NUM_OF_ENTRIES_IN_BLOCK){
-                productsBlocks[curBlock] = serialized.toString();
+                wordsBlocks[curBlock] = serialized.toString();
                 serialized = new StringBuilder();
                 curNumOfEntries = 0;
                 curBlock++;
@@ -143,13 +161,13 @@ public class WordsIndex extends Index {
         if(lastBatch) {
             String lastBlock = serialized.toString();
             if (!lastBlock.equals("")) {
-                productsBlocks[curBlock] = lastBlock;
+                wordsBlocks[curBlock] = lastBlock;
             }
         }else{
-            this.loadSerializedData(serialized.toString());
+            this.loadData(serialized.toString());
         }
 
-        return productsBlocks;
+        return wordsBlocks;
     }
 
 

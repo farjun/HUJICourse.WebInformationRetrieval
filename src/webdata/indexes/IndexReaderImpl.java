@@ -123,12 +123,19 @@ public class IndexReaderImpl {
     }
 
     public Enumeration<Integer> getReviewsWithToken(String token){
+        try {
+            this.wordsIndex.loadBlock(this.wordsInputStream, this.wordsIndex.getBlockNum(token));
+        }catch (OutOfBlocksException e){
+            return Collections.enumeration(Collections.emptyList());
+        }catch (IOException e){
+            System.err.println("Exception was raised in getReviewsWithToken");
+        }
         return this.wordsIndex.getReviewsWithToken(token.toLowerCase());
     }
 
     public int getTokenCollectionFrequency(String token) {
         try {
-            this.wordsIndex.loadBlock(this.reviewsInputStream, this.wordsIndex.getBlockNum(token));
+            this.wordsIndex.loadBlock(this.wordsInputStream, this.wordsIndex.getBlockNum(token));
         }catch (OutOfBlocksException e){
             return -1;
         }catch (IOException e){
@@ -138,11 +145,19 @@ public class IndexReaderImpl {
     }
 
     public int getTokenFrequency(String token) {
+        try {
+            this.wordsIndex.loadBlock(this.wordsInputStream, this.wordsIndex.getBlockNum(token));
+        }catch (OutOfBlocksException e){
+            return -1;
+        }catch (IOException e){
+            System.err.println("Exception was raised in getTokenFrequency");
+        }
         if(!this.wordsIndex.tokenFreq.containsKey(token.toLowerCase())) return 0;
         return this.wordsIndex.tokenFreq.get(token.toLowerCase()).size();
     }
 
     public int getTokenSizeOfReviews() {
+        // TODO add additional value to store global sum of frequencies
         if(this.wordsIndex.tokenGlobalFreq.isEmpty()) return 0;
         return this.wordsIndex.tokenGlobalFreq
                 .values()

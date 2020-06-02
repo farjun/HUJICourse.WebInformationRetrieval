@@ -36,7 +36,7 @@ public class IndexValuesIterator implements Iterator<SortableNode> {
 
     @Override
     public boolean hasNext() {
-        return this.curNodesInBuffer.size() > 0 ||  inputStream.hasMoreInput();
+        return this.curNodesInBuffer.size() > 0 || inputStream.hasMoreInput();
     }
 
     private void fillBuffer() throws IOException {
