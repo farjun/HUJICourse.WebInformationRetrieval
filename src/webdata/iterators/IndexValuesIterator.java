@@ -70,11 +70,12 @@ public class IndexValuesIterator <T extends SortableNode> implements Iterator<T>
             try {
                 this.fillBuffer();
             }catch (OutOfBitsException exception){
-//                return null;
+                return null;
             }catch (IOException exception){
                 System.err.println("Exception in iterator");
             }
         }
+        if(curNodesInBuffer.size() <= 0) return null;
         return (T)index.createSortableNode(curNodesInBuffer.removeFirst());
     }
 }

@@ -32,10 +32,8 @@ public class Merger {
 
 
     public Merger(char separator){
-
         this.separator = separator;
         this.mergedBlock = new ArrayList<>();
-
     }
 
 
@@ -69,7 +67,12 @@ public class Merger {
     }
     public int getMinIndex(){
         int blockMinIndex = 0;
-        for(int i=1;i<iters.length;i++){
+        while(blockMinIndex < decodedEntries.length && decodedEntries[blockMinIndex]==null )
+            blockMinIndex++;
+        if(blockMinIndex == decodedEntries.length)
+            return -1;
+
+        for(int i=blockMinIndex+1;i<iters.length;i++){
             if(decodedEntries[i] == null){
                 continue;
             }
@@ -91,7 +94,7 @@ public class Merger {
 
     public void mergeIter(){
         int blockMinIndex = getMinIndex();
-
+        if(blockMinIndex<0) return;
         if(mergedBlock.size()>0 && mergedBlock.get(mergedBlock.size()-1).compare(decodedEntries[blockMinIndex]) == 0)
             mergedBlock.get(mergedBlock.size()-1).merge(decodedEntries[blockMinIndex]);
         else {
@@ -111,89 +114,17 @@ public class Merger {
             mergeIter();
         }
         while (this.mergedBlock.size() <= blockLength_ && hasMoreInput()); // TODO optimize
+        if(this.mergedBlock.size()==0) return null;
         String[] res = new String[this.mergedBlock.size()];
         int i=0;
         for(SortableNode sn: this.mergedBlock)
             res[i++] = sn.toString();
+        cleanMergingBlock();
         return res;
     }
 
     public void cleanMergingBlock(){
         this.mergedBlock.clear();
     }
-
-//    public void writeEncodedWords(String blockToEncode,
-//                             boolean lastBatch) throws IOException {
-//        ArithmeticEncoder enc = new ArithmeticEncoder(this.output);
-//        for (int symbol: blockToEncode.toCharArray()) {
-//            enc.writeSymbol(symbol);
-//        }
-//        int numOfBytesWritten = this.output.setCheckpoint();
-//        enc = new ArithmeticEncoder(this.output);
-//        var firstTokenEnd = blockToEncode.indexOf("|");
-//        WordsBlockSizesFile outBlockSizesFile = (WordsBlockSizesFile)this.outBlockSizesFile; // down cast to WordsBlockSizesFile
-//        outBlockSizesFile.addBlockDetails(numOfBytesWritten, blockToEncode.substring(0,firstTokenEnd));
-//
-//        // Flush remaining code bits
-//        if(lastBatch){
-//            enc.finish();
-//            outBlockSizesFile.flush();
-//            this.output.flush();
-//        }
-//
-//    }
-
-
-    //    public void writeEncoded(String blockToEncode,
-//                                  boolean lastBatch) throws IOException {
-//        ArithmeticEncoder enc = new ArithmeticEncoder(this.output);
-//        for (int symbol: blockToEncode.toCharArray()) {
-//            enc.writeSymbol(symbol);
-//        }
-//        int numOfBytesWritten = this.output.setCheckpoint();
-//        enc = new ArithmeticEncoder(this.output);
-//        this.outBlockSizesFile.addBlockSize(numOfBytesWritten);
-//
-//        // Flush remaining code bits
-//        if(lastBatch){
-//            enc.finish();
-//            this.outBlockSizesFile.flush();
-//            this.output.flush();
-//        }
-//
-//    }
-//    private void writeToDisk() {
-//        diskMock.append(mergedBlock);
-//
-//        System.out.println("DISK CONTENT:");
-//        System.out.println(diskMock); // TODO:
-//
-//        try{
-//            writeEncoded(mergedBlock.toString(), false); //TODO: check last
-//        } catch(IOException e){
-//            System.err.println(e.toString());
-//        }
-//        mergedBlock = new ArrayList<>();
-//    }
-//    private void writeToDiskWords() {
-//        diskMock.append(mergedBlock);
-//
-//        System.out.println("DISK CONTENT:");
-//        System.out.println(diskMock); // TODO:
-//
-//        try{
-//            for(int i=0;i<mergedBlock.size()-1;i++){
-//                writeEncodedWords(mergedBlock.get(i).toString(), false); //TODO: check last
-//            }
-//            if(mergedBlock.size()>0){
-//                var tmp = mergedBlock.get(mergedBlock.size()-1);
-//                mergedBlock.clear();
-//                mergedBlock.add(tmp);
-//            }
-//        } catch(IOException e){
-//            System.err.println(e.toString());
-//        }
-//        mergedBlock = new ArrayList<>();
-//    }
 
 }

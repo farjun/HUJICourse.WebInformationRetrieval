@@ -184,9 +184,14 @@ public class SlowIndexWriter {
             }
             Merger m = new Merger(iterators, wordsIndex.separator, wordsIndex.NUM_OF_ENTRIES_IN_BLOCK,
                     wordsBlockSizes.size());
-            var x = m.getSortedBlock();
+            String[] res;
+            while((res=m.getSortedBlock())!=null){
+                for(var e:res) System.out.print(e);
+                System.out.println();
+            }
 
-            System.out.println(x);
+            String[] sortedB;
+
         }
         catch (IOException e){
             e.printStackTrace();

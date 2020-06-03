@@ -23,24 +23,20 @@ public class WordsSortableNode extends SortableNode {
         StringBuilder sb = new StringBuilder();
         this.rawValue = sb.
                 append(thisEntryDataStrs[0]).
+                append("|").
                 append(thisGlobFreq+otherGlobFreq).
+                append("|").
                 append(mergedFreqJSON).
                 toString();
     }
 
     @Override
     public int compare(SortableNode o) {
-        try {
-            int thisTokenEndIndex = this.rawValue.indexOf("|");
-            String thisToken = this.rawValue.substring(0, thisTokenEndIndex);
-            int otherTokenEndIndex = o.toString().indexOf("|");
-            String otherToken = o.toString().substring(0, otherTokenEndIndex);
-            return thisToken.compareTo(otherToken);
-        }
-        catch(Exception e){
-            System.out.println('d');
-        }
-        return -1;
+        int thisTokenEndIndex = this.rawValue.indexOf("|");
+        String thisToken = this.rawValue.substring(0, thisTokenEndIndex);
+        int otherTokenEndIndex = o.toString().indexOf("|");
+        String otherToken = o.toString().substring(0, otherTokenEndIndex);
+        return thisToken.compareTo(otherToken);
     }
 
     @Override
