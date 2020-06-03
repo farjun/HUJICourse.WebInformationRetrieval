@@ -5,9 +5,9 @@ import webdata.models.*;
 import java.util.*;
 
 public class ProductsIndex extends Index {
-    private static final int NUM_OF_PRODUCTS_IN_BLOCK = 100;
+    public static final int NUM_OF_PRODUCTS_IN_BLOCK = 100;
     private HashMap<String, CompressedArrayList> hashMap;
-
+    public char seperator = '|';
     public ProductsIndex(){
         this.hashMap = new HashMap<>();
     }

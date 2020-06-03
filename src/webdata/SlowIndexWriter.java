@@ -34,6 +34,8 @@ public class SlowIndexWriter {
 
     private String wordsPath;
     private String sortedWordsPath;
+    private String productsPath;
+    private String sortedProductsPath;
 
     public void close(){
         try {
@@ -116,7 +118,8 @@ public class SlowIndexWriter {
             wordsPath = Paths.get(dirPath,"words").toString();
             sortedWordsPath = wordsPath.concat("_sorted");
             var reviewsPath = Paths.get(dirPath,"reviews").toString();
-            var productsPath = Paths.get(dirPath,"products").toString();
+            productsPath = Paths.get(dirPath,"products").toString();
+            sortedProductsPath = productsPath.concat("_sorted");
 
             this.productsOutputStream = new BitOutputStream(new FileOutputStream(productsPath));
             this.productsIndex = new ProductsIndex();
@@ -172,6 +175,8 @@ public class SlowIndexWriter {
 
     }
 
+
+
     public void sort(){
         try {
 //            var wordsOut = new BitOutputStream(new FileOutputStream(this.sortedWordsPath));
@@ -179,19 +184,39 @@ public class SlowIndexWriter {
             IndexValuesIterator[] iterators = new IndexValuesIterator[wordsBlockSizes.size()]; //wordsInp, wordsBlockSizesFile,
             for(int i=0;i<iterators.length;i++){
                 var wordsInp = new BitRandomAccessInputStream(new File(wordsPath), wordsBlockSizes);
+
                 iterators[i] = new IndexValuesIterator(wordsIndex, wordsInp, wordsIndex.separator,
                         wordsIndex.NUM_OF_ENTRIES_IN_BLOCK, i);
             }
             Merger m = new Merger(iterators, wordsIndex.separator, wordsIndex.NUM_OF_ENTRIES_IN_BLOCK,
                     wordsBlockSizes.size());
+
+
+
             String[] res;
             while((res=m.getSortedBlock())!=null){
                 for(var e:res) System.out.print(e);
                 System.out.println();
             }
 
-            String[] sortedB;
+            ArrayList<Integer> productsBlockSizes = productsBlockSizesFile.getBlockSizes();
+            IndexValuesIterator[] productsIterators = new IndexValuesIterator[productsBlockSizes.size()]; //wordsInp, wordsBlockSizesFile,
+            for(int i=0;i<productsIterators.length;i++){
+                var productsInp = new BitRandomAccessInputStream(new File(productsPath), productsBlockSizes);
 
+                productsIterators[i] = new IndexValuesIterator(productsIndex, productsInp, productsIndex.seperator,
+                        productsIndex.NUM_OF_PRODUCTS_IN_BLOCK, i);
+            }
+            Merger productMerger = new Merger(productsIterators, productsIndex.seperator, productsIndex.NUM_OF_PRODUCTS_IN_BLOCK,
+                    productsBlockSizes.size());
+
+
+
+            String[] productsRes;
+            while((productsRes=productMerger.getSortedBlock())!=null){
+                for(var e:productsRes) System.out.print(e);
+                System.out.println();
+            }
         }
         catch (IOException e){
             e.printStackTrace();
