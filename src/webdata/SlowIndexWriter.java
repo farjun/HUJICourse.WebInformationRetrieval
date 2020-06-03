@@ -7,6 +7,7 @@ import webdata.iostreams.BitOutputStream;
 import webdata.iostreams.BitRandomAccessInputStream;
 import webdata.iterators.IndexValuesIterator;
 import webdata.iterators.ReviewsIterator;
+import webdata.models.IndexBlock;
 import webdata.models.Merger;
 import webdata.models.ProductReview;
 
@@ -67,11 +68,11 @@ public class SlowIndexWriter {
 //        }
 //    }
 
-    public void writeEncoded(String[] blocksToEncode, AppOutputStream out, BlockSizesFile blockSizesFile,
+    public void writeEncoded(IndexBlock[] blocksToEncode, AppOutputStream out, BlockSizesFile blockSizesFile,
                              boolean lastBatch) throws IOException {
         ArithmeticEncoder enc = new ArithmeticEncoder(out);
         for (int i = 0; i < blocksToEncode.length; i++) {
-            String curBlockToEncode = blocksToEncode[i];
+            String curBlockToEncode = blocksToEncode[i].block;
             char[] symbols = curBlockToEncode.toCharArray();
             for (int symbol : symbols) {
                 enc.writeSymbol(symbol);
@@ -83,7 +84,8 @@ public class SlowIndexWriter {
             }
             int numOfBytesWritten = out.setCheckpoint();
             enc = new ArithmeticEncoder(out);
-            blockSizesFile.addBlockSize(numOfBytesWritten);
+
+            blockSizesFile.addBlockDetails(numOfBytesWritten,blocksToEncode[i].key );
         }
 
         if(lastBatch) {

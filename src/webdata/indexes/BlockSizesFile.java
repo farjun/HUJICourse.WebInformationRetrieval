@@ -4,11 +4,16 @@ import java.io.*;
 import java.util.ArrayList;
 
 public class BlockSizesFile {
+    private final ArrayList<String> blockKeyToken;
     protected BufferedWriter out;
     protected BufferedReader in;
     protected final ArrayList<Integer> blockSizes;
 
-    public BlockSizesFile(){blockSizes = new ArrayList<>();}
+    public BlockSizesFile(){
+        blockSizes = new ArrayList<>();
+        blockKeyToken = new ArrayList<>();
+
+    }
 
     public BlockSizesFile(FileWriter filename) throws IOException{
         this();
@@ -20,12 +25,25 @@ public class BlockSizesFile {
 
         String line;
         while ((line = in.readLine()) != null){
-            blockSizes.add(Integer.valueOf(line));
+            String[] splittedLine = line.split("\\|");
+            if( splittedLine.length == 1){
+                blockSizes.add(Integer.valueOf(line));
+            }else{
+                blockSizes.add(Integer.valueOf(splittedLine[0]));
+                blockKeyToken.add(splittedLine[1]);
+            }
+
         }
     }
 
     public void addBlockSize(int batchSize) {
         blockSizes.add(batchSize);
+    }
+
+    public void addBlockDetails(int batchSize, String token) {
+        blockSizes.add(batchSize);
+        if(token != null)
+            blockKeyToken.add(token);
     }
 
     public int getBlockSize(int blockNum){
@@ -38,9 +56,16 @@ public class BlockSizesFile {
 
     public void flush() throws IOException{
         StringBuilder sb = new StringBuilder();
-        for (int batchSize: blockSizes) {
-            sb.append(batchSize).append("\n");
+        if(this.blockKeyToken.size() == 0) {
+            for (Integer blockSize : this.blockSizes) {
+                sb.append(blockSize).append("\n");
+            }
+        }else{
+            for (int i = 0; i < this.blockSizes.size(); i++){
+                sb.append(this.blockSizes.get(i)).append('|').append(this.blockKeyToken.get(i)).append("\n");
+            }
         }
+
         out.write(sb.toString());
         out.flush();
     }

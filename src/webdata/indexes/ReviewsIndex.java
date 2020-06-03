@@ -1,5 +1,7 @@
 package webdata.indexes;
 
+import webdata.models.IndexBlock;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.Stream;
@@ -69,7 +71,7 @@ public class ReviewsIndex extends Index {
         return String.join("|", this.reviews);
     }
 
-    public String[] toStringBlocks(boolean lastBatch) {
+    public IndexBlock[] toStringBlocks(boolean lastBatch) {
         StringBuilder sb = new StringBuilder();
         int curNumOfReviews = 0;
         int curBlock = 0;
@@ -78,12 +80,12 @@ public class ReviewsIndex extends Index {
 
         if(lastBatch && numOfBlocks < blocksToReviewSizeRatio )
             numOfBlocks++;
-        String[] reviewsInBlocks = new String[numOfBlocks];
+        IndexBlock[] reviewsInBlocks = new IndexBlock[numOfBlocks];
         for (String key: this.reviews) {
             sb.append(key).append("|");
             curNumOfReviews++;
             if( curNumOfReviews >= NUM_OF_REVIEWS_IN_BLOCK){
-                reviewsInBlocks[curBlock] = sb.toString();
+                reviewsInBlocks[curBlock] = new IndexBlock(sb.toString());
                 sb = new StringBuilder();
                 curNumOfReviews = 0;
                 curBlock++;
@@ -92,7 +94,7 @@ public class ReviewsIndex extends Index {
         if(lastBatch) {
             String lastBlock = sb.toString();
             if (!lastBlock.equals("")) {
-                reviewsInBlocks[curBlock] = lastBlock;
+                reviewsInBlocks[curBlock] = new IndexBlock(lastBlock);;
             }
         }else{
             this.loadData(sb.toString());

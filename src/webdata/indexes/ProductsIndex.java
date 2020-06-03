@@ -1,14 +1,8 @@
 package webdata.indexes;
 
-import webdata.models.CompressedArrayList;
-import webdata.models.SortableNode;
-import webdata.models.SortableNodeProducts;
-import webdata.models.WordsSortableNode;
+import webdata.models.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.HashMap;
+import java.util.*;
 
 public class ProductsIndex extends Index {
     private static final int NUM_OF_PRODUCTS_IN_BLOCK = 100;
@@ -69,20 +63,23 @@ public class ProductsIndex extends Index {
         return sb.toString();
     }
 
-    public String[] toStringBlocks(boolean lastBatch) {
+    public IndexBlock[] toStringBlocks(boolean lastBatch) {
         StringBuilder sb = new StringBuilder();
         int numOfBlocks = (this.hashMap.size() / NUM_OF_PRODUCTS_IN_BLOCK);
         if(lastBatch && Math.floor((double)this.hashMap.size() / NUM_OF_PRODUCTS_IN_BLOCK) < (double)this.hashMap.size() / NUM_OF_PRODUCTS_IN_BLOCK )
             numOfBlocks++;
 
-        String[] productsBlocks = new String[numOfBlocks];
+        IndexBlock[] productsBlocks = new IndexBlock[numOfBlocks];
         int curNumOfProducts = 0;
         int curBlock = 0;
-        for (String key: this.hashMap.keySet()) {
+
+        SortedSet<String> keys = new TreeSet<>(this.hashMap.keySet());
+
+        for (String key: keys) {
             sb.append(key).append(":").append(this.hashMap.get(key)).append("|");
             curNumOfProducts++;
             if( curNumOfProducts >= NUM_OF_PRODUCTS_IN_BLOCK){
-                productsBlocks[curBlock] = sb.toString();
+                productsBlocks[curBlock] = new IndexBlock(sb.toString(), keys.first());
                 sb = new StringBuilder();
                 curNumOfProducts = 0;
                 curBlock++;
@@ -92,7 +89,7 @@ public class ProductsIndex extends Index {
             String lastBlock = sb.toString();
             if (!lastBlock.equals("")) {
                 sb.deleteCharAt(sb.length() - 1);
-                productsBlocks[curBlock] = lastBlock;
+                productsBlocks[curBlock] = new IndexBlock(lastBlock, keys.first());;
             }
         }else{
             this.loadData(sb.toString());
@@ -100,6 +97,7 @@ public class ProductsIndex extends Index {
 
         return productsBlocks;
     }
+
 
     public SortableNode createSortableNode(String removeFirst) {
         return new SortableNodeProducts(removeFirst);
