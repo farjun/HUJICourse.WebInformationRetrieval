@@ -46,7 +46,7 @@ public class WordsSortableNode extends SortableNode {
 
     @Override
     public String toString(){
-        return rawValue.toString();
+        return rawValue;
     }
 
 }
