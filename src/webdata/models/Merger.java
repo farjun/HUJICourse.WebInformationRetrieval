@@ -20,53 +20,48 @@ public class Merger {
 
     StringBuilder diskMock;
 
-    public StringBuilder getMergedBlock() {
+    public ArrayList<SortableNode> getMergedBlock() {
         return mergedBlock;
     }
     int entryCountInMergedBlock;
-    StringBuilder mergedBlock;
+    ArrayList<SortableNode> mergedBlock;
     int numOfBlocks; // number of blocks to use for merge in RAM
-    static final int blockLength = 5; // number of entries in each block
+    int blockLength; // number of entries in each block
     char separator;
-    AppOutputStream output;
     BlockSizesFile inBlockSizesFile;
-    BlockSizesFile outBlockSizesFile;
-    boolean isWordsMerger;
+
 
     public Merger(char separator, boolean isWordsMerger){
-        this.diskMock = new StringBuilder();
 
         this.separator = separator;
-        this.entryCountInMergedBlock = 0;
-        this.mergedBlock = new StringBuilder();
-        this.isWordsMerger = isWordsMerger;
+        this.mergedBlock = new ArrayList<>();
 
     }
 
-    public Merger(BitRandomAccessInputStream input, AppOutputStream output, BlockSizesFile inBlockSizesFile,
-                  BlockSizesFile outBlockSizesFile, char separator, boolean isWordsMerger) throws IOException {
+    public Merger(BitRandomAccessInputStream input, BlockSizesFile inBlockSizesFile,
+            char separator, boolean isWordsMerger, int blockLength) throws IOException {
         this(separator, isWordsMerger);
-        this.output = output;
+        this.blockLength = blockLength;
+//        this.output = output;
+//        this.outBlockSizesFile = outBlockSizesFile;
         this.inBlockSizesFile = inBlockSizesFile;
-        this.outBlockSizesFile = outBlockSizesFile;
-        ArrayList inBlockSizes = this.inBlockSizesFile.getBlockSizes();
+        ArrayList<Integer> inBlockSizes = this.inBlockSizesFile.getBlockSizes();
         this.numOfBlocks = inBlockSizes.size();
         this.decodedEntries = new SortableNode[numOfBlocks];
-        iters = new IndexValuesIterator[numOfBlocks];
+        this.iters = new IndexValuesIterator[numOfBlocks];
         for(int i = 0; i<iters.length; i++) {
             iters[i] = new IndexValuesIterator(new BitRandomAccessInputStream(input), separator,30, i); // TODO: check with Omer
         }
-        for(int i=0;i<decodedEntries.length;i++){
+        for(int i=0;i<numOfBlocks;i++){
             this.cleanBlockAndFetchNew(i);
         }
     }
 
 
-    public boolean cleanBlockAndFetchNew(int blockIndex){
-        if(blockIndex >= decodedEntries.length || blockIndex<0) return false;
-        if(!iters[blockIndex].hasNext()) return false;
+    public void cleanBlockAndFetchNew(int blockIndex){
+        if(blockIndex >= decodedEntries.length || blockIndex<0) return;
+        if(!iters[blockIndex].hasNext()) return;
         decodedEntries[blockIndex] = iters[blockIndex].next();
-        return true;
     }
 
     private int countInStringBuilder(StringBuilder str, char chr){
@@ -76,108 +71,133 @@ public class Merger {
         }
         return count;
     }
-    
-    public boolean mergeIter(){
-         // init to zeros by default
+    public int getMinIndex(){
         int blockMinIndex = 0;
-        if(!this.cleanBlockAndFetchNew(0))
-            return false;
-        var minEntry = decodedEntries[0];
         for(int i=1;i<iters.length;i++){
-            if(this.cleanBlockAndFetchNew(i)){
-                var compRes = minEntry.compare(decodedEntries[i]);
-                if(compRes > 0){
-                    minEntry = decodedEntries[i];
-                    blockMinIndex = i;
-                }
-                else if(compRes == 0){
-                    decodedEntries[i].merge(minEntry);
-                    minEntry = decodedEntries[i];
-                }
+            if(decodedEntries[i] == null){
+                continue;
+            }
+            int compRes = decodedEntries[blockMinIndex].compare(decodedEntries[i]);
+            if(compRes > 0){
+                blockMinIndex = i;
             }
         }
-        // append min token whole entry to merged
-        mergedBlock.append(decodedEntries[blockMinIndex].toString());
-
-        entryCountInMergedBlock++;
-        if(entryCountInMergedBlock >= blockLength){
-            if(isWordsMerger)
-                writeToDiskWords();
-            else
-                writeToDisk();
-            entryCountInMergedBlock = 0;
-        }
-
-        boolean shouldContinue = this.cleanBlockAndFetchNew(blockMinIndex);
-//        mergedBlock.append(this.separator);
-        return shouldContinue;
+        return blockMinIndex;
     }
-    public void writeEncodedWords(String blockToEncode,
-                             boolean lastBatch) throws IOException {
-        ArithmeticEncoder enc = new ArithmeticEncoder(this.output);
-        for (int symbol: blockToEncode.toCharArray()) {
-            enc.writeSymbol(symbol);
+    public boolean hasMoreInput(){
+        for (SortableNode decodedEntry : decodedEntries) {
+            if (decodedEntry != null)
+                return true;
         }
-        int numOfBytesWritten = this.output.setCheckpoint();
-        enc = new ArithmeticEncoder(this.output);
-        var firstTokenEnd = blockToEncode.indexOf("|");
-        WordsBlockSizesFile outBlockSizesFile = (WordsBlockSizesFile)this.outBlockSizesFile; // down cast to WordsBlockSizesFile
-        outBlockSizesFile.addBlockDetails(numOfBytesWritten, blockToEncode.substring(0,firstTokenEnd));
-
-        // Flush remaining code bits
-        if(lastBatch){
-            enc.finish();
-            outBlockSizesFile.flush();
-            this.output.flush();
-        }
-
-    }
-    public void writeEncoded(String blockToEncode,
-                                  boolean lastBatch) throws IOException {
-        ArithmeticEncoder enc = new ArithmeticEncoder(this.output);
-        for (int symbol: blockToEncode.toCharArray()) {
-            enc.writeSymbol(symbol);
-        }
-        int numOfBytesWritten = this.output.setCheckpoint();
-        enc = new ArithmeticEncoder(this.output);
-        this.outBlockSizesFile.addBlockSize(numOfBytesWritten);
-
-        // Flush remaining code bits
-        if(lastBatch){
-            enc.finish();
-            this.outBlockSizesFile.flush();
-            this.output.flush();
-        }
-
-    }
-    private void writeToDisk() {
-        diskMock.append(mergedBlock);
-
-        System.out.println("DISK CONTENT:");
-        System.out.println(diskMock); // TODO:
-
-        try{
-            writeEncoded(mergedBlock.toString(), false); //TODO: check last
-        } catch(IOException e){
-            System.err.println(e.toString());
-        }
-        mergedBlock.setLength(0);
-    }
-    private void writeToDiskWords() {
-        diskMock.append(mergedBlock);
-
-        System.out.println("DISK CONTENT:");
-        System.out.println(diskMock); // TODO:
-
-        try{
-            writeEncodedWords(mergedBlock.toString(), false); //TODO: check last
-        } catch(IOException e){
-            System.err.println(e.toString());
-        }
-        mergedBlock.setLength(0);
+        return false;
     }
 
-    public void externalMerge(){
-        while (mergeIter());
+
+    public void mergeIter(){
+        int blockMinIndex = getMinIndex();
+
+        if(mergedBlock.size()>0 && mergedBlock.get(mergedBlock.size()-1).compare(decodedEntries[blockMinIndex]) == 0)
+            mergedBlock.get(mergedBlock.size()-1).merge(decodedEntries[blockMinIndex]);
+        else {
+            mergedBlock.add(decodedEntries[blockMinIndex]);
+        }
+
+        this.cleanBlockAndFetchNew(blockMinIndex);
     }
+//
+
+    public String[] getSortedBlock(){
+        return getSortedBlock(this.blockLength);
+    }
+
+    public String[] getSortedBlock(int blockLength_){
+        do {
+            mergeIter();
+        }
+        while (this.mergedBlock.size() <= blockLength_ && hasMoreInput()); // TODO optimize
+        String[] res = new String[this.mergedBlock.size()];
+        int i=0;
+        for(SortableNode sn: this.mergedBlock)
+            res[i++] = sn.toString();
+        return res;
+    }
+
+    public void cleanMergingBlock(){
+        this.mergedBlock.clear();
+    }
+
+//    public void writeEncodedWords(String blockToEncode,
+//                             boolean lastBatch) throws IOException {
+//        ArithmeticEncoder enc = new ArithmeticEncoder(this.output);
+//        for (int symbol: blockToEncode.toCharArray()) {
+//            enc.writeSymbol(symbol);
+//        }
+//        int numOfBytesWritten = this.output.setCheckpoint();
+//        enc = new ArithmeticEncoder(this.output);
+//        var firstTokenEnd = blockToEncode.indexOf("|");
+//        WordsBlockSizesFile outBlockSizesFile = (WordsBlockSizesFile)this.outBlockSizesFile; // down cast to WordsBlockSizesFile
+//        outBlockSizesFile.addBlockDetails(numOfBytesWritten, blockToEncode.substring(0,firstTokenEnd));
+//
+//        // Flush remaining code bits
+//        if(lastBatch){
+//            enc.finish();
+//            outBlockSizesFile.flush();
+//            this.output.flush();
+//        }
+//
+//    }
+
+
+    //    public void writeEncoded(String blockToEncode,
+//                                  boolean lastBatch) throws IOException {
+//        ArithmeticEncoder enc = new ArithmeticEncoder(this.output);
+//        for (int symbol: blockToEncode.toCharArray()) {
+//            enc.writeSymbol(symbol);
+//        }
+//        int numOfBytesWritten = this.output.setCheckpoint();
+//        enc = new ArithmeticEncoder(this.output);
+//        this.outBlockSizesFile.addBlockSize(numOfBytesWritten);
+//
+//        // Flush remaining code bits
+//        if(lastBatch){
+//            enc.finish();
+//            this.outBlockSizesFile.flush();
+//            this.output.flush();
+//        }
+//
+//    }
+//    private void writeToDisk() {
+//        diskMock.append(mergedBlock);
+//
+//        System.out.println("DISK CONTENT:");
+//        System.out.println(diskMock); // TODO:
+//
+//        try{
+//            writeEncoded(mergedBlock.toString(), false); //TODO: check last
+//        } catch(IOException e){
+//            System.err.println(e.toString());
+//        }
+//        mergedBlock = new ArrayList<>();
+//    }
+//    private void writeToDiskWords() {
+//        diskMock.append(mergedBlock);
+//
+//        System.out.println("DISK CONTENT:");
+//        System.out.println(diskMock); // TODO:
+//
+//        try{
+//            for(int i=0;i<mergedBlock.size()-1;i++){
+//                writeEncodedWords(mergedBlock.get(i).toString(), false); //TODO: check last
+//            }
+//            if(mergedBlock.size()>0){
+//                var tmp = mergedBlock.get(mergedBlock.size()-1);
+//                mergedBlock.clear();
+//                mergedBlock.add(tmp);
+//            }
+//        } catch(IOException e){
+//            System.err.println(e.toString());
+//        }
+//        mergedBlock = new ArrayList<>();
+//    }
+
 }

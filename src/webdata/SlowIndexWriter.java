@@ -174,8 +174,11 @@ public class SlowIndexWriter {
         try {
             var wordsInp = new BitRandomAccessInputStream(new File(wordsPath), wordsBlockSizesFile.getBlockSizes());
             var wordsOut = new BitOutputStream(new FileOutputStream(this.sortedWordsPath));
-            Merger m = new Merger(wordsInp, wordsOut, wordsBlockSizesFile, mergeWordsBlockSizesFile, ';', true);
-            m.externalMerge();
+            Merger m = new Merger(wordsInp, wordsBlockSizesFile, ';',
+                    true, wordsIndex.NUM_OF_ENTRIES_IN_BLOCK);
+            var x = m.getSortedBlock();
+
+            System.out.println(x);
         }
         catch (IOException e){
             e.printStackTrace();

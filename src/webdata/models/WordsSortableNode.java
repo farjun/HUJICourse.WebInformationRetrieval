@@ -28,7 +28,8 @@ public class WordsSortableNode extends SortableNode {
                 toString();
     }
 
-    public int compare(WordsSortableNode o) {
+    @Override
+    public int compare(SortableNode o) {
         int thisTokenEndIndex = this.rawValue.indexOf("|");
         String thisToken = this.rawValue.substring(0, thisTokenEndIndex);
         int otherTokenEndIndex = o.toString().indexOf("|");

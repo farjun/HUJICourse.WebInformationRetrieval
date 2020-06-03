@@ -67,7 +67,7 @@ public class IndexValuesIterator implements Iterator<SortableNode> {
             try {
                 this.fillBuffer();
             }catch (OutOfBitsException exception){
-                return null;
+//                return null;
             }catch (IOException exception){
                 System.err.println("Exception in iterator");
             }
