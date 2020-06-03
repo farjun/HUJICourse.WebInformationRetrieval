@@ -28,34 +28,30 @@ public class Merger {
     int numOfBlocks; // number of blocks to use for merge in RAM
     int blockLength; // number of entries in each block
     char separator;
-    BlockSizesFile inBlockSizesFile;
 
 
-    public Merger(char separator, boolean isWordsMerger){
+
+    public Merger(char separator){
 
         this.separator = separator;
         this.mergedBlock = new ArrayList<>();
 
     }
 
-    public Merger(BitRandomAccessInputStream input, BlockSizesFile inBlockSizesFile,
-            char separator, boolean isWordsMerger, int blockLength) throws IOException {
-        this(separator, isWordsMerger);
+
+    public Merger(IndexValuesIterator[] iters, char separator, int blockLength, int numOfBlocks) throws IOException {
+        this(separator);
         this.blockLength = blockLength;
 //        this.output = output;
 //        this.outBlockSizesFile = outBlockSizesFile;
-        this.inBlockSizesFile = inBlockSizesFile;
-        ArrayList<Integer> inBlockSizes = this.inBlockSizesFile.getBlockSizes();
-        this.numOfBlocks = inBlockSizes.size();
+        this.numOfBlocks = numOfBlocks;
         this.decodedEntries = new SortableNode[numOfBlocks];
-        this.iters = new IndexValuesIterator[numOfBlocks];
-        for(int i = 0; i<iters.length; i++) {
-            iters[i] = new IndexValuesIterator(new BitRandomAccessInputStream(input), separator,30, i); // TODO: check with Omer
-        }
+        this.iters = iters;
         for(int i=0;i<numOfBlocks;i++){
             this.cleanBlockAndFetchNew(i);
         }
     }
+
 
 
     public void cleanBlockAndFetchNew(int blockIndex){

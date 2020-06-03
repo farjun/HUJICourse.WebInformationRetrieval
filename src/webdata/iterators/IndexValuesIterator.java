@@ -14,7 +14,7 @@ import java.util.Queue;
 import java.util.Iterator;
 
 
-public class IndexValuesIterator implements Iterator<SortableNode> {
+public class IndexValuesIterator <T extends SortableNode> implements Iterator<T> {
 
     private final BitRandomAccessInputStream inputStream;
     private final char seperator;
@@ -62,9 +62,9 @@ public class IndexValuesIterator implements Iterator<SortableNode> {
     }
 
     @Override
-    public SortableNode next() {
+    public T next() {
         if(curNodesInBuffer.size() > 0){
-            return new SortableNode(curNodesInBuffer.removeFirst());
+            return (T)index.createSortableNode(curNodesInBuffer.removeFirst());
         }
         else{
             try {
@@ -75,7 +75,7 @@ public class IndexValuesIterator implements Iterator<SortableNode> {
                 System.err.println("Exception in iterator");
             }
         }
-        return index.createSortableNode(curNodesInBuffer.removeFirst());
+        return (T)index.createSortableNode(curNodesInBuffer.removeFirst());
     }
 }
 

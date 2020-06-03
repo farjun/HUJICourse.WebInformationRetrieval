@@ -1,18 +1,18 @@
 package webdata;
 
-import org.junit.jupiter.api.Assertions;
 import webdata.encoders.ArithmeticEncoder;
 import webdata.indexes.*;
 import webdata.iostreams.AppOutputStream;
-import webdata.iostreams.BitInputStream;
 import webdata.iostreams.BitOutputStream;
 import webdata.iostreams.BitRandomAccessInputStream;
+import webdata.iterators.IndexValuesIterator;
 import webdata.iterators.ReviewsIterator;
 import webdata.models.Merger;
 import webdata.models.ProductReview;
 
 import java.io.*;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Enumeration;
 
 public class SlowIndexWriter {
@@ -172,10 +172,16 @@ public class SlowIndexWriter {
 
     public void sort(){
         try {
-            var wordsInp = new BitRandomAccessInputStream(new File(wordsPath), wordsBlockSizesFile.getBlockSizes());
-            var wordsOut = new BitOutputStream(new FileOutputStream(this.sortedWordsPath));
-            Merger m = new Merger(wordsInp, wordsBlockSizesFile, ';',
-                    true, wordsIndex.NUM_OF_ENTRIES_IN_BLOCK);
+//            var wordsOut = new BitOutputStream(new FileOutputStream(this.sortedWordsPath));
+            ArrayList<Integer> wordsBlockSizes = wordsBlockSizesFile.getBlockSizes();
+            IndexValuesIterator[] iterators = new IndexValuesIterator[wordsBlockSizes.size()]; //wordsInp, wordsBlockSizesFile,
+            for(int i=0;i<iterators.length;i++){
+                var wordsInp = new BitRandomAccessInputStream(new File(wordsPath), wordsBlockSizes);
+                iterators[i] = new IndexValuesIterator(wordsIndex, wordsInp, wordsIndex.separator,
+                        wordsIndex.NUM_OF_ENTRIES_IN_BLOCK, i);
+            }
+            Merger m = new Merger(iterators, wordsIndex.separator, wordsIndex.NUM_OF_ENTRIES_IN_BLOCK,
+                    wordsBlockSizes.size());
             var x = m.getSortedBlock();
 
             System.out.println(x);

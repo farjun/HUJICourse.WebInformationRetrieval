@@ -13,6 +13,7 @@ public class WordsIndex extends Index {
     public final TreeMap<String, TreeMap<Integer, Integer>> tokenFreq;
     // will host map of sort { token : globalCounter }
     public final TreeMap<String, Integer> tokenGlobalFreq;
+    public final char separator;
 
 //    private final StringBuilder leftOverFromLastBlock;
     public final int NUM_OF_ENTRIES_IN_BLOCK = 10; //TODO : increase
@@ -21,6 +22,7 @@ public class WordsIndex extends Index {
     public WordsIndex(){
         this.tokenFreq = new TreeMap<>();
         this.tokenGlobalFreq = new TreeMap<>();
+        this.separator = ';';
 //        this.leftOverFromLastBlock = new StringBuilder();
         this.mockedCounter = 0;
     }
@@ -41,7 +43,7 @@ public class WordsIndex extends Index {
         // parse entries "phone|4353|{56:100,79:23};"
         this.tokenFreq.clear();
         this.tokenGlobalFreq.clear();
-        String[] rows = serializedWordEntries.split(";"); // Assume ";" is the terminal
+        String[] rows = serializedWordEntries.split(String.valueOf(separator)); // Assume ";" is the terminal
         for (String row : rows) {
             if(row.length()<=0) continue;
 //            if(leftOverFromLastBlock.length()!=0){
@@ -121,7 +123,7 @@ public class WordsIndex extends Index {
             serializedEntry += globalFreq.toString() + "|";
             // replace "=" coming from toString of TreeMap with ":" to make it JSON-like
             serializedEntry += freqMap.toString().replace("=",":").replace(" ", "");
-            serializedEntry += ";"; // terminate line
+            serializedEntry += String.valueOf(separator); // terminate line
             serialized.append(serializedEntry);
         }
         return serialized.toString();
@@ -150,7 +152,7 @@ public class WordsIndex extends Index {
             serializedEntry.append(freqMap.toString().
                     replace("=",":").
                     replace(" ", ""));
-            serializedEntry.append(';'); // terminate line
+            serializedEntry.append(separator); // terminate line
             serialized.append(serializedEntry);
             curNumOfEntries++;
             if( curNumOfEntries >= NUM_OF_ENTRIES_IN_BLOCK){

@@ -11,8 +11,8 @@ public class WordsSortableNode extends SortableNode {
         // the|50|{1:45,3:2};
         // the|2|{7:10,9:2};
         // the|52|{1:45,3:2,7:10,9:2};
-        var thisEntryDataStrs = this.rawValue.split("|");
-        var otherEntryDataStrs = other.toString().split("|");
+        String[] thisEntryDataStrs = this.rawValue.split("\\|");
+        String[] otherEntryDataStrs = other.toString().split("\\|");
 
         int thisGlobFreq = Integer.parseInt(thisEntryDataStrs[1]);
         int otherGlobFreq = Integer.parseInt(otherEntryDataStrs[1]);
@@ -30,11 +30,17 @@ public class WordsSortableNode extends SortableNode {
 
     @Override
     public int compare(SortableNode o) {
-        int thisTokenEndIndex = this.rawValue.indexOf("|");
-        String thisToken = this.rawValue.substring(0, thisTokenEndIndex);
-        int otherTokenEndIndex = o.toString().indexOf("|");
-        String otherToken = o.toString().substring(0, otherTokenEndIndex);
-        return thisToken.compareTo(otherToken);
+        try {
+            int thisTokenEndIndex = this.rawValue.indexOf("|");
+            String thisToken = this.rawValue.substring(0, thisTokenEndIndex);
+            int otherTokenEndIndex = o.toString().indexOf("|");
+            String otherToken = o.toString().substring(0, otherTokenEndIndex);
+            return thisToken.compareTo(otherToken);
+        }
+        catch(Exception e){
+            System.out.println('d');
+        }
+        return -1;
     }
 
     @Override
