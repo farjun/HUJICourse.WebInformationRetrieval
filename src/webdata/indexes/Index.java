@@ -3,6 +3,8 @@ package webdata.indexes;
 import webdata.encoders.ArithmeticDecoder;
 import webdata.iostreams.BitRandomAccessInputStream;
 import webdata.iterators.IndexValuesIterator;
+import webdata.models.SortableNode;
+import webdata.models.WordsSortableNode;
 
 import java.io.IOException;
 
@@ -24,7 +26,7 @@ public class Index {
     }
 
     public IndexValuesIterator valuesIterator(BitRandomAccessInputStream inputStream, char seperator, int maxNumOfElementsInBuffer, int blobkNum) throws IOException  {
-       return new IndexValuesIterator(inputStream, seperator,  maxNumOfElementsInBuffer, blobkNum);
+       return new IndexValuesIterator(this, inputStream, seperator,  maxNumOfElementsInBuffer, blobkNum);
     }
 
     public StringBuffer decodeBlock(BitRandomAccessInputStream inputStream, int blockNum) throws IOException {
@@ -54,4 +56,7 @@ public class Index {
         return 0;
     }
 
+    public SortableNode createSortableNode(String removeFirst) {
+        return new SortableNode(removeFirst);
+    }
 }

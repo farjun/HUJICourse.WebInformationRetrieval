@@ -9,7 +9,8 @@ public class BitRandomAccessInputStream implements AppInputStream {
 
     public static final int NUM_OF_BYTES_IN_DECODER_BUFFER = 3;
     private final RandomAccessFile randomAccessFile;
-    private final int curBlockReading;
+    private int curBlockReading;
+    private File in;
     private int curBlockNumOfBytes;
     private int numOfBytesRead;
 
@@ -18,8 +19,8 @@ public class BitRandomAccessInputStream implements AppInputStream {
     private File input;
 
     private int numBitsRemaining;
+    private ArrayList<Integer> blockSizes;
 
-    private final ArrayList<Integer> blockSizes;
     private int numOfBytsInDecoderBuffer;
 
     /**
@@ -31,7 +32,6 @@ public class BitRandomAccessInputStream implements AppInputStream {
         randomAccessFile = new RandomAccessFile(input, "r");
         byteBuffer = 0;
         numBitsRemaining = 0;
-
         numOfBytesRead = 0;
         curBlockNumOfBytes = 0;
         curBlockReading = -1;

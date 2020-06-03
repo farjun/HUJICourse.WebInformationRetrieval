@@ -1,6 +1,7 @@
 package webdata.iterators;
 
 import webdata.encoders.ArithmeticDecoder;
+import webdata.indexes.Index;
 import webdata.iostreams.BitRandomAccessInputStream;
 import webdata.iostreams.OutOfBitsException;
 import webdata.iostreams.OutOfBlocksException;
@@ -17,17 +18,19 @@ public class IndexValuesIterator implements Iterator<SortableNode> {
 
     private final BitRandomAccessInputStream inputStream;
     private final char seperator;
+    private final Index index;
     private int maxBufferSize;
     private int blockNum; // TODO for debugging purposes at least
     ArithmeticDecoder dec;
     private Deque<String> curNodesInBuffer;
 
-    public IndexValuesIterator(BitRandomAccessInputStream inputStream, char seperator) throws IOException{
-        this(inputStream, seperator, 30, 0);
+    public IndexValuesIterator(Index index,BitRandomAccessInputStream inputStream, char seperator) throws IOException{
+        this(index, inputStream, seperator, 30, 0);
     }
 
-    public IndexValuesIterator(BitRandomAccessInputStream inputStream, char seperator, int maxBufferSize, int blockNum) throws IOException{
+    public IndexValuesIterator(Index index,BitRandomAccessInputStream inputStream, char seperator, int maxBufferSize, int blockNum) throws IOException{
         inputStream.setPointerToBlock(blockNum);
+        this.index = index;
         this.dec = new ArithmeticDecoder(inputStream);
         this.inputStream = inputStream;
         this.seperator = seperator;
@@ -72,7 +75,7 @@ public class IndexValuesIterator implements Iterator<SortableNode> {
                 System.err.println("Exception in iterator");
             }
         }
-        return new SortableNode(curNodesInBuffer.removeFirst());
+        return index.createSortableNode(curNodesInBuffer.removeFirst());
     }
 }
 

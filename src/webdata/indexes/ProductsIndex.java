@@ -1,6 +1,9 @@
 package webdata.indexes;
 
 import webdata.models.CompressedArrayList;
+import webdata.models.SortableNode;
+import webdata.models.SortableNodeProducts;
+import webdata.models.WordsSortableNode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -98,7 +101,7 @@ public class ProductsIndex extends Index {
         return productsBlocks;
     }
 
-    public String toCompressedString() {
-        return this.toString();
+    public SortableNode createSortableNode(String removeFirst) {
+        return new SortableNodeProducts(removeFirst);
     }
 }

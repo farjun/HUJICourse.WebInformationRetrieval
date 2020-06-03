@@ -7,7 +7,7 @@ public class WordsSortableNode extends SortableNode {
     public WordsSortableNode(String rawValue){
         super(rawValue);
     }
-    public void merge(WordsSortableNode other){
+    public void merge(SortableNode other){
         // the|50|{1:45,3:2};
         // the|2|{7:10,9:2};
         // the|52|{1:45,3:2,7:10,9:2};

@@ -1,7 +1,10 @@
 package webdata.indexes;
 
 import webdata.models.ProductReview;
+import webdata.models.SortableNode;
 import webdata.models.TokenFreqEnumeration;
+import webdata.models.WordsSortableNode;
+
 import java.util.*;
 
 
@@ -170,7 +173,9 @@ public class WordsIndex extends Index {
         return wordsBlocks;
     }
 
-
+    public SortableNode createSortableNode(String removeFirst) {
+        return new WordsSortableNode(removeFirst);
+    }
 
 
 
