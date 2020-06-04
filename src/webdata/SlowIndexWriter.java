@@ -1,7 +1,9 @@
 package webdata;
 
+import org.junit.jupiter.api.Assertions;
 import webdata.encoders.ArithmeticEncoder;
 import webdata.indexes.*;
+import webdata.iostreams.AppInputStream;
 import webdata.iostreams.AppOutputStream;
 import webdata.iostreams.BitOutputStream;
 import webdata.iostreams.BitRandomAccessInputStream;
@@ -31,9 +33,10 @@ public class SlowIndexWriter {
     private WordsIndex wordsIndex;
 
     private String wordsPath;
-    private String sortedWordsPath;
     private String productsPath;
-    private String sortedProductsPath;
+    private BitOutputStream wordsMergedOutputStream;
+    private BlockSizesFile productsMergedBlockSizesFile;
+    private BitOutputStream productsMergedOutputStream;
 
     public void close(){
         try {
@@ -55,18 +58,6 @@ public class SlowIndexWriter {
         this.wordsIndex.insert(review);
         this.productsIndex.insert(review.productId, review.getStringId());
     }
-//
-//    public void writeEncoded(String toEncode, AppOutputStream out, boolean lastBatch) throws IOException {
-//        ArithmeticEncoder enc = new ArithmeticEncoder(out);
-//        for (int symbol: toEncode.toCharArray()) {
-//            enc.writeSymbol(symbol);
-//        }
-//        // Flush remaining code bits
-//        if(lastBatch){
-//            enc.finish();
-//            out.flush();
-//        }
-//    }
 
     public void writeEncoded(IndexBlock[] blocksToEncode, AppOutputStream out, BlockSizesFile blockSizesFile,
                              boolean lastBatch) throws IOException {
@@ -114,20 +105,21 @@ public class SlowIndexWriter {
             }
 
             wordsPath = Paths.get(dirPath,"words").toString();
-            sortedWordsPath = wordsPath.concat("_sorted");
-            var reviewsPath = Paths.get(dirPath,"reviews").toString();
+            String reviewsPath = Paths.get(dirPath,"reviews").toString();
             productsPath = Paths.get(dirPath,"products").toString();
-            sortedProductsPath = productsPath.concat("_sorted");
 
             this.productsOutputStream = new BitOutputStream(new FileOutputStream(productsPath));
-            this.productsIndex = new ProductsIndex();
+            this.productsMergedOutputStream = new BitOutputStream(new FileOutputStream(productsPath.concat("_sorted")));
             this.productsBlockSizesFile = new BlockSizesFile(new FileWriter(productsPath.concat("block_sizes")));
+            this.productsMergedBlockSizesFile = new BlockSizesFile(new FileWriter(productsPath.concat("block_sizes_merge")));
+            this.productsIndex = new ProductsIndex();
 
             this.reviewsOutputStream = new BitOutputStream(new FileOutputStream(reviewsPath));
             this.reviewsBlockSizesFile = new BlockSizesFile(new FileWriter(reviewsPath.concat("block_sizes")));
             this.reviewsIndex = new ReviewsIndex();
 
             this.wordsOutputStream =  new BitOutputStream(new FileOutputStream(wordsPath));
+            this.wordsMergedOutputStream =  new BitOutputStream(new FileOutputStream(wordsPath.concat("_sorted")));
             this.wordsBlockSizesFile = new BlockSizesFile(new FileWriter(wordsPath.concat("block_sizes")));
             this.mergeWordsBlockSizesFile = new WordsBlockSizesFile(new FileWriter(wordsPath.concat("block_sizes_merge")));
             this.wordsIndex = new WordsIndex();
@@ -175,51 +167,28 @@ public class SlowIndexWriter {
 
     public void sort(){
         try {
-//            var wordsOut = new BitOutputStream(new FileOutputStream(this.sortedWordsPath));
-            ArrayList<Integer> wordsBlockSizes = wordsBlockSizesFile.getBlockSizes();
-            IndexValuesIterator<SortableNodeWords>[] iterators = new IndexValuesIterator[wordsBlockSizes.size()]; //wordsInp, wordsBlockSizesFile,
-            for(int i=0;i<iterators.length;i++){
-                var wordsInp = new BitRandomAccessInputStream(new File(wordsPath), wordsBlockSizes);
-
-                iterators[i] = new IndexValuesIterator<SortableNodeWords>(wordsIndex, wordsInp, wordsIndex.separator,
-                        WordsIndex.NUM_OF_ENTRIES_IN_BLOCK, i);
-            }
-            Merger wordsMerger = new Merger(iterators, wordsIndex.separator, WordsIndex.NUM_OF_ENTRIES_IN_BLOCK,
-                    wordsBlockSizes.size());
-            IndexBlock[] res;
-            while((res=wordsMerger.getSortedBlock())!=null){
-                for(var e:res) System.out.print(e.block);
-                System.out.println();
-
-//                writeEncoded(res, this.wordsOutputStream, this.mergeWordsBlockSizesFile, false); //TODO check regarding last batch
-            }
-
-            System.out.println();
-            System.out.println();
-            System.out.println();
-
-            ArrayList<Integer> productsBlockSizes = productsBlockSizesFile.getBlockSizes();
-            IndexValuesIterator<SortableNodeProducts>[] productsIterators = new IndexValuesIterator[productsBlockSizes.size()]; //productsInp, wordsBlockSizesFile,
-            for(int i=0;i<productsIterators.length;i++){
-                var productsInp = new BitRandomAccessInputStream(new File(productsPath), productsBlockSizes);
-
-                productsIterators[i] = new IndexValuesIterator<SortableNodeProducts>(productsIndex, productsInp, productsIndex.separator,
-                        ProductsIndex.NUM_OF_PRODUCTS_IN_BLOCK, i);
-            }
-            Merger productMerger = new Merger(productsIterators, productsIndex.separator, ProductsIndex.NUM_OF_PRODUCTS_IN_BLOCK,
-                    productsBlockSizes.size());
-
-
-
-            IndexBlock[] productsRes;
-            while((productsRes=productMerger.getSortedBlock())!=null){
-                for(var e:productsRes) System.out.print(e.block);
-                System.out.println();
-            }
+            writeSorted(wordsBlockSizesFile, wordsPath,  WordsIndex.NUM_OF_ENTRIES_IN_BLOCK, wordsIndex, wordsMergedOutputStream, mergeWordsBlockSizesFile);
+            writeSorted(productsBlockSizesFile, productsPath,  ProductsIndex.NUM_OF_PRODUCTS_IN_BLOCK, productsIndex, productsMergedOutputStream, productsMergedBlockSizesFile);
         }
         catch (IOException e){
             e.printStackTrace();
             System.err.println(e);
+        }
+    }
+
+    private void writeSorted(BlockSizesFile bsf, String inputPath,int blockSize, Index index, BitOutputStream mergedOutputStream, BlockSizesFile mergedBsf) throws IOException {
+        ArrayList<Integer> blockSizes = bsf.getBlockSizes();
+        IndexValuesIterator<SortableNodeWords>[] iterators = new IndexValuesIterator[blockSizes.size()]; //wordsInp, wordsBlockSizesFile,
+        for(int i=0;i<iterators.length;i++){
+            var wordsInp = new BitRandomAccessInputStream(new File(inputPath), blockSizes);
+
+            iterators[i] = new IndexValuesIterator<>(index, wordsInp, index.separator, blockSize, i);
+        }
+
+        Merger merger = new Merger(iterators, index.separator, blockSize, blockSizes.size());
+        while(merger.hasMoreInput()){
+            IndexBlock[] blocks = merger.getSortedBlocks(5);
+            writeEncoded(blocks, mergedOutputStream, mergedBsf, !merger.hasMoreInput());
         }
     }
 
@@ -241,10 +210,14 @@ public class SlowIndexWriter {
 
     private static boolean enumerationContains(Enumeration<Integer> iterable, int val){
         while(iterable.hasMoreElements()){
-            if( iterable.nextElement() == val){
+            Integer elem = iterable.nextElement();
+            System.out.print(elem);
+            System.out.print(',');
+            if( elem == val){
                 return true;
             }
         }
+        System.out.println();
         return false;
     }
 
@@ -255,11 +228,11 @@ public class SlowIndexWriter {
         writer.slowWrite(reviewsFilePath, indexDir);
         writer.sort();
         IndexReader reader = new IndexReader(indexDir);
-//        for (int i = 1; i <= 100; i++) {
-//            String productId = reader.getProductId(i);
-//            Enumeration<Integer> reviewIds = reader.getProductReviews("B00067AD4U");
-//            Assertions.assertTrue(enumerationContains(reviewIds, i), "checking review "+i+"");
-//        }
+        for (int i = 1; i <= 100; i++) {
+            String productId = reader.getProductId(i);
+            Enumeration<Integer> reviewIds = reader.getProductReviews(productId);
+            Assertions.assertTrue(enumerationContains(reviewIds, i), "checking review "+i+"");
+        }
 
     }
 }

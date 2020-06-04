@@ -17,6 +17,9 @@ import static webdata.encoders.BitUtils.BATCH_SEPERATOR;
 import static webdata.encoders.BitUtils.END_OF_FILE;
 
 public class IndexReaderImpl {
+    private final BlockSizesFile wordsBsf;
+    private final BlockSizesFile reviewsBsf;
+    private final BlockSizesFile productsBsf;
     protected BitRandomAccessInputStream productsInputStream;
     protected BitRandomAccessInputStream reviewsInputStream;
     protected BitRandomAccessInputStream wordsInputStream;
@@ -25,14 +28,14 @@ public class IndexReaderImpl {
     private WordsIndex wordsIndex;
 
     public IndexReaderImpl(String productFilePath, String reviewsFilePath, String wordsFilePath) throws IOException {
-        BlockSizesFile productsBsf = new BlockSizesFile(new FileReader(productFilePath.concat("block_sizes")));
-        this.productsInputStream = new BitRandomAccessInputStream(new File(productFilePath), productsBsf.getBlockSizes());
+        productsBsf = new BlockSizesFile(new FileReader(productFilePath.concat("block_sizes_merge")));
+        this.productsInputStream = new BitRandomAccessInputStream(new File(productFilePath.concat("_sorted")), productsBsf.getBlockSizes());
 
-        BlockSizesFile reviewsBsf = new BlockSizesFile(new FileReader(reviewsFilePath.concat("block_sizes")));
+        reviewsBsf = new BlockSizesFile(new FileReader(reviewsFilePath.concat("block_sizes")));
         this.reviewsInputStream = new BitRandomAccessInputStream(new File(reviewsFilePath), reviewsBsf.getBlockSizes());
 
-        BlockSizesFile wordsBsf = new BlockSizesFile(new FileReader(wordsFilePath.concat("block_sizes")));
-        this.wordsInputStream = new BitRandomAccessInputStream(new File(wordsFilePath), wordsBsf.getBlockSizes());
+        wordsBsf = new BlockSizesFile(new FileReader(wordsFilePath.concat("block_sizes_merge")));
+        this.wordsInputStream = new BitRandomAccessInputStream(new File(wordsFilePath.concat("_sorted")), wordsBsf.getBlockSizes());
 
         this.reviewsIndex = new ReviewsIndex();
         this.wordsIndex = new WordsIndex();
@@ -43,7 +46,7 @@ public class IndexReaderImpl {
     /*API Section*/
     public Enumeration<Integer> getProductReviews(String productId){
         try{
-            this.productsIndex.loadBlock(this.productsInputStream, productsIndex.getBlockNum(productId));
+            this.productsIndex.loadBlock(this.productsInputStream, productsBsf.searchByToken(productId));
             if (this.productsIndex.contains(productId)) {
                 return this.productsIndex.get(productId);
             }
@@ -92,6 +95,14 @@ public class IndexReaderImpl {
 
 
     public int getReviewHelpfulnessDenominator(int reviewId) {
+        try {
+            this.reviewsIndex.loadBlock(this.reviewsInputStream, this.reviewsIndex.getBlockNum(reviewId));
+        }catch (OutOfBlocksException e){
+            return -1;
+        }catch (IOException e){
+            System.err.println("Exception was raised in getProductReviews");
+        }
+
         int[] ret = this.reviewsIndex.getReviewNums(reviewId);
         if(ret.length == 1){
             return -1;
@@ -111,6 +122,13 @@ public class IndexReaderImpl {
     }
 
     public int getReviewLength(int reviewId) {
+        try {
+            this.reviewsIndex.loadBlock(this.reviewsInputStream, this.reviewsIndex.getBlockNum(reviewId));
+        }catch (OutOfBlocksException e){
+            return -1;
+        }catch (IOException e){
+            System.err.println("Exception was raised in getProductReviews");
+        }
         int[] ret = this.reviewsIndex.getReviewNums(reviewId);
         if(ret.length == 1){
             return -1;
@@ -124,7 +142,7 @@ public class IndexReaderImpl {
 
     public Enumeration<Integer> getReviewsWithToken(String token){
         try {
-            this.wordsIndex.loadBlock(this.wordsInputStream, this.wordsIndex.getBlockNum(token));
+            this.wordsIndex.loadBlock(this.wordsInputStream, this.wordsBsf.searchByToken(token));
         }catch (OutOfBlocksException e){
             return Collections.enumeration(Collections.emptyList());
         }catch (IOException e){
@@ -135,7 +153,7 @@ public class IndexReaderImpl {
 
     public int getTokenCollectionFrequency(String token) {
         try {
-            this.wordsIndex.loadBlock(this.wordsInputStream, this.wordsIndex.getBlockNum(token));
+            this.wordsIndex.loadBlock(this.wordsInputStream, this.wordsBsf.searchByToken(token));
         }catch (OutOfBlocksException e){
             return -1;
         }catch (IOException e){
@@ -146,7 +164,7 @@ public class IndexReaderImpl {
 
     public int getTokenFrequency(String token) {
         try {
-            this.wordsIndex.loadBlock(this.wordsInputStream, this.wordsIndex.getBlockNum(token));
+            this.wordsIndex.loadBlock(this.wordsInputStream, this.wordsBsf.searchByToken(token));
         }catch (OutOfBlocksException e){
             return -1;
         }catch (IOException e){

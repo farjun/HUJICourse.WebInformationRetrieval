@@ -1,10 +1,5 @@
 package webdata.models;
 
-import webdata.encoders.ArithmeticEncoder;
-import webdata.indexes.BlockSizesFile;
-import webdata.indexes.WordsBlockSizesFile;
-import webdata.iostreams.AppOutputStream;
-import webdata.iostreams.BitRandomAccessInputStream;
 import webdata.iterators.IndexValuesIterator;
 
 import java.io.IOException;
@@ -12,6 +7,7 @@ import java.util.ArrayList;
 
 public class Merger {
 
+    public static final int NUM_OF_BLOCKS_TO_RETURN = 3;
     // external merge:
     // given k-1 sorted blocks merge them strict to the Kth block capacity and commit to disk
     // then replace the used block with new
@@ -49,7 +45,6 @@ public class Merger {
             this.cleanBlockAndFetchNew(i);
         }
     }
-
 
 
     public void cleanBlockAndFetchNew(int blockIndex){
@@ -103,42 +98,36 @@ public class Merger {
 
         this.cleanBlockAndFetchNew(blockMinIndex);
     }
-//
 
-    public IndexBlock[] getSortedBlock(){
-        return getSortedBlock(this.blockLength);
-    }
-
-//    public String[] getSortedBlock(int blockLength_){
-//        do {
-//            mergeIter();
-//        }
-//        while (this.mergedBlock.size() <= blockLength_ && hasMoreInput()); // TODO optimize
-//        if(this.mergedBlock.size()==0) return null;
-//        String[] res = new String[this.mergedBlock.size()];
-//        int i=0;
-//        for(SortableNode sn: this.mergedBlock)
-//            res[i++] = sn.toString();
-//        cleanMergingBlock();
-//        return res;
-//    }
-
-
-    public IndexBlock[] getSortedBlock(int blockLength_){
+    public IndexBlock getSortedBlock(){
         do {
             mergeIter();
         }
-        while (this.mergedBlock.size() <= blockLength_ && hasMoreInput()); // TODO optimize
+        while (this.mergedBlock.size() != this.blockLength && hasMoreInput()); // TODO optimize
         if(this.mergedBlock.size()==0) return null;
-        IndexBlock[] res = new IndexBlock[this.mergedBlock.size()];
-        int i=0;
+        StringBuilder sb = new StringBuilder();
+        String key = this.mergedBlock.get(0).getKey();
         for(SortableNode sn: this.mergedBlock){
-            String entryString = sn.toString();
-            String key = sn.getKey();
-            res[i++] = new IndexBlock(entryString, key);
+            sb.append(sn.toString());
         }
         cleanMergingBlock();
-        return res;
+
+        return new IndexBlock(sb.toString(), key);
+    }
+
+    public IndexBlock[] getSortedBlocks(int numOfBlocks){
+        ArrayList<IndexBlock> res = new ArrayList<>();
+        IndexBlock sortedBlock;
+        int i =0;
+        while((sortedBlock = getSortedBlock()) != null){
+            res.add(sortedBlock);
+            if(res.size() == numOfBlocks){
+                break;
+            }
+        }
+        IndexBlock[] out = new IndexBlock[res.size()];
+        res.toArray(out);
+        return out;
     }
 
     public void cleanMergingBlock(){

@@ -9,7 +9,7 @@ import java.io.IOException;
 
 public class Index {
 
-    private final int curBlockLoaded;
+    private int curBlockLoaded;
     public final char separator;
 
     public Index(char separator){
@@ -23,7 +23,7 @@ public class Index {
         }
         StringBuffer sb = this.decodeBlock(inputStream, blockNum);
         this.loadData(sb.toString());
-
+        curBlockLoaded = blockNum;
     }
 
     public IndexValuesIterator valuesIterator(BitRandomAccessInputStream inputStream, char seperator, int maxNumOfElementsInBuffer, int blobkNum) throws IOException  {
