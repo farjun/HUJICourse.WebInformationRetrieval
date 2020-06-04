@@ -134,7 +134,7 @@ public class Merger {
         int i=0;
         for(SortableNode sn: this.mergedBlock){
             String entryString = sn.toString();
-            String key = entryString.substring(0,entryString.indexOf('|')); //TODO
+            String key = sn.getKey();
             res[i++] = new IndexBlock(entryString, key);
         }
         cleanMergingBlock();

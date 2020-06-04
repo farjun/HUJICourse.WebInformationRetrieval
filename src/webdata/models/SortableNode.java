@@ -27,4 +27,8 @@ public class SortableNode{
         return rawValue;
     }
 
+    public String getKey(){
+        return "";
+    }
+
 }

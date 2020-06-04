@@ -49,4 +49,9 @@ public class SortableNodeWords extends SortableNode {
         return rawValue;
     }
 
+    @Override
+    public String getKey(){
+        return this.rawValue.substring(0,this.rawValue.indexOf('|'));
+    }
+
 }
