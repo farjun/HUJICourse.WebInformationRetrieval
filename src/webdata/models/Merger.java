@@ -105,20 +105,38 @@ public class Merger {
     }
 //
 
-    public String[] getSortedBlock(){
+    public IndexBlock[] getSortedBlock(){
         return getSortedBlock(this.blockLength);
     }
 
-    public String[] getSortedBlock(int blockLength_){
+//    public String[] getSortedBlock(int blockLength_){
+//        do {
+//            mergeIter();
+//        }
+//        while (this.mergedBlock.size() <= blockLength_ && hasMoreInput()); // TODO optimize
+//        if(this.mergedBlock.size()==0) return null;
+//        String[] res = new String[this.mergedBlock.size()];
+//        int i=0;
+//        for(SortableNode sn: this.mergedBlock)
+//            res[i++] = sn.toString();
+//        cleanMergingBlock();
+//        return res;
+//    }
+
+
+    public IndexBlock[] getSortedBlock(int blockLength_){
         do {
             mergeIter();
         }
         while (this.mergedBlock.size() <= blockLength_ && hasMoreInput()); // TODO optimize
         if(this.mergedBlock.size()==0) return null;
-        String[] res = new String[this.mergedBlock.size()];
+        IndexBlock[] res = new IndexBlock[this.mergedBlock.size()];
         int i=0;
-        for(SortableNode sn: this.mergedBlock)
-            res[i++] = sn.toString();
+        for(SortableNode sn: this.mergedBlock){
+            String entryString = sn.toString();
+            String key = entryString.substring(0,entryString.indexOf('|')); //TODO
+            res[i++] = new IndexBlock(entryString, key);
+        }
         cleanMergingBlock();
         return res;
     }

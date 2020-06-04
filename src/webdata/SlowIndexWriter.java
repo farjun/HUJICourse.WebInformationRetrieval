@@ -74,7 +74,7 @@ public class SlowIndexWriter {
         for (int i = 0; i < blocksToEncode.length; i++) {
             String curBlockToEncode = blocksToEncode[i].block;
             char[] symbols = curBlockToEncode.toCharArray();
-            for (int symbol : symbols) {
+            for (int symbol: symbols) {
                 enc.writeSymbol(symbol);
             }
             enc.writeSymbol('$');
@@ -177,20 +177,23 @@ public class SlowIndexWriter {
         try {
 //            var wordsOut = new BitOutputStream(new FileOutputStream(this.sortedWordsPath));
             ArrayList<Integer> wordsBlockSizes = wordsBlockSizesFile.getBlockSizes();
-            IndexValuesIterator<WordsSortableNode>[] iterators = new IndexValuesIterator[wordsBlockSizes.size()]; //wordsInp, wordsBlockSizesFile,
+            IndexValuesIterator<SortableNodeWords>[] iterators = new IndexValuesIterator[wordsBlockSizes.size()]; //wordsInp, wordsBlockSizesFile,
             for(int i=0;i<iterators.length;i++){
                 var wordsInp = new BitRandomAccessInputStream(new File(wordsPath), wordsBlockSizes);
 
-                iterators[i] = new IndexValuesIterator<WordsSortableNode>(wordsIndex, wordsInp, wordsIndex.separator,
+                iterators[i] = new IndexValuesIterator<SortableNodeWords>(wordsIndex, wordsInp, wordsIndex.separator,
                         WordsIndex.NUM_OF_ENTRIES_IN_BLOCK, i);
             }
             Merger wordsMerger = new Merger(iterators, wordsIndex.separator, WordsIndex.NUM_OF_ENTRIES_IN_BLOCK,
                     wordsBlockSizes.size());
-            String[] res;
+            IndexBlock[] res;
             while((res=wordsMerger.getSortedBlock())!=null){
-                for(var e:res) System.out.print(e);
+                for(var e:res) System.out.print(e.block);
                 System.out.println();
+
+//                writeEncoded(res, this.wordsOutputStream, this.mergeWordsBlockSizesFile, false); //TODO check regarding last batch
             }
+
             System.out.println();
             System.out.println();
             System.out.println();
@@ -208,9 +211,9 @@ public class SlowIndexWriter {
 
 
 
-            String[] productsRes;
+            IndexBlock[] productsRes;
             while((productsRes=productMerger.getSortedBlock())!=null){
-                for(var e:productsRes) System.out.print(e);
+                for(var e:productsRes) System.out.print(e.block);
                 System.out.println();
             }
         }

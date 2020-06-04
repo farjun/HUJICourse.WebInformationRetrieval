@@ -2,9 +2,9 @@ package webdata.models;
 
 import java.util.Objects;
 
-public class WordsSortableNode extends SortableNode {
+public class SortableNodeWords extends SortableNode {
     // super class has "rawValue" String variable.
-    public WordsSortableNode(String rawValue){
+    public SortableNodeWords(String rawValue){
         super(rawValue);
     }
     public void merge(SortableNode other){

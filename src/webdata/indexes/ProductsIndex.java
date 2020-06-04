@@ -92,7 +92,7 @@ public class ProductsIndex extends Index {
                 sb.deleteCharAt(sb.length() - 1);
                 productsBlocks[curBlock] = new IndexBlock(lastBlock, keys.first());;
             }
-        }else{
+        } else {
             this.loadData(sb.toString());
         }
 

@@ -57,10 +57,19 @@ public class SortableNodeProducts extends SortableNode {
     public String toString(){
         StringBuilder sb = new StringBuilder();
         sb.append(this.key);
+        sb.append(':');
         for (int val: this.array) {
             sb.append(val).append(",");
         }
         sb.deleteCharAt(sb.length() - 1);
         return sb.toString();
     }
+
+    public static void main(String[] args){
+        var o = new SortableNodeProducts("dssdds:3,1,5,1");
+        int[] arr1 = new int[]{1,1,1};
+        int[] arr2 = new int[]{3,1,1,1,3};
+        int[] res = o.mergeArrays(arr1,arr2);
+    }
+
 }

@@ -4,7 +4,6 @@ import webdata.encoders.ArithmeticDecoder;
 import webdata.iostreams.BitRandomAccessInputStream;
 import webdata.iterators.IndexValuesIterator;
 import webdata.models.SortableNode;
-import webdata.models.WordsSortableNode;
 
 import java.io.IOException;
 

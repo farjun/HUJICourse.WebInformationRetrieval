@@ -181,7 +181,7 @@ public class WordsIndex extends Index {
     }
 
     public SortableNode createSortableNode(String removeFirst) {
-        return new WordsSortableNode(removeFirst);
+        return new SortableNodeWords(removeFirst);
     }
 
 
