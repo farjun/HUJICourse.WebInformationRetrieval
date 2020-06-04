@@ -15,24 +15,42 @@ public class BlockSizesFile {
 
     }
 
+    private int basicSearchByToken(String token){
+        if(token.compareTo(blockKeyToken.get(0))<0)
+            return -1; // definitely not there
+        for(int i=0;i<blockKeyToken.size()-1;i++){
+            int compResFirst = token.compareTo(blockKeyToken.get(i));
+            int compResSecond = token.compareTo(blockKeyToken.get(i+1));
+            if(compResFirst>=0 && compResSecond<0) return i;
+        }
+        return blockKeyToken.size()-1; // might be in the last block
+    }
 
     public int searchByToken(String token){
         // assumes the list is ordered.
+
+//        return basicSearchByToken(token); // O(n)
+
+        // O(log(n))
         int left = 0, right = blockKeyToken.size()-1;
+        if(token.compareTo(blockKeyToken.get(left))<0)
+            return -1; // definitely not there
         while(left<right){
             int mid = (left+right)/2;
             String midToken = blockKeyToken.get(mid);
-            int compRes = token.compareTo(midToken);
-            if(compRes==0){
+            String nextToMidToken = blockKeyToken.get(mid+1);
+            int compResMid = token.compareTo(midToken);
+            int compResNextToMid = token.compareTo(nextToMidToken);
+            if(compResMid>=0 && compResNextToMid<0){
                 return mid;
             }
-            else if(compRes<0){
+            else if(compResMid < 0){
                 right = mid-1;
             } else {
                 left = mid+1;
             }
         }
-        return -1;
+        return left;
     }
 
     public BlockSizesFile(FileWriter filename) throws IOException{
@@ -94,4 +112,15 @@ public class BlockSizesFile {
         return this.blockSizes.get(batchNumber);
     }
 
+//    public static void main(String[] args) {
+//        BlockSizesFile b = new BlockSizesFile();
+////        b.addBlockDetails(6,"0zz");
+//        b.addBlockDetails(34,"ab");
+//        b.addBlockDetails(30,"cd");
+//        b.addBlockDetails(50,"fg");
+//        b.addBlockDetails(30,"zz");
+////        b.addBlockDetails(30,"zzz");
+//        int i=b.searchByToken("zzz");
+//        System.out.println(i);
+//    }
 }

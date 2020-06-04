@@ -17,23 +17,23 @@ import java.util.Iterator;
 public class IndexValuesIterator <T extends SortableNode> implements Iterator<T> {
 
     private final BitRandomAccessInputStream inputStream;
-    private final char seperator;
+    private final char separator;
     private final Index index;
     private int maxBufferSize;
-    private int blockNum; // TODO for debugging purposes at least
+    private int blockNum;
     ArithmeticDecoder dec;
-    private Deque<String> curNodesInBuffer;
+    private final Deque<String> curNodesInBuffer;
 
     public IndexValuesIterator(Index index,BitRandomAccessInputStream inputStream, char seperator) throws IOException{
         this(index, inputStream, seperator, 30, 0);
     }
 
-    public IndexValuesIterator(Index index,BitRandomAccessInputStream inputStream, char seperator, int maxBufferSize, int blockNum) throws IOException{
+    public IndexValuesIterator(Index index,BitRandomAccessInputStream inputStream, char separator, int maxBufferSize, int blockNum) throws IOException{
         inputStream.setPointerToBlock(blockNum);
         this.index = index;
         this.dec = new ArithmeticDecoder(inputStream);
         this.inputStream = inputStream;
-        this.seperator = seperator;
+        this.separator = separator;
         this.maxBufferSize = maxBufferSize;
         this.curNodesInBuffer = new LinkedList<>();
         this.blockNum = blockNum;
@@ -49,12 +49,13 @@ public class IndexValuesIterator <T extends SortableNode> implements Iterator<T>
         while (curNodesInBuffer.size() < maxBufferSize) {
             // Decode and write one byte
             int symbol = dec.read();
-            if(symbol != seperator){
+            if(symbol != separator){
                 sb.append((char)symbol);
             }
             else{
-                if((char)seperator == ';')
+                if((char)separator == ';')
                     sb.append(';'); // in case of words index entries
+//                sb.append(separator); // TODO shouldn't be for all?
                 curNodesInBuffer.add(sb.toString());
                 sb = new StringBuilder();
             }

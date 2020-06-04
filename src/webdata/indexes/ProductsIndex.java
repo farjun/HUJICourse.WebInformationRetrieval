@@ -7,8 +7,9 @@ import java.util.*;
 public class ProductsIndex extends Index {
     public static final int NUM_OF_PRODUCTS_IN_BLOCK = 100;
     private HashMap<String, CompressedArrayList> hashMap;
-    public char seperator = '|';
+
     public ProductsIndex(){
+        super('|');
         this.hashMap = new HashMap<>();
     }
 

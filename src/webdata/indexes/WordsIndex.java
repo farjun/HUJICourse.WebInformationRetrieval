@@ -10,16 +10,15 @@ public class WordsIndex extends Index {
     public final TreeMap<String, TreeMap<Integer, Integer>> tokenFreq;
     // will host map of sort { token : globalCounter }
     public final TreeMap<String, Integer> tokenGlobalFreq;
-    public final char separator;
 
 //    private final StringBuilder leftOverFromLastBlock;
-    public final int NUM_OF_ENTRIES_IN_BLOCK = 300; //TODO : increase
+    public static final int NUM_OF_ENTRIES_IN_BLOCK = 300; //TODO : increase
     private int mockedCounter;
 
     public WordsIndex(){
+        super(';');
         this.tokenFreq = new TreeMap<>();
         this.tokenGlobalFreq = new TreeMap<>();
-        this.separator = ';';
 //        this.leftOverFromLastBlock = new StringBuilder();
         this.mockedCounter = 0;
     }

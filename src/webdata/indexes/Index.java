@@ -11,9 +11,11 @@ import java.io.IOException;
 public class Index {
 
     private final int curBlockLoaded;
+    public final char separator;
 
-    public Index(){
+    public Index(char separator){
         curBlockLoaded = -1;
+        this.separator = separator;
     }
 
     public void loadBlock(BitRandomAccessInputStream inputStream, int blockNum) throws IOException  {

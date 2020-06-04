@@ -15,6 +15,7 @@ public class ReviewsIndex extends Index {
     private static final int NUM_OF_REVIEWS_IN_BLOCK = 200;
 
     public ReviewsIndex(){
+        super('|');
         this.reviews = new ArrayList<>();
     }
 
@@ -75,7 +76,7 @@ public class ReviewsIndex extends Index {
         StringBuilder sb = new StringBuilder();
         int curNumOfReviews = 0;
         int curBlock = 0;
-        int numOfBlocks = (int)Math.floor(this.reviews.size() / NUM_OF_REVIEWS_IN_BLOCK);
+        int numOfBlocks = (int)Math.floor((double)this.reviews.size() / NUM_OF_REVIEWS_IN_BLOCK);
         double blocksToReviewSizeRatio =  (double)this.reviews.size() / NUM_OF_REVIEWS_IN_BLOCK;
 
         if(lastBatch && numOfBlocks < blocksToReviewSizeRatio )
