@@ -15,6 +15,26 @@ public class BlockSizesFile {
 
     }
 
+
+    public int searchByToken(String token){
+        // assumes the list is ordered.
+        int left = 0, right = blockKeyToken.size()-1;
+        while(left<right){
+            int mid = (left+right)/2;
+            String midToken = blockKeyToken.get(mid);
+            int compRes = token.compareTo(midToken);
+            if(compRes==0){
+                return mid;
+            }
+            else if(compRes<0){
+                right = mid-1;
+            } else {
+                left = mid+1;
+            }
+        }
+        return -1;
+    }
+
     public BlockSizesFile(FileWriter filename) throws IOException{
         this();
         out = new BufferedWriter(filename);
@@ -73,4 +93,5 @@ public class BlockSizesFile {
     public int getBatchSize(int batchNumber){
         return this.blockSizes.get(batchNumber);
     }
+
 }
