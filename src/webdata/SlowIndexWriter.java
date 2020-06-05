@@ -165,12 +165,18 @@ public class SlowIndexWriter {
 
     }
 
+    public void clearIndexesFromRAM(){
+        this.wordsIndex = new WordsIndex(); // TODO can be optimized to not creating new indexes
+        this.productsIndex = new ProductsIndex();
+        this.reviewsIndex = new ReviewsIndex();
+    }
+
     public void sort(){
         try {
             writeSorted(wordsBlockSizesFile, wordsPath,  WordsIndex.NUM_OF_ENTRIES_IN_BLOCK, wordsIndex,
                     wordsMergedOutputStream, mergeWordsBlockSizesFile);
-            writeSorted(productsBlockSizesFile, productsPath,  ProductsIndex.NUM_OF_PRODUCTS_IN_BLOCK, productsIndex,
-                    productsMergedOutputStream, productsMergedBlockSizesFile);
+//            writeSorted(productsBlockSizesFile, productsPath,  ProductsIndex.NUM_OF_PRODUCTS_IN_BLOCK, productsIndex,
+//                    productsMergedOutputStream, productsMergedBlockSizesFile);
         }
         catch (IOException e){
             e.printStackTrace();
@@ -178,18 +184,18 @@ public class SlowIndexWriter {
         }
     }
 
+
     private void writeSorted(BlockSizesFile bsf, String inputPath,int blockSize, Index index, BitOutputStream mergedOutputStream, BlockSizesFile mergedBsf) throws IOException {
         ArrayList<Integer> blockSizes = bsf.getBlockSizes();
         IndexValuesIterator<SortableNodeWords>[] iterators = new IndexValuesIterator[blockSizes.size()]; //wordsInp, wordsBlockSizesFile,
         for(int i=0;i<iterators.length;i++){
             var wordsInp = new BitRandomAccessInputStream(new File(inputPath), blockSizes);
-
             iterators[i] = new IndexValuesIterator<>(index, wordsInp, index.separator, blockSize, i);
         }
 
         Merger merger = new Merger(iterators, index.separator, blockSize, blockSizes.size());
         while(merger.hasMoreInput()){
-            IndexBlock[] blocks = merger.getSortedBlocks(5);
+            IndexBlock[] blocks = merger.getSortedBlocks(5); //TODO WHY 5?
             writeEncoded(blocks, mergedOutputStream, mergedBsf, !merger.hasMoreInput());
         }
     }
@@ -228,6 +234,9 @@ public class SlowIndexWriter {
         String reviewsFilePath = "./datasets/1000.txt";
         SlowIndexWriter writer = new SlowIndexWriter();
         writer.slowWrite(reviewsFilePath, indexDir);
+        //
+        writer.clearIndexesFromRAM();
+        //
         writer.sort();
         IndexReader reader = new IndexReader(indexDir);
         for (int i = 1; i <= 100; i++) {
