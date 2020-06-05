@@ -22,12 +22,8 @@ public class ProductsIndex extends Index {
         this.hashMap = new HashMap<>();
         String[] keysAndValues = rawIndex.split("\\|");
         for (String andValue : keysAndValues) {
-            try {
-                String[] keysAndValue = andValue.split(":");
-                this.hashMap.put(keysAndValue[0], new CompressedArrayList(keysAndValue[1]));
-            }catch (Exception e){
-                System.out.println("error");
-            }
+            String[] keysAndValue = andValue.split(":");
+            this.hashMap.put(keysAndValue[0], new CompressedArrayList(keysAndValue[1]));
         }
     }
 
@@ -93,7 +89,9 @@ public class ProductsIndex extends Index {
                 productsBlocks[curBlock] = new IndexBlock(lastBlock, keys.first());;
             }
         } else {
-            this.loadData(sb.toString());
+            if (!sb.toString().equals("")) {
+                this.loadData(sb.toString());
+            }
         }
 
         return productsBlocks;

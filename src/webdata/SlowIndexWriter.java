@@ -17,7 +17,8 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 
 public class SlowIndexWriter {
-    public static final int BATCH_SIZE = 500;
+    public static final int BATCH_SIZE = 5000;
+    public static final int NUM_OF_BLOCKS_IN_EACH_SORT = 5;
     private BlockSizesFile productsBlockSizesFile;
     protected AppOutputStream productsOutputStream;
 
@@ -194,9 +195,18 @@ public class SlowIndexWriter {
         }
 
         Merger merger = new Merger(iterators, index.separator, blockSize, blockSizes.size());
+        int iterations = 0;
         while(merger.hasMoreInput()){
-            IndexBlock[] blocks = merger.getSortedBlocks(5);
-            writeEncoded(blocks, mergedOutputStream, mergedBsf, !merger.hasMoreInput());
+            try {
+                IndexBlock[] blocks = merger.getSortedBlocks(NUM_OF_BLOCKS_IN_EACH_SORT);
+                writeEncoded(blocks, mergedOutputStream, mergedBsf, !merger.hasMoreInput());
+                iterations++;
+                System.out.println(String.format("Sorted %s blocks out of %s blocks for input = %s index", iterations*NUM_OF_BLOCKS_IN_EACH_SORT, blockSizes.size(), inputPath));
+            }catch (Exception e){
+                System.out.println("Sorterror");
+                System.out.println(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -228,7 +238,7 @@ public class SlowIndexWriter {
 
     public static void main(String[] args) {
         String indexDir =  "./src/index";
-        String reviewsFilePath = "./datasets/1000.txt";
+        String reviewsFilePath = "./datasets/full/foods.txt";
         SlowIndexWriter writer = new SlowIndexWriter();
         writer.slowWrite(reviewsFilePath, indexDir);
         //
