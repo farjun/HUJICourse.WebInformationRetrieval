@@ -104,7 +104,9 @@ public class Merger {
             mergeIter();
         }
         while (this.mergedBlock.size() != this.blockLength && hasMoreInput()); // TODO optimize
-        if(this.mergedBlock.size()==0) return null;
+        if(this.mergedBlock.size()==0){
+            return null;
+        }
         StringBuilder sb = new StringBuilder();
         String key = this.mergedBlock.get(0).getKey();
         for(SortableNode sn: this.mergedBlock){
@@ -118,7 +120,6 @@ public class Merger {
     public IndexBlock[] getSortedBlocks(int numOfBlocks){
         ArrayList<IndexBlock> res = new ArrayList<>();
         IndexBlock sortedBlock;
-        int i =0;
         while((sortedBlock = getSortedBlock()) != null){
             res.add(sortedBlock);
             if(res.size() == numOfBlocks){
