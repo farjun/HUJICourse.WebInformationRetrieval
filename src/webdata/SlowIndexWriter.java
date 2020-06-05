@@ -195,7 +195,7 @@ public class SlowIndexWriter {
 
         Merger merger = new Merger(iterators, index.separator, blockSize, blockSizes.size());
         while(merger.hasMoreInput()){
-            IndexBlock[] blocks = merger.getSortedBlocks(3); //TODO WHY 5?
+            IndexBlock[] blocks = merger.getSortedBlocks(5);
             writeEncoded(blocks, mergedOutputStream, mergedBsf, !merger.hasMoreInput());
         }
     }
@@ -219,13 +219,10 @@ public class SlowIndexWriter {
     private static boolean enumerationContains(Enumeration<Integer> iterable, int val){
         while(iterable.hasMoreElements()){
             Integer elem = iterable.nextElement();
-            System.out.print(elem);
-            System.out.print(',');
             if( elem == val){
                 return true;
             }
         }
-        System.out.println();
         return false;
     }
 
@@ -243,7 +240,6 @@ public class SlowIndexWriter {
             String productId = reader.getProductId(i);
             Enumeration<Integer> reviewIds = reader.getProductReviews(productId);
             Assertions.assertTrue(enumerationContains(reviewIds, i), "checking review "+i+"");
-
             var r = reader.getTokenCollectionFrequency("the");
         }
 

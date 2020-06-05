@@ -41,8 +41,11 @@ public class Index {
                 symbol = dec.read();
                 sb.append((char)symbol);
             }catch (IOException e){
-                assert symbol == '$';
-                sb.deleteCharAt(sb.length() - 1);
+                for (int i = 1; i <= 5; i++) {
+                    if( sb.charAt(sb.length() - 1) == separator)
+                        break;
+                    sb.deleteCharAt(sb.length() - 1);
+                }
                 break;
             }
         }
