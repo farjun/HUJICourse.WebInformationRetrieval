@@ -15,19 +15,25 @@ public class SortableNodeWords extends SortableNode {
         String[] otherEntryDataStrs = other.toString().split("\\|");
 
         int thisGlobFreq = Integer.parseInt(thisEntryDataStrs[1]);
+        thisEntryDataStrs[1] = null; // dropping pointer
         int otherGlobFreq = Integer.parseInt(otherEntryDataStrs[1]);
+        otherEntryDataStrs[1] = null; // dropping pointer
 
-        String mergedFreqJSON = thisEntryDataStrs[2].
-                concat(otherEntryDataStrs[2]).
-                replace("};{",",");
+        otherEntryDataStrs[2] = otherEntryDataStrs[2].substring(1); // deleting "{"
+        StringBuilder mergedFreqJSON = new StringBuilder();
+        mergedFreqJSON.append(thisEntryDataStrs[2]).
+                replace(mergedFreqJSON.length()-2, mergedFreqJSON.length(),",");
+        thisEntryDataStrs[2] = null; // dropping pointer
+        mergedFreqJSON.append(otherEntryDataStrs[2]);
+        otherEntryDataStrs[2] = null; // dropping pointer
         StringBuilder sb = new StringBuilder();
-        this.rawValue = sb.
-                append(thisEntryDataStrs[0]).
+        sb.append(thisEntryDataStrs[0]).
                 append("|").
                 append(thisGlobFreq+otherGlobFreq).
                 append("|").
-                append(mergedFreqJSON).
-                toString();
+                append(mergedFreqJSON);
+        mergedFreqJSON = null; // dropping pointer
+        this.rawValue = sb.toString();
     }
 
     @Override

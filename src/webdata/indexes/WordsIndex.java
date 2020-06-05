@@ -12,7 +12,7 @@ public class WordsIndex extends Index {
     public final TreeMap<String, Integer> tokenGlobalFreq;
 
 //    private final StringBuilder leftOverFromLastBlock;
-    public static final int NUM_OF_ENTRIES_IN_BLOCK = 300; //TODO : increase
+    public static final int NUM_OF_ENTRIES_IN_BLOCK = 300;
     private int mockedCounter;
 
     public WordsIndex(){
@@ -58,7 +58,7 @@ public class WordsIndex extends Index {
                 this.tokenGlobalFreq.put(key, Integer.parseInt(globFreq));
                 this.tokenFreq.put(key, this.loadJSON(freqJSON));
             }catch (Exception e){
-                System.out.println("omer");
+                e.printStackTrace();
             }
         }
     }

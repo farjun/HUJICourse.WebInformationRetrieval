@@ -137,7 +137,8 @@ public class IndexReaderImpl {
     }
 
     public int getNumberOfReviews() {
-        return this.reviewsIndex.getNumberOfReviews();
+//        return this.reviewsIndex.getNumberOfReviews();
+        return this.reviewsBsf.getBlockSizes().size();
     }
 
     public Enumeration<Integer> getReviewsWithToken(String token){
