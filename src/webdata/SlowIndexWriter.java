@@ -167,8 +167,10 @@ public class SlowIndexWriter {
 
     public void sort(){
         try {
-            writeSorted(wordsBlockSizesFile, wordsPath,  WordsIndex.NUM_OF_ENTRIES_IN_BLOCK, wordsIndex, wordsMergedOutputStream, mergeWordsBlockSizesFile);
-            writeSorted(productsBlockSizesFile, productsPath,  ProductsIndex.NUM_OF_PRODUCTS_IN_BLOCK, productsIndex, productsMergedOutputStream, productsMergedBlockSizesFile);
+            writeSorted(wordsBlockSizesFile, wordsPath,  WordsIndex.NUM_OF_ENTRIES_IN_BLOCK, wordsIndex,
+                    wordsMergedOutputStream, mergeWordsBlockSizesFile);
+            writeSorted(productsBlockSizesFile, productsPath,  ProductsIndex.NUM_OF_PRODUCTS_IN_BLOCK, productsIndex,
+                    productsMergedOutputStream, productsMergedBlockSizesFile);
         }
         catch (IOException e){
             e.printStackTrace();
@@ -232,6 +234,8 @@ public class SlowIndexWriter {
             String productId = reader.getProductId(i);
             Enumeration<Integer> reviewIds = reader.getProductReviews(productId);
             Assertions.assertTrue(enumerationContains(reviewIds, i), "checking review "+i+"");
+
+            var r = reader.getTokenCollectionFrequency("the");
         }
 
     }

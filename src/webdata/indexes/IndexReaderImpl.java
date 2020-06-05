@@ -97,9 +97,9 @@ public class IndexReaderImpl {
     public int getReviewHelpfulnessDenominator(int reviewId) {
         try {
             this.reviewsIndex.loadBlock(this.reviewsInputStream, this.reviewsIndex.getBlockNum(reviewId));
-        }catch (OutOfBlocksException e){
+        } catch (OutOfBlocksException e){
             return -1;
-        }catch (IOException e){
+        } catch (IOException e){
             System.err.println("Exception was raised in getProductReviews");
         }
 
@@ -124,9 +124,9 @@ public class IndexReaderImpl {
     public int getReviewLength(int reviewId) {
         try {
             this.reviewsIndex.loadBlock(this.reviewsInputStream, this.reviewsIndex.getBlockNum(reviewId));
-        }catch (OutOfBlocksException e){
+        } catch (OutOfBlocksException e){
             return -1;
-        }catch (IOException e){
+        } catch (IOException e){
             System.err.println("Exception was raised in getProductReviews");
         }
         int[] ret = this.reviewsIndex.getReviewNums(reviewId);
@@ -142,7 +142,7 @@ public class IndexReaderImpl {
 
     public Enumeration<Integer> getReviewsWithToken(String token){
         try {
-            this.wordsIndex.loadBlock(this.wordsInputStream, this.wordsBsf.searchByToken(token));
+            this.wordsIndex.loadBlock(this.wordsInputStream, this.wordsBsf.searchByToken(token.toLowerCase()));
         }catch (OutOfBlocksException e){
             return Collections.enumeration(Collections.emptyList());
         }catch (IOException e){
@@ -153,7 +153,7 @@ public class IndexReaderImpl {
 
     public int getTokenCollectionFrequency(String token) {
         try {
-            this.wordsIndex.loadBlock(this.wordsInputStream, this.wordsBsf.searchByToken(token));
+            this.wordsIndex.loadBlock(this.wordsInputStream, this.wordsBsf.searchByToken(token.toLowerCase()));
         }catch (OutOfBlocksException e){
             return -1;
         }catch (IOException e){
@@ -164,7 +164,7 @@ public class IndexReaderImpl {
 
     public int getTokenFrequency(String token) {
         try {
-            this.wordsIndex.loadBlock(this.wordsInputStream, this.wordsBsf.searchByToken(token));
+            this.wordsIndex.loadBlock(this.wordsInputStream, this.wordsBsf.searchByToken(token.toLowerCase()));
         }catch (OutOfBlocksException e){
             return -1;
         }catch (IOException e){
