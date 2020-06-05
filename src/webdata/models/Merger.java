@@ -49,7 +49,10 @@ public class Merger {
 
     public void cleanBlockAndFetchNew(int blockIndex){
         if(blockIndex >= decodedEntries.length || blockIndex<0) return;
-        if(!iters[blockIndex].hasNext()) return;
+        if(!iters[blockIndex].hasNext()){
+            decodedEntries[blockIndex] = null;
+            return;
+        }
         decodedEntries[blockIndex] = iters[blockIndex].next();
     }
 

@@ -175,8 +175,8 @@ public class SlowIndexWriter {
         try {
             writeSorted(wordsBlockSizesFile, wordsPath,  WordsIndex.NUM_OF_ENTRIES_IN_BLOCK, wordsIndex,
                     wordsMergedOutputStream, mergeWordsBlockSizesFile);
-//            writeSorted(productsBlockSizesFile, productsPath,  ProductsIndex.NUM_OF_PRODUCTS_IN_BLOCK, productsIndex,
-//                    productsMergedOutputStream, productsMergedBlockSizesFile);
+            writeSorted(productsBlockSizesFile, productsPath,  ProductsIndex.NUM_OF_PRODUCTS_IN_BLOCK, productsIndex,
+                    productsMergedOutputStream, productsMergedBlockSizesFile);
         }
         catch (IOException e){
             e.printStackTrace();
@@ -190,12 +190,12 @@ public class SlowIndexWriter {
         IndexValuesIterator<SortableNodeWords>[] iterators = new IndexValuesIterator[blockSizes.size()]; //wordsInp, wordsBlockSizesFile,
         for(int i=0;i<iterators.length;i++){
             var wordsInp = new BitRandomAccessInputStream(new File(inputPath), blockSizes);
-            iterators[i] = new IndexValuesIterator<>(index, wordsInp, index.separator, blockSize, i);
+            iterators[i] = new IndexValuesIterator<>(index, wordsInp, index.separator, 20, i);
         }
 
         Merger merger = new Merger(iterators, index.separator, blockSize, blockSizes.size());
         while(merger.hasMoreInput()){
-            IndexBlock[] blocks = merger.getSortedBlocks(5); //TODO WHY 5?
+            IndexBlock[] blocks = merger.getSortedBlocks(3); //TODO WHY 5?
             writeEncoded(blocks, mergedOutputStream, mergedBsf, !merger.hasMoreInput());
         }
     }

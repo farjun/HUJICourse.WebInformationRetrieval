@@ -25,7 +25,7 @@ public class IndexValuesIterator <T extends SortableNode> implements Iterator<T>
     private final Deque<String> curNodesInBuffer;
 
     public IndexValuesIterator(Index index,BitRandomAccessInputStream inputStream, char seperator) throws IOException{
-        this(index, inputStream, seperator, 30, 0);
+        this(index, inputStream, seperator, 5, 0);
     }
 
     public IndexValuesIterator(Index index,BitRandomAccessInputStream inputStream, char separator, int maxBufferSize, int blockNum) throws IOException{
