@@ -180,6 +180,9 @@ public class SlowIndexWriter {
             this.writeAdditionalInfo();
             this.close();
 
+            this.clearIndexesFromRAM();
+            this.sort();
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -259,7 +262,7 @@ public class SlowIndexWriter {
 
     public static void main(String[] args) {
         String indexDir =  "./src/index";
-        String reviewsFilePath = "./datasets/full/foods_partial.txt";
+        String reviewsFilePath = "./datasets/full/foods.txt";
 //        SlowIndexWriter writer = new SlowIndexWriter();
 //        writer.slowWrite(reviewsFilePath, indexDir);
 //        writer.clearIndexesFromRAM();
