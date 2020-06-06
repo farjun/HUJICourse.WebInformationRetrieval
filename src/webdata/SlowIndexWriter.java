@@ -39,11 +39,14 @@ public class SlowIndexWriter {
     private BlockSizesFile productsMergedBlockSizesFile;
     private BitOutputStream productsMergedOutputStream;
 
+    private FileWriter additionalInfoWriter;
+
     public void close(){
         try {
             this.productsOutputStream.close();
             this.reviewsOutputStream.close();
             this.wordsOutputStream.close();
+            this.additionalInfoWriter.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -85,7 +88,24 @@ public class SlowIndexWriter {
         }
     }
 
+    private void writeAdditionalInfo() {
+        try {
+            File addInfoFile = new File("./src/index/additional_info");
+            if(!addInfoFile.exists())
+                addInfoFile.createNewFile();
+            this.additionalInfoWriter = new FileWriter(addInfoFile);
+
+            this.additionalInfoWriter.write(""+this.wordsIndex.getGlobalFreqSum()+"\n");
+
+            this.additionalInfoWriter.flush();
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+
     public void writeProcessed( boolean lastBatch ) throws IOException {
+
+
         writeEncoded(this.productsIndex.toStringBlocks(lastBatch), this.productsOutputStream, this.productsBlockSizesFile, lastBatch);
         writeEncoded(this.reviewsIndex.toStringBlocks(lastBatch), this.reviewsOutputStream, this.reviewsBlockSizesFile,lastBatch );
         writeEncoded(this.wordsIndex.toStringBlocks(lastBatch), this.wordsOutputStream, this.wordsBlockSizesFile, lastBatch);
@@ -158,6 +178,7 @@ public class SlowIndexWriter {
                 curIteration++;
             }
             this.writeProcessed(true);
+            this.writeAdditionalInfo(); //TODO
             this.close();
 
         } catch (IOException e) {
@@ -174,6 +195,7 @@ public class SlowIndexWriter {
 
     public void sort(){
         try {
+
             writeSorted(wordsBlockSizesFile, wordsPath,  WordsIndex.NUM_OF_ENTRIES_IN_BLOCK, wordsIndex,
                     wordsMergedOutputStream, mergeWordsBlockSizesFile);
             writeSorted(productsBlockSizesFile, productsPath,  ProductsIndex.NUM_OF_PRODUCTS_IN_BLOCK, productsIndex,

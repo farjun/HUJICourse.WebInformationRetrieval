@@ -12,7 +12,7 @@ import java.util.function.Function;
 import static org.junit.jupiter.api.Assertions.*;
 
 class IndexReaderEdgeTest {
-	final static String inputFile = "tests\\2.txt";
+	final static String inputFile = "./tests/indexReader/2.txt";
 	private static final String indexDir =  "./src/index";
 	static private IndexReader indexReader;
 	static private SlowIndexWriter indexWriter;
@@ -23,6 +23,8 @@ class IndexReaderEdgeTest {
 	static void before() {
 		indexWriter = new SlowIndexWriter();
 		indexWriter.slowWrite(inputFile, indexDir);
+		indexWriter.clearIndexesFromRAM();
+		indexWriter.sort();
 		indexReader = new IndexReader(indexDir);
 	}
 

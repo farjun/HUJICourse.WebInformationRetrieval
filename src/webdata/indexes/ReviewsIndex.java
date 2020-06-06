@@ -13,9 +13,11 @@ public class ReviewsIndex extends Index {
     public static final int HELPFULLNESS_DENUMERATOR = 2;
     public static final int LENGHT = 3;
     private static final int NUM_OF_REVIEWS_IN_BLOCK = 200;
+    private int numOfReviews;
 
     public ReviewsIndex(){
         super('|');
+        this.numOfReviews = 0;
         this.reviews = new ArrayList<>();
     }
 
@@ -34,6 +36,7 @@ public class ReviewsIndex extends Index {
     }
 
     public void insert(String value){
+        this.numOfReviews++;
         this.reviews.add(value);
     }
 

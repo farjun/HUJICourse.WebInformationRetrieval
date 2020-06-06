@@ -1,20 +1,11 @@
 package webdata.indexes;
 
-import webdata.encoders.ArithmeticDecoder;
-import webdata.iostreams.AppInputStream;
-import webdata.iostreams.BitInputStream;
 import webdata.iostreams.BitRandomAccessInputStream;
 import webdata.iostreams.OutOfBlocksException;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.Collections;
 import java.util.Enumeration;
-
-import static webdata.encoders.BitUtils.BATCH_SEPERATOR;
-import static webdata.encoders.BitUtils.END_OF_FILE;
 
 public class IndexReaderImpl {
     private final BlockSizesFile wordsBsf;
@@ -26,6 +17,7 @@ public class IndexReaderImpl {
     private ProductsIndex productsIndex;
     private ReviewsIndex reviewsIndex;
     private WordsIndex wordsIndex;
+    private FileReader additionalInfoReader;
 
     public IndexReaderImpl(String productFilePath, String reviewsFilePath, String wordsFilePath) throws IOException {
         productsBsf = new BlockSizesFile(new FileReader(productFilePath.concat("block_sizes_merge")));
@@ -37,11 +29,34 @@ public class IndexReaderImpl {
         wordsBsf = new BlockSizesFile(new FileReader(wordsFilePath.concat("block_sizes_merge")));
         this.wordsInputStream = new BitRandomAccessInputStream(new File(wordsFilePath.concat("_sorted")), wordsBsf.getBlockSizes());
 
+
+        this.additionalInfoReader = new FileReader("./src/index/additional_info");
+
         this.reviewsIndex = new ReviewsIndex();
         this.wordsIndex = new WordsIndex();
         this.productsIndex = new ProductsIndex();
+
+        this.readAdditionalInfo();
     }
 
+    private void readAdditionalInfo() {
+        try {
+            File addInfoFile = new File("./src/index/additional_info");
+            if(!addInfoFile.exists()) {
+                wordsIndex.setGlobalFreqSum(0);
+                return;
+            }
+            additionalInfoReader = new FileReader(addInfoFile);
+            int ch;
+            StringBuilder sb = new StringBuilder();
+            while((ch=additionalInfoReader.read())!=-1)
+                sb.append((char)ch);
+            String[] lines = sb.toString().split("\n");
+            wordsIndex.setGlobalFreqSum(Integer.valueOf(lines[0]));
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+    }
 
     /*API Section*/
     public Enumeration<Integer> getProductReviews(String productId){
@@ -175,13 +190,14 @@ public class IndexReaderImpl {
     }
 
     public int getTokenSizeOfReviews() {
-        // TODO add additional value to store global sum of frequencies
-        if(this.wordsIndex.tokenGlobalFreq.isEmpty()) return 0;
-        return this.wordsIndex.tokenGlobalFreq
-                .values()
-                .stream()
-                .mapToInt(Integer::valueOf)
-                .sum();
+        return this.wordsIndex.getGlobalFreqSum();
+//        if(this.wordsIndex.tokenGlobalFreq.isEmpty()) return 0;
+//        return this.wordsIndex.tokenGlobalFreq
+//                .values()
+//                .stream()
+//                .mapToInt(Integer::valueOf)
+//                .sum();
+
     }
 
 }

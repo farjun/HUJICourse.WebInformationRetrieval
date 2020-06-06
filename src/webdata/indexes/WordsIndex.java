@@ -13,14 +13,18 @@ public class WordsIndex extends Index {
 
 //    private final StringBuilder leftOverFromLastBlock;
     public static final int NUM_OF_ENTRIES_IN_BLOCK = 300;
-    private int mockedCounter;
+    private int globalFreqSum;
+
+    public int getGlobalFreqSum() {
+        return globalFreqSum;
+    }
 
     public WordsIndex(){
         super(';');
         this.tokenFreq = new TreeMap<>();
         this.tokenGlobalFreq = new TreeMap<>();
 //        this.leftOverFromLastBlock = new StringBuilder();
-        this.mockedCounter = 0;
+        this.globalFreqSum = 0;
     }
 
     public WordsIndex(String serializedWordEntry){
@@ -29,10 +33,6 @@ public class WordsIndex extends Index {
         this.loadData(serializedWordEntry);
     }
 
-
-    public int getBlockNum(String token){
-        return mockedCounter++; //TODO
-    }
 
     @Override
     public void loadData(String serializedWordEntries){
@@ -53,9 +53,9 @@ public class WordsIndex extends Index {
             String[] cols = row.split("\\|");
             try {
                 var key = cols[0];
-                var globFreq = cols[1];
-                var freqJSON = cols[2];
-                this.tokenGlobalFreq.put(key, Integer.parseInt(globFreq));
+                int globFreq = Integer.parseInt(cols[1]);
+                String freqJSON = cols[2];
+                this.tokenGlobalFreq.put(key, globFreq);
                 this.tokenFreq.put(key, this.loadJSON(freqJSON));
             }catch (Exception e){
                 e.printStackTrace();
@@ -85,6 +85,8 @@ public class WordsIndex extends Index {
             }
             var tokenGlobFreq = this.tokenGlobalFreq.getOrDefault(token, 0);
             this.tokenGlobalFreq.put(token, tokenGlobFreq+countInReview);
+            this.globalFreqSum += countInReview;
+
         }
 //        System.out.println("Global Freq Map:" + this.tokenGlobalFreq.toString());
     }
@@ -185,7 +187,9 @@ public class WordsIndex extends Index {
     }
 
 
-
+    public void setGlobalFreqSum(int globalFreqSum) {
+        this.globalFreqSum = globalFreqSum;
+    }
 }
 
 
