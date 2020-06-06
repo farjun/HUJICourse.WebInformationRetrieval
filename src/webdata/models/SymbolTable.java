@@ -14,6 +14,7 @@ public class SymbolTable {
 
     public SymbolTable(int numSymbols) {
         frequencies = new int[numSymbols];
+        sumOfFrequencies = new int[numSymbols+1];
         totalNumOfFrequencies = 0;
         for (int i = 0; i < frequencies.length; i++) {
             frequencies[i] = 1;
