@@ -41,7 +41,6 @@ class IndexReaderTest {
         SlowIndexWriter writer = new SlowIndexWriter();
         writer.slowWrite(reviewsFilePath, indexDir);
         writer.clearIndexesFromRAM();
-        writer.sort();
     }
 
     @org.junit.jupiter.api.AfterEach

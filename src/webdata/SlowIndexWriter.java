@@ -17,8 +17,8 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 
 public class SlowIndexWriter {
-    public static final int BATCH_SIZE = 5000;
-    public static final int NUM_OF_BLOCKS_IN_EACH_SORT = 5;
+    public static final int BATCH_SIZE = 10000;
+    public static final int NUM_OF_BLOCKS_IN_EACH_SORT = 3;
     private BlockSizesFile productsBlockSizesFile;
     protected AppOutputStream productsOutputStream;
 
@@ -210,9 +210,9 @@ public class SlowIndexWriter {
 
     public void sort(){
         try {
-            writeSorted(wordsBlockSizesFile, wordsPath,  WordsIndex.NUM_OF_ENTRIES_IN_BLOCK, wordsIndex,
+            writeSorted(wordsBlockSizesFile, wordsPath,  WordsIndex.NUM_OF_ENTRIES_IN_BLOCK/2, wordsIndex,
                     wordsMergedOutputStream, mergeWordsBlockSizesFile);
-            writeSorted(productsBlockSizesFile, productsPath,  ProductsIndex.NUM_OF_PRODUCTS_IN_BLOCK, productsIndex,
+            writeSorted(productsBlockSizesFile, productsPath,  ProductsIndex.NUM_OF_PRODUCTS_IN_BLOCK/2, productsIndex,
                     productsMergedOutputStream, productsMergedBlockSizesFile);
         }
         catch (IOException e){
@@ -227,7 +227,7 @@ public class SlowIndexWriter {
         IndexValuesIterator[] iterators = new IndexValuesIterator[blockSizes.size()]; //wordsInp, wordsBlockSizesFile,
         for(int i=0;i<iterators.length;i++){
             var wordsInp = new BitRandomAccessInputStream(new File(inputPath), blockSizes);
-            iterators[i] = new IndexValuesIterator<>(index, wordsInp, index.separator, 20, i);
+            iterators[i] = new IndexValuesIterator<>(index, wordsInp, index.separator, 3, i);
         }
 
         Merger merger = new Merger(iterators, index.separator, blockSize, blockSizes.size());
@@ -275,10 +275,10 @@ public class SlowIndexWriter {
 
     public static void main(String[] args) {
         String indexDir =  "./src/index";
-        String reviewsFilePath = "./datasets/full/foods.txt";
-//        SlowIndexWriter writer = new SlowIndexWriter();
-//        writer.slowWrite(reviewsFilePath, indexDir);
-//        writer.clearIndexesFromRAM();
+        String reviewsFilePath = "./datasets/full/foods_partial.txt";
+        SlowIndexWriter writer = new SlowIndexWriter();
+        writer.slowWrite(reviewsFilePath, indexDir);
+        writer.clearIndexesFromRAM();
 //        writer.sort();
         IndexReader reader = new IndexReader(indexDir);
         for (int i = 1; i <= 100; i++) {

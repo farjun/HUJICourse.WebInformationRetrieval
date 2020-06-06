@@ -5,6 +5,7 @@ import webdata.iterators.IndexValuesIterator;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.SortedSet;
+import java.util.TreeSet;
 
 public class Merger {
 
@@ -35,6 +36,7 @@ public class Merger {
 //        this.outBlockSizesFile = outBlockSizesFile;
         this.numOfBlocks = numOfBlocks;
         this.decodedEntries = new SortableNode[numOfBlocks];
+        sortedNodes = new TreeSet<>();
         this.iters = iters;
         for(int i=0;i<numOfBlocks;i++){
             this.cleanBlockAndFetchNew(i);
@@ -48,8 +50,11 @@ public class Merger {
             decodedEntries[blockIndex] = null;
             return;
         }
+//        if (decodedEntries[blockIndex] != null)
+//            sortedNodes.remove(decodedEntries[blockIndex]);
+
         decodedEntries[blockIndex] = iters[blockIndex].next();
-        sortedNodes.add(decodedEntries[blockIndex]);
+//        sortedNodes.add(decodedEntries[blockIndex]);
     }
 
     private int countInStringBuilder(StringBuilder str, char chr){
@@ -79,6 +84,9 @@ public class Merger {
     }
 
     public int getMinIndex2(){
+        if(this.sortedNodes.size() == 0){
+            return -1;
+        }
         return this.sortedNodes.first().fromIter;
     }
     public boolean hasMoreInput(){
@@ -91,14 +99,14 @@ public class Merger {
 
 
     public void mergeIter(){
-        int blockMinIndex = getMinIndex2();
+        int blockMinIndex = getMinIndex();
         if(blockMinIndex<0) return;
         if(mergedBlock.size()>0 && mergedBlock.get(mergedBlock.size()-1).compare(decodedEntries[blockMinIndex]) == 0)
             mergedBlock.get(mergedBlock.size()-1).merge(decodedEntries[blockMinIndex]);
         else {
             mergedBlock.add(decodedEntries[blockMinIndex]);
-            sortedNodes.remove(decodedEntries[blockMinIndex]);
         }
+
 
         this.cleanBlockAndFetchNew(blockMinIndex);
     }

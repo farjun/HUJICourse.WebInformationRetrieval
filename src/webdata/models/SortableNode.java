@@ -16,7 +16,7 @@ public class SortableNode implements Comparable {
     }
 
     public int compare(SortableNode o) {
-        return rawValue.compareTo(o.rawValue);
+        return getKey().compareTo(o.getKey());
     }
 
     @Override

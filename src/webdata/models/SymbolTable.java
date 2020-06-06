@@ -19,7 +19,7 @@ public class SymbolTable {
             frequencies[i] = 1;
             totalNumOfFrequencies++;
         }
-        recalculateSum();
+        recalculateSum(0);
     }
 
 
@@ -41,7 +41,7 @@ public class SymbolTable {
     public void incrementSymbolCounter(int symbol) {
         totalNumOfFrequencies++;
         frequencies[symbol]++;
-        recalculateSum();
+        recalculateSum(symbol);
     }
 
     public int getTotalNumOfSymbolsFrequencies() {
@@ -55,15 +55,16 @@ public class SymbolTable {
 
     /**
      * return the high boundry of the symbol
+     * [ 1,2 -> 3,3,4,5,67,8]
+     * [ 0, 1, 3,6...]
      */
     public int getHigh(int symbol) {
         return sumOfFrequencies[symbol + 1];
     }
 
-    private void recalculateSum() {
-        sumOfFrequencies = new int[frequencies.length + 1];
-        int sum = 0;
-        for (int i = 0; i < frequencies.length; i++) {
+    private void recalculateSum(int startFrom) {
+        int sum = sumOfFrequencies[startFrom];
+        for (int i = startFrom; i < frequencies.length; i++) {
             sum += frequencies[i];
             sumOfFrequencies[i+1] = sum;
         }
