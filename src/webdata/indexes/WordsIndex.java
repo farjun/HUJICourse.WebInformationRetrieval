@@ -12,7 +12,7 @@ public class WordsIndex extends Index {
     public final TreeMap<String, Integer> tokenGlobalFreq;
 
 //    private final StringBuilder leftOverFromLastBlock;
-    public static final int NUM_OF_ENTRIES_IN_BLOCK = 300;
+    public static final int NUM_OF_ENTRIES_IN_BLOCK = 5000;
     private int globalFreqSum;
 
     public int getGlobalFreqSum() {
@@ -40,8 +40,11 @@ public class WordsIndex extends Index {
         this.tokenFreq.clear();
         this.tokenGlobalFreq.clear();
         String[] rows = serializedWordEntries.split(String.valueOf(separator)); // Assume ";" is the terminal
+//        String rowRegex = "^[a-z0-9]+\\|[0-9]+\\|\\{([0-9]+\\:[0-9]+|\\,([0-9]+\\:[0-9]+)+)*\\}$"; // VERY HEAVY
+        String rowRegex = "^[a-z0-9]+\\|[0-9]+\\|\\{(.)*\\}$";
         for (String row : rows) {
-            if(row.length()<=0) continue;
+            if(row.length()<=0||!row.matches(rowRegex)) continue;
+//            if(row.length()<=0) continue;
 //            if(leftOverFromLastBlock.length()!=0){
 //                row = leftOverFromLastBlock.toString().concat(row);
 //                leftOverFromLastBlock.setLength(0);//empty
