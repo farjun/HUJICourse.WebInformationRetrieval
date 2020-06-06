@@ -33,7 +33,7 @@ public class BlockSizesFile {
 
         // O(log(n))
         int left = 0, right = blockKeyToken.size()-1;
-        if(token.compareTo(blockKeyToken.get(left))<0)
+        if(blockKeyToken.size()==0||token.compareTo(blockKeyToken.get(left))<0)
             return -1; // definitely not there
         while(left<right){
             int mid = (left+right)/2;

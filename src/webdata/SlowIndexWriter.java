@@ -39,11 +39,14 @@ public class SlowIndexWriter {
     private BlockSizesFile productsMergedBlockSizesFile;
     private BitOutputStream productsMergedOutputStream;
 
+    private FileWriter additionalInfoWriter;
+
     public void close(){
         try {
             this.productsOutputStream.close();
             this.reviewsOutputStream.close();
             this.wordsOutputStream.close();
+            this.additionalInfoWriter.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -82,6 +85,21 @@ public class SlowIndexWriter {
 
         if(lastBatch) {
             blockSizesFile.flush();
+        }
+    }
+
+    private void writeAdditionalInfo() {
+        try {
+            File addInfoFile = new File("./src/index/additional_info");
+            if(!addInfoFile.exists())
+                addInfoFile.createNewFile();
+            this.additionalInfoWriter = new FileWriter(addInfoFile);
+
+            this.additionalInfoWriter.write(""+this.wordsIndex.getGlobalFreqSum()+"\n");
+
+            this.additionalInfoWriter.flush();
+        } catch (IOException e){
+            e.printStackTrace();
         }
     }
 
@@ -158,6 +176,7 @@ public class SlowIndexWriter {
                 curIteration++;
             }
             this.writeProcessed(true);
+            this.writeAdditionalInfo();
             this.close();
 
         } catch (IOException e) {
@@ -172,13 +191,8 @@ public class SlowIndexWriter {
         this.reviewsIndex = new ReviewsIndex();
     }
 
-    public void sort(String dirPath){
-        wordsPath = Paths.get(dirPath,"words").toString();
-        String reviewsPath = Paths.get(dirPath,"reviews").toString();
-        productsPath = Paths.get(dirPath,"products").toString();
+    public void sort(){
         try {
-            BlockSizesFile productsBSF = new BlockSizesFile(new FileReader(productsPath.concat("block_sizes")));
-            WordsBlockSizesFile wordsBSF = new WordsBlockSizesFile(new FileReader(wordsPath.concat("block_sizes")));
             writeSorted(wordsBlockSizesFile, wordsPath,  WordsIndex.NUM_OF_ENTRIES_IN_BLOCK, wordsIndex,
                     wordsMergedOutputStream, mergeWordsBlockSizesFile);
             writeSorted(productsBlockSizesFile, productsPath,  ProductsIndex.NUM_OF_PRODUCTS_IN_BLOCK, productsIndex,
@@ -206,9 +220,10 @@ public class SlowIndexWriter {
                 IndexBlock[] blocks = merger.getSortedBlocks(NUM_OF_BLOCKS_IN_EACH_SORT);
                 writeEncoded(blocks, mergedOutputStream, mergedBsf, !merger.hasMoreInput());
                 iterations++;
-                System.out.println(String.format("Sorted %s blocks out of %s blocks for input = %s index", iterations*NUM_OF_BLOCKS_IN_EACH_SORT, blockSizes.size(), inputPath));
+                System.out.println(String.format("Sorted %s blocks out of %s blocks for input = %s index",
+                        iterations*NUM_OF_BLOCKS_IN_EACH_SORT, blockSizes.size(), inputPath));
             }catch (Exception e){
-                System.out.println("Sorterror");
+                System.out.println("Sort error");
                 System.out.println(e.toString());
                 e.printStackTrace();
             }
@@ -247,7 +262,8 @@ public class SlowIndexWriter {
         SlowIndexWriter writer = new SlowIndexWriter();
         writer.slowWrite(reviewsFilePath, indexDir);
         writer.clearIndexesFromRAM();
-        writer.sort(indexDir);
+        //
+        writer.sort();
         IndexReader reader = new IndexReader(indexDir);
         for (int i = 1; i <= 100; i++) {
             String productId = reader.getProductId(i);

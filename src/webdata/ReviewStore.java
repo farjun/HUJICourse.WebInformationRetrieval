@@ -1,14 +1,11 @@
 package webdata;
 
 //to manually test serialization
-import org.junit.jupiter.api.Assertions;
 import webdata.encoders.ConcatEncoder;
 import webdata.encoders.ConcatDecoder;
-import webdata.models.Merger;
 import webdata.models.ProductReview;
-import webdata.models.WordIndexTrie;
 
-        import java.io.*;
+import java.io.*;
 import java.util.Enumeration;
 
 public class ReviewStore {
@@ -52,42 +49,7 @@ public class ReviewStore {
         }
 
     }
-    private static void runTrie() {
 
-        ProductReview rev1 = new ProductReview(
-                997,
-                "product/productId: B006F2NYI2",
-                "review/userId: AF50D40Y85TV3", "review/profileName: Mike A.",
-                "review/helpfulness: 1/1",
-                "review/score: 5.0",
-                "review/time: 1328140800",
-                "review/summary: Great Hot Sauce and people who run it!",
-                "review/text: Man what can i say, this salsa is the bomb!! i have all the different kinds." +
-                        " i have it with almost every meal. the owner is a cool dude, He's dropped off free bottles" +
-                        " to me in my mailbox. i stole the f");
-        ProductReview rev2 = new ProductReview(
-                999,
-                "product/productId: B006F2NYI2",
-                "review/userId: AF50D40Y85TV3", "review/profileName: Mike A.",
-                "review/helpfulness: 1/1",
-                "review/score: 5.0",
-                "review/time: 1328140800",
-                "review/summary: Great Hot Hot Hot  Hot'Hot Sauce and people who run it!",
-                "review/text: Man what what what whatwhatv what what what can i say, this salsa is the bomb!! i have all the different kinds." +
-                        " i have it with almost 123Tamer 22222222 every meal. the owner is a cool dude, He's dropped off free bottles" +
-                        " to me in my mailbox. i stole the f");
-        WordIndexTrie tree = new WordIndexTrie();
-        tree.insert(rev1);
-        tree.insert(rev2);
-        tree.commit();
-        System.out.println(tree.toString());
-
-        var terminalNode = tree.getTerminalNode("Can".toLowerCase());
-        System.out.println(terminalNode.getTokenGlobalFreq());
-
-        terminalNode = tree.getTerminalNode("what".toLowerCase());
-        System.out.println(terminalNode.getTokenFreq().size());
-    }
     private static void run() {
 //        String reviewsFilePath = "./src/datasets/full/foods.txt";
         String reviewsFilePath = "./datasets/1000.txt";
