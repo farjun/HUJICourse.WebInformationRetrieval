@@ -10,7 +10,8 @@ public class SortableNode{
     }
 
     public void merge(SortableNode other){
-        rawValue = rawValue.concat(other.rawValue);
+        System.out.println("Not Calleble Method!!");
+
     }
 
     public int compare(SortableNode o) {

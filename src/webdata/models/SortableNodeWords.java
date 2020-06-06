@@ -13,7 +13,7 @@ public class SortableNodeWords extends SortableNode {
         // the|2|{7:10,9:2};
         // the|52|{1:45,3:2,7:10,9:2};
         String[] thisEntryDataStrs = this.rawValue.split("\\|");
-        String[] otherEntryDataStrs = other.toString().split("\\|");
+        String[] otherEntryDataStrs = other.rawValue.split("\\|");
 
         int thisGlobFreq = Integer.parseInt(thisEntryDataStrs[1]);
         int otherGlobFreq = Integer.parseInt(otherEntryDataStrs[1]);
@@ -22,6 +22,7 @@ public class SortableNodeWords extends SortableNode {
                 concat(otherEntryDataStrs[2]).
                 replace("}{",",");
         StringBuilder sb = new StringBuilder();
+
         this.rawValue = sb.
                 append(thisEntryDataStrs[0]).
                 append("|").
@@ -40,7 +41,7 @@ public class SortableNodeWords extends SortableNode {
             String otherToken = o.toString().substring(0, otherTokenEndIndex);
             return thisToken.compareTo(otherToken);
         }catch (Exception e){
-            System.out.println("omer");
+            System.out.println("error in words sortable node compare");
             throw e;
         }
     }
@@ -52,9 +53,6 @@ public class SortableNodeWords extends SortableNode {
 
     @Override
     public String toString(){
-        if(rawValue.startsWith("{")){
-            System.out.println("whyy??!");
-        }
         if(rawValue.charAt(rawValue.length()-1) != ';')
             return rawValue.concat(";");
         else

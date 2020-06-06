@@ -259,11 +259,10 @@ public class SlowIndexWriter {
     public static void main(String[] args) {
         String indexDir =  "./src/index";
         String reviewsFilePath = "./datasets/full/foods_partial.txt";
-        SlowIndexWriter writer = new SlowIndexWriter();
-        writer.slowWrite(reviewsFilePath, indexDir);
-        writer.clearIndexesFromRAM();
-        //
-        writer.sort();
+//        SlowIndexWriter writer = new SlowIndexWriter();
+//        writer.slowWrite(reviewsFilePath, indexDir);
+//        writer.clearIndexesFromRAM();
+//        writer.sort();
         IndexReader reader = new IndexReader(indexDir);
         for (int i = 1; i <= 100; i++) {
             String productId = reader.getProductId(i);
