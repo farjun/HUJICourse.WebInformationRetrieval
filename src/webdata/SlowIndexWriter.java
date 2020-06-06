@@ -96,6 +96,7 @@ public class SlowIndexWriter {
             this.additionalInfoWriter = new FileWriter(addInfoFile);
 
             this.additionalInfoWriter.write(""+this.wordsIndex.getGlobalFreqSum()+"\n");
+            this.additionalInfoWriter.write(""+this.reviewsIndex.getNumberOfReviews()+"\n");
 
             this.additionalInfoWriter.flush();
         } catch (IOException e){
@@ -207,7 +208,7 @@ public class SlowIndexWriter {
 
     private void writeSorted(BlockSizesFile bsf, String inputPath,int blockSize, Index index, BitOutputStream mergedOutputStream, BlockSizesFile mergedBsf) throws IOException {
         ArrayList<Integer> blockSizes = bsf.getBlockSizes();
-        IndexValuesIterator<SortableNodeWords>[] iterators = new IndexValuesIterator[blockSizes.size()]; //wordsInp, wordsBlockSizesFile,
+        IndexValuesIterator[] iterators = new IndexValuesIterator[blockSizes.size()]; //wordsInp, wordsBlockSizesFile,
         for(int i=0;i<iterators.length;i++){
             var wordsInp = new BitRandomAccessInputStream(new File(inputPath), blockSizes);
             iterators[i] = new IndexValuesIterator<>(index, wordsInp, index.separator, 20, i);

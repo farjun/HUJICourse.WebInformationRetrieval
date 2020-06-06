@@ -15,6 +15,14 @@ public class ReviewsIndex extends Index {
     private static final int NUM_OF_REVIEWS_IN_BLOCK = 200;
     private int numOfReviews;
 
+    public int getNumberOfReviews() {
+        return numOfReviews;
+    }
+
+    public void setNumOfReviews(int numOfReviews) {
+        this.numOfReviews = numOfReviews;
+    }
+
     public ReviewsIndex(){
         super('|');
         this.numOfReviews = 0;
@@ -66,9 +74,6 @@ public class ReviewsIndex extends Index {
         }
     }
 
-    public int getNumberOfReviews() {
-        return this.reviews.size();
-    }
 
     @Override
     public String toString() {

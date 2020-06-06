@@ -44,6 +44,7 @@ public class IndexReaderImpl {
             File addInfoFile = new File("./src/index/additional_info");
             if(!addInfoFile.exists()) {
                 wordsIndex.setGlobalFreqSum(0);
+                reviewsIndex.setNumOfReviews(0);
                 return;
             }
             additionalInfoReader = new FileReader(addInfoFile);
@@ -53,6 +54,7 @@ public class IndexReaderImpl {
                 sb.append((char)ch);
             String[] lines = sb.toString().split("\n");
             wordsIndex.setGlobalFreqSum(Integer.valueOf(lines[0]));
+            reviewsIndex.setNumOfReviews(Integer.valueOf(lines[1]));
         } catch (IOException e){
             e.printStackTrace();
         }
