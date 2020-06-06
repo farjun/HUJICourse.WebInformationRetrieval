@@ -16,21 +16,48 @@ public class SortableNodeWords extends SortableNode {
         String[] otherEntryDataStrs = other.rawValue.split("\\|");
 
         int thisGlobFreq = Integer.parseInt(thisEntryDataStrs[1]);
+        thisEntryDataStrs[1] = null;
         int otherGlobFreq = Integer.parseInt(otherEntryDataStrs[1]);
-
-        String mergedFreqJSON = thisEntryDataStrs[2].
-                concat(otherEntryDataStrs[2]).
-                replace("}{",",");
+        otherEntryDataStrs[1] = null;
+        StringBuilder mergedFreqJSON = new StringBuilder();
+        mergedFreqJSON.append(thisEntryDataStrs[2]).
+                replace(thisEntryDataStrs[2].length()-1,thisEntryDataStrs[2].length(),",").
+                append(otherEntryDataStrs[2].substring(1));
+        thisEntryDataStrs[2] = null;
+        otherEntryDataStrs[2] = null;
         StringBuilder sb = new StringBuilder();
-
         this.rawValue = sb.
                 append(thisEntryDataStrs[0]).
-                append("|").
+                append('|').
                 append(thisGlobFreq+otherGlobFreq).
-                append("|").
+                append('|').
                 append(mergedFreqJSON).
                 toString();
     }
+
+//    public void merge(SortableNode other){
+//        // the|50|{1:45,3:2};
+//        // the|2|{7:10,9:2};
+//        // the|52|{1:45,3:2,7:10,9:2};
+//        String[] thisEntryDataStrs = this.rawValue.split("\\|");
+//        String[] otherEntryDataStrs = other.rawValue.split("\\|");
+//
+//        int thisGlobFreq = Integer.parseInt(thisEntryDataStrs[1]);
+//        int otherGlobFreq = Integer.parseInt(otherEntryDataStrs[1]);
+//
+//        String mergedFreqJSON = thisEntryDataStrs[2].
+//                concat(otherEntryDataStrs[2]).
+//                replace("}{",",");
+//        StringBuilder sb = new StringBuilder();
+//
+//        this.rawValue = sb.
+//                append(thisEntryDataStrs[0]).
+//                append("|").
+//                append(thisGlobFreq+otherGlobFreq).
+//                append("|").
+//                append(mergedFreqJSON).
+//                toString();
+//    }
 
     @Override
     public int compare(SortableNode o) {
