@@ -23,8 +23,6 @@ class IndexReaderEdgeTest {
 	static void before() {
 		indexWriter = new SlowIndexWriter();
 		indexWriter.slowWrite(inputFile, indexDir);
-		indexWriter.clearIndexesFromRAM();
-		indexWriter.sort();
 		indexReader = new IndexReader(indexDir);
 	}
 

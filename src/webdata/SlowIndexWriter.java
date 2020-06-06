@@ -182,6 +182,7 @@ public class SlowIndexWriter {
 
             this.clearIndexesFromRAM();
             this.sort();
+            this.clearRedundantFiles(); // AFTER sort
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -193,6 +194,18 @@ public class SlowIndexWriter {
         this.wordsIndex = new WordsIndex(); // TODO can be optimized to not creating new indexes
         this.productsIndex = new ProductsIndex();
         this.reviewsIndex = new ReviewsIndex();
+    }
+
+    public void clearRedundantFiles(){
+        File[] fs = new File[4];
+        fs[0] = new File(wordsPath.concat("block_sizes"));
+        fs[1] = new File(wordsPath);
+        fs[2] = new File(productsPath.concat("block_sizes"));
+        fs[3] = new File(productsPath);
+        for(File f:fs){
+            if(!f.exists()) continue;
+            f.delete();
+        }
     }
 
     public void sort(){
