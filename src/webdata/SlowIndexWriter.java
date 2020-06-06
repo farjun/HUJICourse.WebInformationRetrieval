@@ -172,8 +172,13 @@ public class SlowIndexWriter {
         this.reviewsIndex = new ReviewsIndex();
     }
 
-    public void sort(){
+    public void sort(String dirPath){
+        wordsPath = Paths.get(dirPath,"words").toString();
+        String reviewsPath = Paths.get(dirPath,"reviews").toString();
+        productsPath = Paths.get(dirPath,"products").toString();
         try {
+            BlockSizesFile productsBSF = new BlockSizesFile(new FileReader(productsPath.concat("block_sizes")));
+            WordsBlockSizesFile wordsBSF = new WordsBlockSizesFile(new FileReader(wordsPath.concat("block_sizes")));
             writeSorted(wordsBlockSizesFile, wordsPath,  WordsIndex.NUM_OF_ENTRIES_IN_BLOCK, wordsIndex,
                     wordsMergedOutputStream, mergeWordsBlockSizesFile);
             writeSorted(productsBlockSizesFile, productsPath,  ProductsIndex.NUM_OF_PRODUCTS_IN_BLOCK, productsIndex,
@@ -238,20 +243,19 @@ public class SlowIndexWriter {
 
     public static void main(String[] args) {
         String indexDir =  "./src/index";
-        String reviewsFilePath = "./datasets/full/foods.txt";
+        String reviewsFilePath = "./datasets/full/foods_partial.txt";
         SlowIndexWriter writer = new SlowIndexWriter();
         writer.slowWrite(reviewsFilePath, indexDir);
-        //
         writer.clearIndexesFromRAM();
-        //
-        writer.sort();
+        writer.sort(indexDir);
         IndexReader reader = new IndexReader(indexDir);
         for (int i = 1; i <= 100; i++) {
             String productId = reader.getProductId(i);
             Enumeration<Integer> reviewIds = reader.getProductReviews(productId);
             Assertions.assertTrue(enumerationContains(reviewIds, i), "checking review "+i+"");
-            var r = reader.getTokenCollectionFrequency("the");
         }
+
+        var r = reader.getTokenCollectionFrequency("the");
 
     }
 }

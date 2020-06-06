@@ -7,6 +7,7 @@ public class SortableNodeWords extends SortableNode {
     public SortableNodeWords(String rawValue){
         super(rawValue);
     }
+
     public void merge(SortableNode other){
         // the|50|{1:45,3:2};
         // the|2|{7:10,9:2};
@@ -19,7 +20,7 @@ public class SortableNodeWords extends SortableNode {
 
         String mergedFreqJSON = thisEntryDataStrs[2].
                 concat(otherEntryDataStrs[2]).
-                replace("};{",",");
+                replace("}{",",");
         StringBuilder sb = new StringBuilder();
         this.rawValue = sb.
                 append(thisEntryDataStrs[0]).
@@ -32,11 +33,16 @@ public class SortableNodeWords extends SortableNode {
 
     @Override
     public int compare(SortableNode o) {
-        int thisTokenEndIndex = this.rawValue.indexOf("|");
-        String thisToken = this.rawValue.substring(0, thisTokenEndIndex);
-        int otherTokenEndIndex = o.toString().indexOf("|");
-        String otherToken = o.toString().substring(0, otherTokenEndIndex);
-        return thisToken.compareTo(otherToken);
+        try {
+            int thisTokenEndIndex = this.rawValue.indexOf("|");
+            String thisToken = this.rawValue.substring(0, thisTokenEndIndex);
+            int otherTokenEndIndex = o.toString().indexOf("|");
+            String otherToken = o.toString().substring(0, otherTokenEndIndex);
+            return thisToken.compareTo(otherToken);
+        }catch (Exception e){
+            System.out.println("omer");
+            throw e;
+        }
     }
 
     @Override
@@ -46,7 +52,13 @@ public class SortableNodeWords extends SortableNode {
 
     @Override
     public String toString(){
-        return rawValue;
+        if(rawValue.startsWith("{")){
+            System.out.println("whyy??!");
+        }
+        if(rawValue.charAt(rawValue.length()-1) != ';')
+            return rawValue.concat(";");
+        else
+            return rawValue;
     }
 
     @Override

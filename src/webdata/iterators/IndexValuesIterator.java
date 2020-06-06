@@ -16,6 +16,7 @@ import java.util.Iterator;
 
 public class IndexValuesIterator <T extends SortableNode> implements Iterator<T> {
 
+    public static final char SEP_CHAR = '#';
     private final BitRandomAccessInputStream inputStream;
     private final char separator;
     private final Index index;
@@ -53,10 +54,11 @@ public class IndexValuesIterator <T extends SortableNode> implements Iterator<T>
                 sb.append((char)symbol);
             }
             else{
-                if((char)separator == ';')
-                    sb.append(';'); // in case of words index entries
-//                sb.append(separator); // TODO shouldn't be for all?
-                curNodesInBuffer.add(sb.toString());
+                if(sb.length() > 5){
+                    curNodesInBuffer.add(sb.toString());
+                }else{
+                    System.out.println("wtf?");
+                }
                 sb = new StringBuilder();
             }
         }
