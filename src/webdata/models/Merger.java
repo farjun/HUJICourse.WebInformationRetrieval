@@ -4,6 +4,7 @@ import webdata.iterators.IndexValuesIterator;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.SortedSet;
 
 public class Merger {
 
@@ -13,19 +14,13 @@ public class Merger {
     // then replace the used block with new
     SortableNode[] decodedEntries;
     IndexValuesIterator[] iters;
-
+    SortedSet<SortableNode> sortedNodes;
     StringBuilder diskMock;
-
-    public ArrayList<SortableNode> getMergedBlock() {
-        return mergedBlock;
-    }
     int entryCountInMergedBlock;
     ArrayList<SortableNode> mergedBlock;
     int numOfBlocks; // number of blocks to use for merge in RAM
     int blockLength; // number of entries in each block
     char separator;
-
-
 
     public Merger(char separator){
         this.separator = separator;
@@ -54,6 +49,7 @@ public class Merger {
             return;
         }
         decodedEntries[blockIndex] = iters[blockIndex].next();
+        sortedNodes.add(decodedEntries[blockIndex]);
     }
 
     private int countInStringBuilder(StringBuilder str, char chr){
@@ -81,6 +77,10 @@ public class Merger {
         }
         return blockMinIndex;
     }
+
+    public int getMinIndex2(){
+        return this.sortedNodes.first().fromIter;
+    }
     public boolean hasMoreInput(){
         for (SortableNode decodedEntry : decodedEntries) {
             if (decodedEntry != null)
@@ -91,12 +91,13 @@ public class Merger {
 
 
     public void mergeIter(){
-        int blockMinIndex = getMinIndex();
+        int blockMinIndex = getMinIndex2();
         if(blockMinIndex<0) return;
         if(mergedBlock.size()>0 && mergedBlock.get(mergedBlock.size()-1).compare(decodedEntries[blockMinIndex]) == 0)
             mergedBlock.get(mergedBlock.size()-1).merge(decodedEntries[blockMinIndex]);
         else {
             mergedBlock.add(decodedEntries[blockMinIndex]);
+            sortedNodes.remove(decodedEntries[blockMinIndex]);
         }
 
         this.cleanBlockAndFetchNew(blockMinIndex);

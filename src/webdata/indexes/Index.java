@@ -60,7 +60,7 @@ public class Index {
         return 0;
     }
 
-    public SortableNode createSortableNode(String removeFirst) {
-        return new SortableNode(removeFirst);
+    public SortableNode createSortableNode(int fromIter, String removeFirst) {
+        return new SortableNode(fromIter, removeFirst);
     }
 }

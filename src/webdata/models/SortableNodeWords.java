@@ -4,8 +4,8 @@ import java.util.Objects;
 
 public class SortableNodeWords extends SortableNode {
     // super class has "rawValue" String variable.
-    public SortableNodeWords(String rawValue){
-        super(rawValue);
+    public SortableNodeWords(int fromIter, String rawValue){
+        super(fromIter, rawValue);
     }
 
     public void merge(SortableNode other){

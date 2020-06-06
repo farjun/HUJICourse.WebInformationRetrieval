@@ -43,8 +43,7 @@ public class WordsIndex extends Index {
 //        String rowRegex = "^[a-z0-9]+\\|[0-9]+\\|\\{([0-9]+\\:[0-9]+|\\,([0-9]+\\:[0-9]+)+)*\\}$"; // VERY HEAVY
         String rowRegex = "^[a-z0-9]+\\|[0-9]+\\|\\{(.)*\\}$";
         for (String row : rows) {
-            if(row.length()<=0||!row.matches(rowRegex)) continue;
-//            if(row.length()<=0) continue;
+            if(row.length()<=0) continue;
 //            if(leftOverFromLastBlock.length()!=0){
 //                row = leftOverFromLastBlock.toString().concat(row);
 //                leftOverFromLastBlock.setLength(0);//empty
@@ -185,8 +184,8 @@ public class WordsIndex extends Index {
         return wordsBlocks;
     }
 
-    public SortableNode createSortableNode(String removeFirst) {
-        return new SortableNodeWords(removeFirst);
+    public SortableNode createSortableNode(int fromIter ,String removeFirst) {
+        return new SortableNodeWords(fromIter, removeFirst);
     }
 
 

@@ -5,7 +5,7 @@ import webdata.models.*;
 import java.util.*;
 
 public class ProductsIndex extends Index {
-    public static final int NUM_OF_PRODUCTS_IN_BLOCK = 300;
+    public static final int NUM_OF_PRODUCTS_IN_BLOCK = 1000;
     private HashMap<String, CompressedArrayList> hashMap;
 
     public ProductsIndex(){
@@ -98,7 +98,7 @@ public class ProductsIndex extends Index {
     }
 
 
-    public SortableNode createSortableNode(String removeFirst) {
-        return new SortableNodeProducts(removeFirst);
+    public SortableNode createSortableNode(int fromIter,String removeFirst) {
+        return new SortableNodeProducts(fromIter,removeFirst);
     }
 }

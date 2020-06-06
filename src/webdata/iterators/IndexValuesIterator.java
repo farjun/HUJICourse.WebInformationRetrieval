@@ -67,7 +67,7 @@ public class IndexValuesIterator <T extends SortableNode> implements Iterator<T>
     @Override
     public T next() {
         if(curNodesInBuffer.size() > 0){
-            return (T)index.createSortableNode(curNodesInBuffer.removeFirst());
+            return (T)index.createSortableNode(blockNum, curNodesInBuffer.removeFirst());
         }
         else{
             try {
@@ -81,7 +81,7 @@ public class IndexValuesIterator <T extends SortableNode> implements Iterator<T>
             }
         }
         if(curNodesInBuffer.size() <= 0) return null;
-        return (T)index.createSortableNode(curNodesInBuffer.removeFirst());
+        return (T)index.createSortableNode(blockNum, curNodesInBuffer.removeFirst());
     }
 }
 

@@ -2,16 +2,17 @@ package webdata.models;
 
 import java.util.Objects;
 
-public class SortableNode{
+public class SortableNode implements Comparable {
+    public int fromIter;
     protected String rawValue;
 
-    public SortableNode(String rawValue){
+    public SortableNode(int fromIter, String rawValue){
+        this.fromIter = fromIter;
         this.rawValue = rawValue;
     }
 
     public void merge(SortableNode other){
         System.out.println("Not Calleble Method!!");
-
     }
 
     public int compare(SortableNode o) {
@@ -32,4 +33,8 @@ public class SortableNode{
         return "";
     }
 
+    @Override
+    public int compareTo(Object o) {
+        return this.compare((SortableNode) o);
+    }
 }

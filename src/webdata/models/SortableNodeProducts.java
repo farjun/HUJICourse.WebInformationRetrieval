@@ -8,8 +8,8 @@ public class SortableNodeProducts extends SortableNode {
     private int[] array;
     private final String key;
 
-    public SortableNodeProducts(String rawValue){
-        super(rawValue);
+    public SortableNodeProducts(int fromIter, String rawValue){
+        super(fromIter, rawValue);
         String[] keysAndValue = rawValue.split(":");
         this.key = keysAndValue[0];
         this.array = valuesToIntArray(keysAndValue[1]);
