@@ -49,11 +49,11 @@ public class ReviewsIndex extends Index {
     }
 
     public int[] getReviewNums(int reviewID){
-        
-        if(this.reviews.size() < reviewID || reviewID < 1){
+        int inBlockReviewId = (reviewID-1) % NUM_OF_REVIEWS_IN_BLOCK;
+        if(this.reviews.size() < inBlockReviewId || reviewID < 1){
             return new int[]{-1};
         }else{
-            return Stream.of(this.reviews.get(reviewID-1).split(","))
+            return Stream.of(this.reviews.get(inBlockReviewId).split(","))
                     .limit(4) // limit=4 because productId is not int
                     .mapToInt(Integer::parseInt)
                     .toArray();

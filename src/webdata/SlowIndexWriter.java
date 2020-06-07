@@ -159,6 +159,7 @@ public class SlowIndexWriter {
      * if the directory does not exist, it should be created
      */
     public void slowWrite(String inputFile, String dir) {
+        System.out.println("START FIRST WRITE "+java.time.LocalTime.now());
         this.setWriters(dir);
         ReviewsIterator iter = new ReviewsIterator(inputFile);
         try {
@@ -179,11 +180,12 @@ public class SlowIndexWriter {
             this.writeProcessed(true);
             this.writeAdditionalInfo();
             this.close();
-
+            System.out.println("FINISHED FIRST WRITE "+java.time.LocalTime.now());
             this.clearIndexesFromRAM();
+            System.out.println("STARTED SORT "+java.time.LocalTime.now());
             this.sort();
             this.clearRedundantFiles(); // AFTER sort
-
+            System.out.println("FINISHED SORT "+java.time.LocalTime.now());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -237,6 +239,7 @@ public class SlowIndexWriter {
                 IndexBlock[] blocks = merger.getSortedBlocks(NUM_OF_BLOCKS_IN_EACH_SORT);
                 writeEncoded(blocks, mergedOutputStream, mergedBsf, !merger.hasMoreInput());
                 iterations++;
+                System.out.println("ITERATION "+java.time.LocalTime.now());
                 System.out.println(String.format("Sorted %s blocks out of %s blocks for input = %s index",
                         iterations*NUM_OF_BLOCKS_IN_EACH_SORT, blockSizes.size(), inputPath));
             }catch (Exception e){
@@ -286,6 +289,27 @@ public class SlowIndexWriter {
         }
 
         var r = reader.getTokenCollectionFrequency("the");
+
+        var nor = reader.getNumberOfReviews();
+        var den = reader.getReviewHelpfulnessDenominator(10000);
+        var num = reader.getReviewHelpfulnessNumerator(10000);
+        var prdId = reader.getProductId(10000);
+        var scr = reader.getReviewScore(10000);
+
+        String[] tokens = {"Not", "vendor", "to", "this", "most", "it", "coated", "powdered", "intended", "And", "products", "an", "found", "meat", "stew", "treat", "recommend", "canned", "Jumbo", "good", "then", "she", "or", "nuts", "processed", "like", "I", "be", "of", "dog", "light", "My", "unsalted", "been", "gelatin", "pillowy", "very", "Vitality", "bought", "Product", "and", "appreciates", "It", "finicky", "chewy", "them", "This", "labeled", "tiny", "looks", "peanuts", "highly", "with", "confection", "has", "yummy", "citrus", "smells", "heaven", "arrived", "product", "actually", "food", "The", "too", "Filberts", "cut", "the", "Labrador", "a", "centuries", "around", "was", "than", "into", "all", "several", "small", "sized", "represent", "mouthful", "flavorful", "squares", "were", "if", "in", "more", "Salted", "is", "better", "that", "quality", "liberally", "as", "case", "sugar", "Peanuts", "sure", "error", "have", "few"};
+        System.out.println("LENGTH"+tokens.length);
+        Enumeration<Integer> rr;
+        System.out.println("start reading getReviewsWithToken "+java.time.LocalTime.now());
+        for(var t:tokens)
+            rr = reader.getReviewsWithToken(t);
+        System.out.println("end reading getReviewsWithToken "+java.time.LocalTime.now());
+
+        int rrr;
+        System.out.println("start reading TokenFrequency "+java.time.LocalTime.now());
+        for(var t:tokens)
+            rrr = reader.getTokenFrequency(t);
+        System.out.println("end reading TokenFrequency "+java.time.LocalTime.now());
+
 
     }
 }
