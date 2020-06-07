@@ -40,7 +40,7 @@ public class ReviewStore {
 //            );
         String indexDir =  "./src/index";
         String reviewsFilePath = "./datasets/1000.txt";
-        SlowIndexWriter writer = new SlowIndexWriter();
+        IndexWriter writer = new IndexWriter();
 //        writer.slowWrite(reviewsFilePath, indexDir);
         IndexReader reader = new IndexReader(indexDir);
         for (int i = 1; i <= 100; i++) {
@@ -54,8 +54,8 @@ public class ReviewStore {
 //        String reviewsFilePath = "./src/datasets/full/foods.txt";
         String reviewsFilePath = "./datasets/1000.txt";
         String indexDir =  "./src/index";
-        SlowIndexWriter writer = new SlowIndexWriter();
-        writer.slowWrite(reviewsFilePath,indexDir);
+        IndexWriter writer = new IndexWriter();
+        writer.write(reviewsFilePath,indexDir);
         IndexReader reader = new IndexReader(indexDir);
 //        Enumeration<Integer> enumeration = reader.getProductReviews("B0009XLVG0");
 //
@@ -99,8 +99,8 @@ public class ReviewStore {
 
     private static void run1() {
         String reviewsFilePath = "./src/datasets/1000.txt";
-        SlowIndexWriter writer = new SlowIndexWriter();
-        writer.slowWrite(reviewsFilePath, "./src/index");
+        IndexWriter writer = new IndexWriter();
+        writer.write(reviewsFilePath, "./src/index");
         System.out.println("-----------------------------");
         try {
             // POC of serialization and deserialization with byte level control. didn't include all the data.

@@ -2,7 +2,7 @@ package indexReader;
 
 import org.junit.jupiter.api.Assertions;
 import webdata.IndexReader;
-import webdata.SlowIndexWriter;
+import webdata.IndexWriter;
 
 import java.util.Enumeration;
 import java.util.stream.IntStream;
@@ -38,8 +38,8 @@ class IndexReaderTest {
 
     @org.junit.jupiter.api.BeforeAll
     static void setUp() {
-        SlowIndexWriter writer = new SlowIndexWriter();
-        writer.slowWrite(reviewsFilePath, indexDir);
+        IndexWriter writer = new IndexWriter();
+        writer.write(reviewsFilePath, indexDir);
         writer.clearIndexesFromRAM();
     }
 

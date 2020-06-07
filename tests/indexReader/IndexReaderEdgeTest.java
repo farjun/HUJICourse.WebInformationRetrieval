@@ -2,7 +2,7 @@ package indexReader;
 
 import org.junit.jupiter.api.*;
 import webdata.IndexReader;
-import webdata.SlowIndexWriter;
+import webdata.IndexWriter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,14 +15,14 @@ class IndexReaderEdgeTest {
 	final static String inputFile = "./tests/indexReader/2.txt";
 	private static final String indexDir =  "./src/index";
 	static private IndexReader indexReader;
-	static private SlowIndexWriter indexWriter;
+	static private IndexWriter indexWriter;
 	private final String msgInt = "fail on input: %d";
 	private final String msgStr = "fail on input: %s";
 
 	@BeforeAll
 	static void before() {
-		indexWriter = new SlowIndexWriter();
-		indexWriter.slowWrite(inputFile, indexDir);
+		indexWriter = new IndexWriter();
+		indexWriter.write(inputFile, indexDir);
 		indexReader = new IndexReader(indexDir);
 	}
 

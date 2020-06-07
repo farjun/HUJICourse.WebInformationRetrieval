@@ -5,7 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import webdata.IndexReader;
-import webdata.SlowIndexWriter;
+import webdata.IndexWriter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,14 +19,14 @@ class IndexReadeBigInputTest {
 	private static final String inputFile = "./datasets/full/Books.txt";
 	private static final String indexDir =  "./src/index";
 	static private IndexReader indexReader;
-	static private SlowIndexWriter indexWriter;
+	static private IndexWriter indexWriter;
 	private final String msgInt = "fail on input: %d";
 	private final String msgStr = "fail on input: %s";
 
 	@BeforeAll
 	static void before() {
-		indexWriter = new SlowIndexWriter();
-		indexWriter.slowWrite(inputFile, indexDir);
+		indexWriter = new IndexWriter();
+		indexWriter.write(inputFile, indexDir);
 		indexReader = new IndexReader(indexDir);
 	}
 
