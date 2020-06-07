@@ -34,17 +34,31 @@ public class Index {
         inputStream.setPointerToBlock(blockNum);
         ArithmeticDecoder dec = new ArithmeticDecoder(inputStream);
         StringBuffer sb = new StringBuffer();
+        StringBuffer entry = new StringBuffer();
+
         int symbol = 0;
         while (true) {
             // Decode and write one byte
             try {
                 symbol = dec.read();
-                sb.append((char)symbol);
+                if(symbol == separator){
+                    if(entry.length() > 5) {
+                        sb.append(entry.toString());
+                        sb.append((char) symbol);
+                    }
+                    entry = new StringBuffer();
+                }else {
+                    entry.append((char) symbol);
+                }
             }catch (IOException e){
-                for (int i = 1; i <= 5; i++) {
-                    if( sb.charAt(sb.length() - 1) == separator)
-                        break;
-                    sb.deleteCharAt(sb.length() - 1);
+//                for (int i = 1; i <= 5; i++) {
+//                    if( sb.charAt(sb.length() - 1) == separator)
+//                        break;
+//                    sb.deleteCharAt(sb.length() - 1);
+//                }
+                if(entry.length() > 5){
+                    sb.append(entry.toString());
+                    sb.append(separator);
                 }
                 break;
             }

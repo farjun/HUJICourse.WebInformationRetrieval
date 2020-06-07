@@ -20,11 +20,16 @@ public class ProductsIndex extends Index {
 
     public void loadData(String rawIndex){
         this.hashMap = new HashMap<>();
-        String[] keysAndValues = rawIndex.split("\\|");
-        for (String andValue : keysAndValues) {
-            String[] keysAndValue = andValue.split(":");
-            this.hashMap.put(keysAndValue[0], new CompressedArrayList(keysAndValue[1]));
+        try {
+            String[] keysAndValues = rawIndex.split("\\|");
+            for (String andValue : keysAndValues) {
+                String[] keysAndValue = andValue.split(":");
+                this.hashMap.put(keysAndValue[0], new CompressedArrayList(keysAndValue[1]));
+            }
+        }catch (Exception e){
+            System.out.println();
         }
+
     }
 
     public void put(String key,  CompressedArrayList value){

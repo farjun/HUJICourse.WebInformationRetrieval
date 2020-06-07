@@ -275,13 +275,11 @@ public class SlowIndexWriter {
 
     public static void main(String[] args) {
         String indexDir =  "./src/index";
-        String reviewsFilePath = "./datasets/full/foods_partial.txt";
+        String reviewsFilePath = "./datasets/full/foods.txt";
         SlowIndexWriter writer = new SlowIndexWriter();
         writer.slowWrite(reviewsFilePath, indexDir);
-        writer.clearIndexesFromRAM();
-//        writer.sort();
         IndexReader reader = new IndexReader(indexDir);
-        for (int i = 1; i <= 100; i++) {
+        for (int i = 1; i <= 10000; i++) {
             String productId = reader.getProductId(i);
             Enumeration<Integer> reviewIds = reader.getProductReviews(productId);
             Assertions.assertTrue(enumerationContains(reviewIds, i), "checking review "+i+"");
