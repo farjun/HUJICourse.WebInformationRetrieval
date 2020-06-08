@@ -187,9 +187,11 @@ public class IndexWriter {
             long stopTime = System.nanoTime();
             System.out.print("processing done:");
             printInSec(stopTime - startTime);
+            startTime = System.nanoTime();
             this.clearIndexesFromRAM();
 //            System.out.println("STARTED SORT "+java.time.LocalTime.now());
             this.sort();
+            stopTime = System.nanoTime();
             System.out.print("sorting done:");
             printInSec(stopTime - startTime);
             this.clearRedundantFiles(); // AFTER sort
