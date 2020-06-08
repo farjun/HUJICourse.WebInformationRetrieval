@@ -37,17 +37,17 @@ public class ProductReview implements Serializable {
     public ProductReview(int id, String productId, String userId, String profileName, String helpfulness, String score,
                          String time, String summary, String text ){
         this.id = id;
-        this.productId = productId.substring("product/productId: ".length());
-        this.userId = userId.substring("review/userId: ".length());
-        this.profileName = profileName.substring("review/profileName: ".length());
-        String[] helpfulnessSplit = helpfulness.substring("review/helpfulness: ".length()).split("/");
+        this.productId = productId;
+        this.userId = userId;
+        this.profileName = profileName;
+        String[] helpfulnessSplit = helpfulness.split("/");
         this.helpfulnessNumerator = Integer.parseInt(helpfulnessSplit[0]);
         this.helpfulnessDenominator = Integer.parseInt(helpfulnessSplit[1]);
 
-        this.score = Short.parseShort(score.substring("review/score: ".length()).split(".0")[0]); // based on ex1, score is int 1-5
-        this.time = time.substring("review/time: ".length());
-        this.summary = summary.substring("review/summary: ".length());
-        this.text = text.substring("review/text:".length());
+        this.score = Short.parseShort(score.split(".0")[0]); // based on ex1, score is int 1-5
+        this.time = time;
+        this.summary = summary;
+        this.text = text;
 
         this.tokenStats = new HashMap<String, Integer>();
         var tokensList = this.text.toLowerCase().split("[^a-zA-Z0-9]+");

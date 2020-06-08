@@ -50,7 +50,7 @@ public class ReviewsIndex extends Index {
 
     public int[] getReviewNums(int reviewID){
         int inBlockReviewId = (reviewID-1) % NUM_OF_REVIEWS_IN_BLOCK;
-        if(this.reviews.size() < inBlockReviewId || reviewID < 1){
+        if(this.reviews.size() <= inBlockReviewId || reviewID < 1){
             return new int[]{-1};
         }else{
             return Stream.of(this.reviews.get(inBlockReviewId).split(","))
