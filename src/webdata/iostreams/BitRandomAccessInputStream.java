@@ -9,6 +9,7 @@ public class BitRandomAccessInputStream implements AppInputStream {
 
     public static final int NUM_OF_BYTES_IN_DECODER_BUFFER = 3;
     private final RandomAccessFile randomAccessFile;
+    private BufferedInputStream bufferedInputStream;
     private int curBlockReading;
     private File in;
     private int curBlockNumOfBytes;
@@ -30,6 +31,7 @@ public class BitRandomAccessInputStream implements AppInputStream {
     public BitRandomAccessInputStream(File input, ArrayList<Integer> blockSizes) throws IOException  {
         this.input = input;
         randomAccessFile = new RandomAccessFile(input, "r");
+        bufferedInputStream = new BufferedInputStream(new FileInputStream(randomAccessFile.getFD()));
         byteBuffer = 0;
         numBitsRemaining = 0;
         numOfBytesRead = 0;
@@ -48,9 +50,6 @@ public class BitRandomAccessInputStream implements AppInputStream {
     }
 
     public boolean blockFinished(){
-//        if(curBlockNumOfBytes < numOfBytesRead + 1 ){
-//            System.out.println("omer");
-//        }
         return curBlockNumOfBytes == numOfBytesRead && numBitsRemaining == 0 || curBlockNumOfBytes < numOfBytesRead;
     }
 
@@ -80,7 +79,7 @@ public class BitRandomAccessInputStream implements AppInputStream {
             byteBuffer =  -1;
             numOfBytsInDecoderBuffer--;
         }else {
-            byteBuffer = randomAccessFile.read();
+            byteBuffer = bufferedInputStream.read();
             numOfBytesRead++;
         }
         numBitsRemaining = 8;
@@ -105,7 +104,7 @@ public class BitRandomAccessInputStream implements AppInputStream {
         byteBuffer = 0;
         numOfBytesRead = 0;
         numOfBytsInDecoderBuffer = NUM_OF_BYTES_IN_DECODER_BUFFER;
-
+        bufferedInputStream = new BufferedInputStream(new FileInputStream(randomAccessFile.getFD()));
     }
 
 
