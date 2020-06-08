@@ -78,14 +78,18 @@ public class PlotTimes {
 
     public static void main(String[] args) {
         String reviewsFilePathBase = "./datasets/counted/";
-        int[] sizes = new int[]{100,1000,10000,50000,100000,200000,300000,500000};
-//        int[] sizes = new int[]{100000};
+//        int[] sizes = new int[]{100,1000,10000,50000,100000,200000,300000,500000};
+        int[] sizes = new int[]{100};
         for (int size: sizes) {
             String reviewsFilePath = reviewsFilePathBase + size + ".txt";
             System.out.print("Starting Index run on index of size: ");
             System.out.println(size);
             runIndex(reviewsFilePath);
         }
+        System.out.print("Starting Index run on Movies database:");
+        String reviewsFilePath = "./datasets/full/Movies_&_TV.txt";
+        runIndex(reviewsFilePath);
+
 
     }
 }

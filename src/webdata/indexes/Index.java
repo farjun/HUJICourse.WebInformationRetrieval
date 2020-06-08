@@ -51,11 +51,6 @@ public class Index {
                     entry.append((char) symbol);
                 }
             }catch (IOException e){
-//                for (int i = 1; i <= 5; i++) {
-//                    if( sb.charAt(sb.length() - 1) == separator)
-//                        break;
-//                    sb.deleteCharAt(sb.length() - 1);
-//                }
                 if(entry.length() > 5){
                     sb.append(entry.toString());
                     sb.append(separator);

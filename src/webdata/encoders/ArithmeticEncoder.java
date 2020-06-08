@@ -76,6 +76,9 @@ public final class ArithmeticEncoder {
             output.write(bit ^ 1);
     }
 
-
+    public void writeSuperSecretIndexMultiThreadedChars(){
+        this.writeSymbol('$');
+        this.writeSymbol('$');
+    }
 
 }

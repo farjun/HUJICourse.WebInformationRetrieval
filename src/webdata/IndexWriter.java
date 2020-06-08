@@ -73,7 +73,7 @@ public class IndexWriter {
             for (int symbol: symbols) {
                 enc.writeSymbol(symbol);
             }
-            enc.writeSymbol('$');
+            enc.writeSuperSecretIndexMultiThreadedChars();
             // Flush remaining code bits
             if(lastBatch && i == blocksToEncode.length - 1){ // last block of last batch
                 enc.finish();
