@@ -129,18 +129,18 @@ public class IndexWriter {
             String reviewsPath = Paths.get(dirPath,"reviews").toString();
             productsPath = Paths.get(dirPath,"products").toString();
 
-            this.productsOutputStream = new BitOutputStream(new FileOutputStream(productsPath));
-            this.productsMergedOutputStream = new BitOutputStream(new FileOutputStream(productsPath.concat("_sorted")));
+            this.productsOutputStream = new BitOutputStream(new BufferedOutputStream(new FileOutputStream(productsPath)));
+            this.productsMergedOutputStream = new BitOutputStream(new BufferedOutputStream(new FileOutputStream(productsPath.concat("_sorted"))));
             this.productsBlockSizesFile = new BlockSizesFile(new FileWriter(productsPath.concat("block_sizes")));
             this.productsMergedBlockSizesFile = new BlockSizesFile(new FileWriter(productsPath.concat("block_sizes_merge")));
             this.productsIndex = new ProductsIndex();
 
-            this.reviewsOutputStream = new BitOutputStream(new FileOutputStream(reviewsPath));
+            this.reviewsOutputStream = new BitOutputStream(new BufferedOutputStream(new FileOutputStream(reviewsPath)));
             this.reviewsBlockSizesFile = new BlockSizesFile(new FileWriter(reviewsPath.concat("block_sizes")));
             this.reviewsIndex = new ReviewsIndex();
 
-            this.wordsOutputStream =  new BitOutputStream(new FileOutputStream(wordsPath));
-            this.wordsMergedOutputStream =  new BitOutputStream(new FileOutputStream(wordsPath.concat("_sorted")));
+            this.wordsOutputStream =  new BitOutputStream(new BufferedOutputStream(new FileOutputStream(wordsPath)));
+            this.wordsMergedOutputStream =  new BitOutputStream(new BufferedOutputStream(new FileOutputStream(wordsPath.concat("_sorted"))));
             this.wordsBlockSizesFile = new BlockSizesFile(new FileWriter(wordsPath.concat("block_sizes")));
             this.mergeWordsBlockSizesFile = new WordsBlockSizesFile(new FileWriter(wordsPath.concat("block_sizes_merge")));
             this.wordsIndex = new WordsIndex();
@@ -173,8 +173,8 @@ public class IndexWriter {
                     this.writeProcessed(false);
                     curIteration = 1;
                     batchNumber++;
-//                    System.out.println("Batch number: " + String.valueOf(batchNumber) + " done");
-//                    System.out.println("total reviews processed: " + String.valueOf(batchNumber * BATCH_SIZE) );
+                    System.out.println("Batch number: " + String.valueOf(batchNumber) + " done");
+                    System.out.println("total reviews processed: " + String.valueOf(batchNumber * BATCH_SIZE) );
                 }
                 ProductReview review = iter.next();
                 this.process(review);
@@ -222,9 +222,9 @@ public class IndexWriter {
 
     public void sort(){
         try {
-            writeSorted(wordsBlockSizesFile, wordsPath,  WordsIndex.NUM_OF_ENTRIES_IN_BLOCK/2, wordsIndex,
+            writeSorted(wordsBlockSizesFile, wordsPath,  WordsIndex.NUM_OF_ENTRIES_IN_BLOCK/4, wordsIndex,
                     wordsMergedOutputStream, mergeWordsBlockSizesFile);
-            writeSorted(productsBlockSizesFile, productsPath,  ProductsIndex.NUM_OF_PRODUCTS_IN_BLOCK/2, productsIndex,
+            writeSorted(productsBlockSizesFile, productsPath,  ProductsIndex.NUM_OF_PRODUCTS_IN_BLOCK/4, productsIndex,
                     productsMergedOutputStream, productsMergedBlockSizesFile);
         }
         catch (IOException e){

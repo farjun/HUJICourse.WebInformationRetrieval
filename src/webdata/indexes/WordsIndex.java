@@ -12,7 +12,7 @@ public class WordsIndex extends Index {
     public final TreeMap<String, Integer> tokenGlobalFreq;
 
 //    private final StringBuilder leftOverFromLastBlock;
-    public static final int NUM_OF_ENTRIES_IN_BLOCK = 1000;
+    public static final int NUM_OF_ENTRIES_IN_BLOCK = 2000;
     private int globalFreqSum;
 
     public int getGlobalFreqSum() {
