@@ -27,7 +27,7 @@ public class ProductsIndex extends Index {
                 this.hashMap.put(keysAndValue[0], new CompressedArrayList(keysAndValue[1]));
             }
         }catch (Exception e){
-            System.out.println();
+
         }
 
     }

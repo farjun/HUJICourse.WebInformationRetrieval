@@ -22,7 +22,7 @@ public class PlotTimes {
             "killer"};
 
     public static void printInSec(long nanosec){
-        System.out.println(nanosec/100000000);
+        System.out.println((float)nanosec/1000000000);
     }
 
     public static long folderSize(File directory) {
@@ -50,14 +50,26 @@ public class PlotTimes {
             reader.getReviewsWithToken(word);
         }
         long stopTime = System.nanoTime();
+        System.out.print("100 getReviewsWithToken took:");
+        printInSec(stopTime - startTime);
+
+        startTime = System.nanoTime();
+        for (String word : words) {
+            reader.getTokenFrequency(word);
+        }
+        stopTime = System.nanoTime();
+        System.out.print("100 getTokenFrequency took:");
         printInSec(stopTime - startTime);
     }
 
     public static void runIndex(String reviewsFilePath) {
         String indexDir =  "./src/index";
+        long startTime = System.nanoTime();
         System.out.println("Starting Writing index");
         writeIndex(reviewsFilePath, indexDir);
-        System.out.println("Done Writing index");
+        long stopTime = System.nanoTime();
+        System.out.print("Done Writing index:");
+        printInSec(stopTime - startTime);
 
         System.out.println("Starting Reading operations");
         timeReader(indexDir);
@@ -66,16 +78,14 @@ public class PlotTimes {
 
     public static void main(String[] args) {
         String reviewsFilePathBase = "./datasets/counted/";
-        int[] sizes = new int[]{100,1000,10000,50000,100000,200000,300000,500000,1000000};
-//        int[] sizes = new int[]{100,1000,10000};
+        int[] sizes = new int[]{100,1000,10000,50000,100000,200000,300000,500000};
+//        int[] sizes = new int[]{100000};
         for (int size: sizes) {
             String reviewsFilePath = reviewsFilePathBase + size + ".txt";
             System.out.print("Starting Index run on index of size: ");
             System.out.println(size);
             runIndex(reviewsFilePath);
         }
-
-
 
     }
 }

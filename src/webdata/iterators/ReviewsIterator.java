@@ -50,20 +50,16 @@ public class ReviewsIterator implements Iterator<ProductReview> {
         return str.toString();
     }
 
+    public String readAttr() throws IOException {
+        StringBuilder str = new StringBuilder();
+
+        return null;
+    }
+
     @Override
     public ProductReview next() {
 
         try {
-//
-//            String productId = this.curLine;
-//            String userId = this.inputFile.readLine();
-//            String profileName = this.inputFile.readLine();
-//            String temp = this.inputFile.readLine();
-//            String helpfulness = temp.startsWith("review/helpfulness:") ? temp : this.inputFile.readLine();
-//            String score = this.inputFile.readLine();
-//            String time = this.inputFile.readLine();
-//            String summary = this.inputFile.readLine();
-//            String text = this.inputFile.readLine();
 
 
             String productId = this.readCurrAttr("review/userId");

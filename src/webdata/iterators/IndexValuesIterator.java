@@ -56,8 +56,6 @@ public class IndexValuesIterator <T extends SortableNode> implements Iterator<T>
             else{
                 if(sb.length() > 5){
                     curNodesInBuffer.add(sb.toString());
-                }else{
-                    System.out.println("wtf?" + sb.toString());
                 }
                 sb = new StringBuilder();
             }
