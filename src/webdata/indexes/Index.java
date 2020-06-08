@@ -51,7 +51,7 @@ public class Index {
                     entry.append((char) symbol);
                 }
             }catch (IOException e){
-                if(entry.length() > 5){
+                if(entry.length() > 7){
                     sb.append(entry.toString());
                     sb.append(separator);
                 }
