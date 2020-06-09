@@ -4,6 +4,7 @@ import webdata.iterators.IndexValuesIterator;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.PriorityQueue;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -15,7 +16,7 @@ public class Merger {
     // then replace the used block with new
     SortableNode[] decodedEntries;
     IndexValuesIterator[] iters;
-    SortedSet<SortableNode> sortedNodes;
+    PriorityQueue<SortableNode> sortedNodes;
     StringBuilder diskMock;
     int entryCountInMergedBlock;
     ArrayList<SortableNode> mergedBlock;
@@ -36,7 +37,7 @@ public class Merger {
 //        this.outBlockSizesFile = outBlockSizesFile;
         this.numOfBlocks = numOfBlocks;
         this.decodedEntries = new SortableNode[numOfBlocks];
-        sortedNodes = new TreeSet<>();
+        sortedNodes = new PriorityQueue<>();
         this.iters = iters;
         for(int i=0;i<numOfBlocks;i++){
             this.cleanBlockAndFetchNew(i);
@@ -55,7 +56,9 @@ public class Merger {
         }
 
         decodedEntries[blockIndex] = iters[blockIndex].next();
-        sortedNodes.add(decodedEntries[blockIndex]);
+        if(decodedEntries[blockIndex] != null)
+            sortedNodes.add(decodedEntries[blockIndex]);
+
     }
 
     private int countInStringBuilder(StringBuilder str, char chr){
@@ -88,7 +91,7 @@ public class Merger {
         if(this.sortedNodes.size() == 0){
             return -1;
         }
-        return this.sortedNodes.first().fromIter;
+        return this.sortedNodes.peek().fromIter;
     }
     public boolean hasMoreInput(){
         for (SortableNode decodedEntry : decodedEntries) {
@@ -100,7 +103,7 @@ public class Merger {
 
 
     public void mergeIter(){
-        int blockMinIndex = getMinIndex();
+        int blockMinIndex = getMinIndex2();
         if(blockMinIndex<0) return;
         if(mergedBlock.size()>0 && mergedBlock.get(mergedBlock.size()-1).compare(decodedEntries[blockMinIndex]) == 0)
             mergedBlock.get(mergedBlock.size()-1).merge(decodedEntries[blockMinIndex]);

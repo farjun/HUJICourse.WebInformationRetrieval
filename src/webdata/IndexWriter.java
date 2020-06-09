@@ -20,6 +20,7 @@ import static scripts.PlotTimes.printInSec;
 public class IndexWriter {
     public static final int BATCH_SIZE = 100000;
     public static final int NUM_OF_BLOCKS_IN_EACH_SORT = 20;
+    public static final int RATIO = 20;
     private BlockSizesFile productsBlockSizesFile;
     protected AppOutputStream productsOutputStream;
 
@@ -224,9 +225,9 @@ public class IndexWriter {
 
     public void sort(){
         try {
-            writeSorted(wordsBlockSizesFile, wordsPath,  WordsIndex.NUM_OF_ENTRIES_IN_BLOCK/16, wordsIndex,
+            writeSorted(wordsBlockSizesFile, wordsPath,  WordsIndex.NUM_OF_ENTRIES_IN_BLOCK/ RATIO, wordsIndex,
                     wordsMergedOutputStream, mergeWordsBlockSizesFile);
-            writeSorted(productsBlockSizesFile, productsPath,  ProductsIndex.NUM_OF_PRODUCTS_IN_BLOCK/16, productsIndex,
+            writeSorted(productsBlockSizesFile, productsPath,  ProductsIndex.NUM_OF_PRODUCTS_IN_BLOCK/RATIO, productsIndex,
                     productsMergedOutputStream, productsMergedBlockSizesFile);
         }
         catch (IOException e){
@@ -241,7 +242,7 @@ public class IndexWriter {
         IndexValuesIterator[] iterators = new IndexValuesIterator[blockSizes.size()]; //wordsInp, wordsBlockSizesFile,
         for(int i=0;i<iterators.length;i++){
             var wordsInp = new BitRandomAccessInputStream(new File(inputPath), blockSizes);
-            iterators[i] = new IndexValuesIterator<>(index, wordsInp, index.separator, 300, i);
+            iterators[i] = new IndexValuesIterator<>(index, wordsInp, index.separator, 10, i);
         }
 
         Merger merger = new Merger(iterators, index.separator, blockSize, blockSizes.size());
@@ -253,7 +254,7 @@ public class IndexWriter {
                 iterations++;
                 System.out.println("ITERATION "+java.time.LocalTime.now());
                 System.out.println(String.format("Sorted %s blocks out of %s blocks for input = %s index",
-                        iterations*NUM_OF_BLOCKS_IN_EACH_SORT, blockSizes.size(), inputPath));
+                        iterations*NUM_OF_BLOCKS_IN_EACH_SORT, blockSizes.size()*RATIO, inputPath));
             }catch (Exception e){
                 System.out.println("Sort error");
                 System.out.println(e.toString());
