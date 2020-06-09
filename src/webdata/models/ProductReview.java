@@ -14,8 +14,6 @@ public class ProductReview implements Serializable {
     private int id;
 
     public final String productId;
-    public final String userId;
-    public final String profileName;
     public int helpfulnessNumerator;
     public int helpfulnessDenominator;
     public short score;
@@ -34,12 +32,10 @@ public class ProductReview implements Serializable {
     private final int HELPFUL_DEN = Integer.BYTES;
     private final int LENGTH = Integer.BYTES;
     private final int TOTAL_SIZE = REVIEW_ID + SCORE + HELPFUL_NUM + HELPFUL_DEN + LENGTH;
-    public ProductReview(int id, String productId, String userId, String profileName, String helpfulness, String score,
+    public ProductReview(int id, String productId, String helpfulness, String score,
                          String time, String summary, String text ){
         this.id = id;
         this.productId = productId;
-        this.userId = userId;
-        this.profileName = profileName;
         String[] helpfulnessSplit = helpfulness.split("/");
         this.helpfulnessNumerator = Integer.parseInt(helpfulnessSplit[0]);
         this.helpfulnessDenominator = Integer.parseInt(helpfulnessSplit[1]);
@@ -80,8 +76,6 @@ public class ProductReview implements Serializable {
         return "ProductReview{" +
                 "id='" + id + '\'' +
                 "productId='" + productId + '\'' +
-                ", userId='" + userId + '\'' +
-                ", profileName='" + profileName + '\'' +
                 ", helpfulness='" + helpfulnessNumerator+"/"+helpfulnessDenominator+ '\'' +
                 ", score='" + score + '\'' +
                 ", time='" + time + '\'' +

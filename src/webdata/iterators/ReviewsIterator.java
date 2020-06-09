@@ -11,7 +11,7 @@ public class ReviewsIterator implements Iterator<ProductReview> {
     private String curLine;
     int reviewIdCounter;
 
-    private static int NUM_OF_FIELDS_IN_REVIEW = 8;
+//    private static int NUM_OF_FIELDS_IN_REVIEW = 6;
     private boolean isFirstLine;
 
     public ReviewsIterator(String inputFile){
@@ -41,23 +41,10 @@ public class ReviewsIterator implements Iterator<ProductReview> {
 //    review/summary: Good Quality Dog Food
 //    review/text: I have bought several of the Vitality canned dog food products and have found them all to be of good quality. The product looks more like a stew than a processed meat and it smells better. My Labrador is finicky and she appreciates this product better than  most.
 
-//    product/productId: B00813GRG4
-//    public String readCurrAttr(String nextAttrName) throws IOException {
-//        StringBuilder str = new StringBuilder();
-//        str.append(this.curLine);
-//        while((this.curLine = this.inputFile.readLine()) != null ){
-//            if(this.curLine.startsWith(nextAttrName)) {
-//                break;
-//            }
-//            str.append(this.curLine);
-//            str.append("\n");
-//        }
-//        return str.toString();
-//    }
+
 
     private boolean ofInterest(String field) {
-        return field!=null && (field.equals("product/productId") || field.equals("review/userId") ||
-                field.equals("review/profileName") || field.equals("review/helpfulness") ||
+        return field!=null && (field.equals("product/productId") || field.equals("review/helpfulness") ||
                 field.equals("review/score") || field.equals("review/time") ||
                 field.equals("review/summary") || field.equals("review/text"));
     }
@@ -79,7 +66,8 @@ public class ReviewsIterator implements Iterator<ProductReview> {
                     if(ofInterest(fieldName)) {
                         fields.put(fieldName, content.toString());
                     }
-                    if(fields.size() == NUM_OF_FIELDS_IN_REVIEW) {
+                    if(fieldName.equals("review/text")) {
+//                    if(fields.size() == NUM_OF_FIELDS_IN_REVIEW) {
                         this.isFirstLine = true;
                         return fields;
                     }
@@ -107,19 +95,24 @@ public class ReviewsIterator implements Iterator<ProductReview> {
 
         try {
             HashMap<String,String> review = this.readAttrs();
-            if(review.size()==NUM_OF_FIELDS_IN_REVIEW){
+            if(review!=null){
                 String productId = review.get("product/productId");
-                String userId = review.get("review/userId");
-                String profileName = review.get("review/profileName");
                 String helpfulness = review.get("review/helpfulness");
                 String score = review.get("review/score");
                 String time = review.get("review/time");
                 String summary = review.get("review/summary");
                 String text = review.get("review/text");
                 this.reviewIdCounter++;
-                return new ProductReview(this.reviewIdCounter, productId, userId, profileName, helpfulness, score,
+                return new ProductReview(this.reviewIdCounter, productId, helpfulness, score,
                         time, summary, text);
             }
+            else{
+                System.out.println(this.reviewIdCounter + " " +
+                        review.getOrDefault("product/productId", "null")
+                        );
+            }
+
+
         } catch (IOException e) {
             e.printStackTrace();
         }

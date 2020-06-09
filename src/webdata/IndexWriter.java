@@ -18,7 +18,7 @@ import java.util.Enumeration;
 import static scripts.PlotTimes.printInSec;
 
 public class IndexWriter {
-    public static final int BATCH_SIZE = 10000;
+    public static final int BATCH_SIZE = 100000;
     public static final int NUM_OF_BLOCKS_IN_EACH_SORT = 20;
     private BlockSizesFile productsBlockSizesFile;
     protected AppOutputStream productsOutputStream;
@@ -241,7 +241,7 @@ public class IndexWriter {
         IndexValuesIterator[] iterators = new IndexValuesIterator[blockSizes.size()]; //wordsInp, wordsBlockSizesFile,
         for(int i=0;i<iterators.length;i++){
             var wordsInp = new BitRandomAccessInputStream(new File(inputPath), blockSizes);
-            iterators[i] = new IndexValuesIterator<>(index, wordsInp, index.separator, 3, i);
+            iterators[i] = new IndexValuesIterator<>(index, wordsInp, index.separator, 300, i);
         }
 
         Merger merger = new Merger(iterators, index.separator, blockSize, blockSizes.size());
