@@ -1,6 +1,6 @@
 package webdata;
 
-import org.junit.jupiter.api.Assertions;
+
 import webdata.encoders.ArithmeticEncoder;
 import webdata.indexes.*;
 import webdata.iostreams.AppOutputStream;
@@ -19,7 +19,7 @@ import static scripts.PlotTimes.printInSec;
 
 public class IndexWriter {
     public static final int BATCH_SIZE = 10000;
-    public static final int NUM_OF_BLOCKS_IN_EACH_SORT = 3;
+    public static final int NUM_OF_BLOCKS_IN_EACH_SORT = 20;
     private BlockSizesFile productsBlockSizesFile;
     protected AppOutputStream productsOutputStream;
 
@@ -89,9 +89,9 @@ public class IndexWriter {
         }
     }
 
-    private void writeAdditionalInfo() {
+    private void writeAdditionalInfo(String indexDirPath) {
         try {
-            File addInfoFile = new File("./src/index/additional_info");
+            File addInfoFile = new File(Paths.get(indexDirPath,"additional_info").toString());
             if(!addInfoFile.exists())
                 addInfoFile.createNewFile();
             this.additionalInfoWriter = new FileWriter(addInfoFile);
@@ -177,11 +177,13 @@ public class IndexWriter {
                     System.out.println("total reviews processed: " + String.valueOf(batchNumber * BATCH_SIZE) );
                 }
                 ProductReview review = iter.next();
-                this.process(review);
-                curIteration++;
+                if(review != null) {
+                    this.process(review);
+                    curIteration++;
+                }
             }
             this.writeProcessed(true);
-            this.writeAdditionalInfo();
+            this.writeAdditionalInfo(dir);
             this.close();
 //            System.out.println("FINISHED FIRST WRITE "+java.time.LocalTime.now());
             long stopTime = System.nanoTime();
@@ -222,9 +224,9 @@ public class IndexWriter {
 
     public void sort(){
         try {
-            writeSorted(wordsBlockSizesFile, wordsPath,  WordsIndex.NUM_OF_ENTRIES_IN_BLOCK/4, wordsIndex,
+            writeSorted(wordsBlockSizesFile, wordsPath,  WordsIndex.NUM_OF_ENTRIES_IN_BLOCK/16, wordsIndex,
                     wordsMergedOutputStream, mergeWordsBlockSizesFile);
-            writeSorted(productsBlockSizesFile, productsPath,  ProductsIndex.NUM_OF_PRODUCTS_IN_BLOCK/4, productsIndex,
+            writeSorted(productsBlockSizesFile, productsPath,  ProductsIndex.NUM_OF_PRODUCTS_IN_BLOCK/16, productsIndex,
                     productsMergedOutputStream, productsMergedBlockSizesFile);
         }
         catch (IOException e){
@@ -249,9 +251,9 @@ public class IndexWriter {
                 IndexBlock[] blocks = merger.getSortedBlocks(NUM_OF_BLOCKS_IN_EACH_SORT);
                 writeEncoded(blocks, mergedOutputStream, mergedBsf, !merger.hasMoreInput());
                 iterations++;
-//                System.out.println("ITERATION "+java.time.LocalTime.now());
-//                System.out.println(String.format("Sorted %s blocks out of %s blocks for input = %s index",
-//                        iterations*NUM_OF_BLOCKS_IN_EACH_SORT, blockSizes.size(), inputPath));
+                System.out.println("ITERATION "+java.time.LocalTime.now());
+                System.out.println(String.format("Sorted %s blocks out of %s blocks for input = %s index",
+                        iterations*NUM_OF_BLOCKS_IN_EACH_SORT, blockSizes.size(), inputPath));
             }catch (Exception e){
                 System.out.println("Sort error");
                 System.out.println(e.toString());
@@ -284,42 +286,5 @@ public class IndexWriter {
             }
         }
         return false;
-    }
-
-    public static void main(String[] args) {
-        String indexDir =  "./src/index";
-        String reviewsFilePath = "./datasets/full/foods.txt";
-        IndexWriter writer = new IndexWriter();
-        writer.write(reviewsFilePath, indexDir);
-        IndexReader reader = new IndexReader(indexDir);
-        for (int i = 1; i <= 10000; i++) {
-            String productId = reader.getProductId(i);
-            Enumeration<Integer> reviewIds = reader.getProductReviews(productId);
-            Assertions.assertTrue(enumerationContains(reviewIds, i), "checking review "+i+"");
-        }
-
-        var r = reader.getTokenCollectionFrequency("the");
-
-        var nor = reader.getNumberOfReviews();
-        var den = reader.getReviewHelpfulnessDenominator(10000);
-        var num = reader.getReviewHelpfulnessNumerator(10000);
-        var prdId = reader.getProductId(10000);
-        var scr = reader.getReviewScore(10000);
-
-        String[] tokens = {"Not", "vendor", "to", "this", "most", "it", "coated", "powdered", "intended", "And", "products", "an", "found", "meat", "stew", "treat", "recommend", "canned", "Jumbo", "good", "then", "she", "or", "nuts", "processed", "like", "I", "be", "of", "dog", "light", "My", "unsalted", "been", "gelatin", "pillowy", "very", "Vitality", "bought", "Product", "and", "appreciates", "It", "finicky", "chewy", "them", "This", "labeled", "tiny", "looks", "peanuts", "highly", "with", "confection", "has", "yummy", "citrus", "smells", "heaven", "arrived", "product", "actually", "food", "The", "too", "Filberts", "cut", "the", "Labrador", "a", "centuries", "around", "was", "than", "into", "all", "several", "small", "sized", "represent", "mouthful", "flavorful", "squares", "were", "if", "in", "more", "Salted", "is", "better", "that", "quality", "liberally", "as", "case", "sugar", "Peanuts", "sure", "error", "have", "few"};
-        System.out.println("LENGTH"+tokens.length);
-        Enumeration<Integer> rr;
-        System.out.println("start reading getReviewsWithToken "+java.time.LocalTime.now());
-        for(var t:tokens)
-            rr = reader.getReviewsWithToken(t);
-        System.out.println("end reading getReviewsWithToken "+java.time.LocalTime.now());
-
-        int rrr;
-        System.out.println("start reading TokenFrequency "+java.time.LocalTime.now());
-        for(var t:tokens)
-            rrr = reader.getTokenFrequency(t);
-        System.out.println("end reading TokenFrequency "+java.time.LocalTime.now());
-
-
     }
 }

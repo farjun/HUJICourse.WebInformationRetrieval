@@ -4,12 +4,14 @@ import webdata.iostreams.BitRandomAccessInputStream;
 import webdata.iostreams.OutOfBlocksException;
 
 import java.io.*;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Enumeration;
 
 public class IndexReaderImpl {
     private final BlockSizesFile wordsBsf;
     private final BlockSizesFile reviewsBsf;
+    private String indexDirPath;
     private final BlockSizesFile productsBsf;
     protected BitRandomAccessInputStream productsInputStream;
     protected BitRandomAccessInputStream reviewsInputStream;
@@ -19,7 +21,9 @@ public class IndexReaderImpl {
     private WordsIndex wordsIndex;
     private FileReader additionalInfoReader;
 
-    public IndexReaderImpl(String productFilePath, String reviewsFilePath, String wordsFilePath) throws IOException {
+    public IndexReaderImpl(String indexDirPath, String productFilePath, String reviewsFilePath, String wordsFilePath) throws IOException {
+        this.indexDirPath = indexDirPath;
+
         productsBsf = new BlockSizesFile(new FileReader(productFilePath.concat("block_sizes_merge")));
         this.productsInputStream = new BitRandomAccessInputStream(new File(productFilePath.concat("_sorted")), productsBsf.getBlockSizes());
 
@@ -30,7 +34,7 @@ public class IndexReaderImpl {
         this.wordsInputStream = new BitRandomAccessInputStream(new File(wordsFilePath.concat("_sorted")), wordsBsf.getBlockSizes());
 
 
-        this.additionalInfoReader = new FileReader("./src/index/additional_info");
+        this.additionalInfoReader = new FileReader(Paths.get(this.indexDirPath,"additional_info").toString());
 
         this.reviewsIndex = new ReviewsIndex();
         this.wordsIndex = new WordsIndex();
@@ -41,7 +45,7 @@ public class IndexReaderImpl {
 
     private void readAdditionalInfo() {
         try {
-            File addInfoFile = new File("./src/index/additional_info");
+            File addInfoFile = new File(Paths.get(this.indexDirPath,"additional_info").toString());
             if(!addInfoFile.exists()) {
                 wordsIndex.setGlobalFreqSum(0);
                 reviewsIndex.setNumOfReviews(0);
@@ -53,8 +57,8 @@ public class IndexReaderImpl {
             while((ch=additionalInfoReader.read())!=-1)
                 sb.append((char)ch);
             String[] lines = sb.toString().split("\n");
-            wordsIndex.setGlobalFreqSum(Integer.valueOf(lines[0]));
-            reviewsIndex.setNumOfReviews(Integer.valueOf(lines[1]));
+            wordsIndex.setGlobalFreqSum(Integer.parseInt(lines[0]));
+            reviewsIndex.setNumOfReviews(Integer.parseInt(lines[1]));
         } catch (IOException e){
             e.printStackTrace();
         }

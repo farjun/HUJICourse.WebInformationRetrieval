@@ -46,15 +46,16 @@ public class Merger {
 
     public void cleanBlockAndFetchNew(int blockIndex){
         if(blockIndex >= decodedEntries.length || blockIndex<0) return;
+        if (decodedEntries[blockIndex] != null)
+            sortedNodes.remove(decodedEntries[blockIndex]);
+
         if(!iters[blockIndex].hasNext()){
             decodedEntries[blockIndex] = null;
             return;
         }
-//        if (decodedEntries[blockIndex] != null)
-//            sortedNodes.remove(decodedEntries[blockIndex]);
 
         decodedEntries[blockIndex] = iters[blockIndex].next();
-//        sortedNodes.add(decodedEntries[blockIndex]);
+        sortedNodes.add(decodedEntries[blockIndex]);
     }
 
     private int countInStringBuilder(StringBuilder str, char chr){

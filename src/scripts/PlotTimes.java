@@ -1,11 +1,10 @@
 package scripts;
 
-import org.junit.jupiter.api.Assertions;
+
 import webdata.IndexReader;
 import webdata.IndexWriter;
 
 import java.io.File;
-import java.util.Enumeration;
 import java.util.Objects;
 
 public class PlotTimes {
@@ -63,7 +62,7 @@ public class PlotTimes {
     }
 
     public static void runIndex(String reviewsFilePath) {
-        String indexDir =  "./src/index";
+        String indexDir =  "./index";
         long startTime = System.nanoTime();
         System.out.println("Starting Writing index");
         writeIndex(reviewsFilePath, indexDir);
@@ -80,12 +79,12 @@ public class PlotTimes {
         String reviewsFilePathBase = "./datasets/counted/";
         int[] sizes = new int[]{100,1000,10000,50000,100000,200000,300000,500000};
 //        int[] sizes = new int[]{50000};
-        for (int size: sizes) {
-            String reviewsFilePath = reviewsFilePathBase + size + ".txt";
-            System.out.print("Starting Index run on index of size: ");
-            System.out.println(size);
-            runIndex(reviewsFilePath);
-        }
+//        for (int size: sizes) {
+//            String reviewsFilePath = reviewsFilePathBase + size + ".txt";
+//            System.out.print("Starting Index run on index of size: ");
+//            System.out.println(size);
+//            runIndex(reviewsFilePath);
+//        }
         System.out.print("Starting Index run on Movies database:");
         String reviewsFilePath = "./datasets/full/Movies_&_TV.txt";
         runIndex(reviewsFilePath);

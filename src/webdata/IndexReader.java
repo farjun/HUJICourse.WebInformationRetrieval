@@ -21,7 +21,7 @@ public class IndexReader {
             var wordsPath = Paths.get(dir,"words").toString();
             var reviewsPath = Paths.get(dir,"reviews").toString();
             var productsPath = Paths.get(dir,"products").toString();
-            this.indexReader = new IndexReaderImpl(productsPath, reviewsPath, wordsPath);
+            this.indexReader = new IndexReaderImpl(dir, productsPath, reviewsPath, wordsPath);
 
         } catch (IOException e) {
             e.printStackTrace();
