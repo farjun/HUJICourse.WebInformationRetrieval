@@ -1,11 +1,9 @@
 package webdata;
 
 import webdata.models.Query;
+import webdata.models.ReviewScore;
 
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Queue;
+import java.util.*;
 
 public class ReviewSearch {
     private IndexReader iReader;
@@ -17,6 +15,15 @@ public class ReviewSearch {
         this.iReader = iReader;
     }
 
+
+    private double computeScore(HashMap<String, Double> queryScore, HashMap<String, Double> documnetScore){
+        double score = 0;
+        for(String term : queryScore.keySet()){
+            score += queryScore.get(term)*documnetScore.getOrDefault(term, 0.0);
+        }
+        return score;
+    }
+
     /**
      * Returns a list of the id-s of the k most highly ranked reviews for the
      * given query, using the vector space ranking function lnn.ltc (using the
@@ -25,9 +32,16 @@ public class ReviewSearch {
      */
     public Enumeration<Integer> vectorSpaceSearch(Enumeration<String> query, int k) {
         Query queryObj = new Query(query);
-        HashMap<String, Double> LTCscore = queryObj.generateLTC(this.iReader);
+        PriorityQueue<ReviewScore> results = new PriorityQueue<>();
+        HashMap<String, Double> LTCscore = queryObj.getLTCScore(this.iReader, true);
+        HashMap<Integer, HashMap<String, Double>> reviewIdToFreqMapForQueryTokens = queryObj.getReviewIdToFreqMapForQueryTokens(iReader, true);
+        for( int reviewId : reviewIdToFreqMapForQueryTokens.keySet()){
+            double reviewScore = computeScore(LTCscore, reviewIdToFreqMapForQueryTokens.get(reviewId));
+            ReviewScore rs = new ReviewScore(reviewId, reviewScore);
+            results.add(rs);
+        }
 
-        return null;
+        return  ReviewScore.getIterator(results);
     }
 
     /**
