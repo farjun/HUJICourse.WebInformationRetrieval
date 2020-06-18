@@ -76,7 +76,12 @@ public class Query {
         int N = iReader.getTokenSizeOfReviews();
         for (String term: stringIntegerHashMap.keySet()) {
             int freq = stringIntegerHashMap.get(term);
-            termMap.put(term,(1 + Math.log(freq))*Math.log(N/freq));
+            if(freq == 0){
+                termMap.put(term, 0.0);
+
+            }else {
+                termMap.put(term, (1 + Math.log(freq)) * Math.log(N / freq));
+            }
         }
 
         if(normelize){

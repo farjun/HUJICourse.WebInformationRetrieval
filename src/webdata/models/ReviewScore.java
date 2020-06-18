@@ -15,7 +15,7 @@ public class ReviewScore implements Comparable{
     @Override
     public int compareTo(Object o) {
         ReviewScore obj = (ReviewScore)o;
-        return Double.compare(this.score,obj.score);
+        return Double.compare(obj.score, this.score); // order is reversed to sort from big to small
     }
 
     public static ReviewScoresIterator getIterator(PriorityQueue<ReviewScore> reviewScores){
