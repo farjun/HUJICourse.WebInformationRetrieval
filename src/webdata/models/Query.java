@@ -29,6 +29,7 @@ public class Query {
         return termMap;
     }
 
+
     public HashMap<String, Integer> generateCorpusTermFrequency(IndexReader iReader){
         HashMap<String, Integer> termMap = new HashMap<>();
         for (String term: queryTermFreq.keySet()) {
@@ -70,7 +71,7 @@ public class Query {
         return reviewIdToFreqMap;
     }
 
-    public HashMap<String, Double> getLTCScore(IndexReader iReader, boolean normelize){
+    public HashMap<String, Double> getLTCScore(IndexReader iReader, boolean normalize){
         HashMap<String, Integer> stringIntegerHashMap = generateCorpusTermFrequency(iReader);
         HashMap<String, Double> termMap =  new HashMap<>();
         int N = iReader.getTokenSizeOfReviews();
@@ -84,7 +85,7 @@ public class Query {
             }
         }
 
-        if(normelize){
+        if(normalize){
             double ltcNormSum = 0;
             for(double value : termMap.values()){
                 ltcNormSum+= value*value;

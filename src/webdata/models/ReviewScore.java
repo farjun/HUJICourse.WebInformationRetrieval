@@ -18,20 +18,22 @@ public class ReviewScore implements Comparable{
         return Double.compare(obj.score, this.score); // order is reversed to sort from big to small
     }
 
-    public static ReviewScoresIterator getIterator(PriorityQueue<ReviewScore> reviewScores){
-        return new ReviewScoresIterator(reviewScores);
+    public static ReviewScoresIterator getIterator(PriorityQueue<ReviewScore> reviewScores, int k){
+        return new ReviewScoresIterator(reviewScores, k);
     }
 
     public static class ReviewScoresIterator implements Enumeration<Integer>{
         private PriorityQueue<ReviewScore> reviewScores;
+        private int leftOfK;
 
-        public ReviewScoresIterator(PriorityQueue<ReviewScore> reviewScores){
+        public ReviewScoresIterator(PriorityQueue<ReviewScore> reviewScores, int k){
             this.reviewScores = reviewScores;
+            this.leftOfK = k;
         }
 
         @Override
         public boolean hasMoreElements() {
-            return this.reviewScores.size() > 0;
+            return this.reviewScores.size() > 0 && leftOfK > 0;
         }
 
         @Override
@@ -40,6 +42,7 @@ public class ReviewScore implements Comparable{
             if(rv == null){
                 return null;
             }
+            this.leftOfK--;
             return rv.review;
         }
     }

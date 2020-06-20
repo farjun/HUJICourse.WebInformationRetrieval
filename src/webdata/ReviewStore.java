@@ -40,11 +40,13 @@ public class ReviewStore {
     private static void run() {
         String indexDir = "./index";
         String inputFilePath = "./datasets/counted/10000.txt";
-        IndexWriter indexWriter = new IndexWriter();
+//        IndexWriter indexWriter = new IndexWriter();
 //        indexWriter.write(inputFilePath, indexDir);
 
         ReviewSearch reviewSearch = new ReviewSearch(new IndexReader(indexDir));
         printEnumeration(reviewSearch.vectorSpaceSearch(new QueryEnumeration("Guinness"), 4));
+        System.out.println("---------------------------------------------------------------");
+        printEnumeration(reviewSearch.languageModelSearch(new QueryEnumeration("Guinness the"), 0.5, 4));
 
     }
 

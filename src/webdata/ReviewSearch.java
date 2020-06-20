@@ -24,6 +24,20 @@ public class ReviewSearch {
         return score;
     }
 
+    /* computes the LM query score for a review */
+    private double computeScoreLM(HashMap<String, Integer> corpusFreq, HashMap<String, Double> revFreq,
+                                  double lambda){
+        double score = 1;
+        for(String term : revFreq.keySet()){
+            double globalFreq = (double)corpusFreq.getOrDefault(term, 0);
+            double inRevFreq = revFreq.getOrDefault(term, 0.0);
+            score *= lambda*revFreq.getOrDefault(term, 0.0) + (1-lambda)*(double)corpusFreq.getOrDefault(term, 0);
+        }
+        return score;
+    }
+
+
+
     /**
      * Returns a list of the id-s of the k most highly ranked reviews for the
      * given query, using the vector space ranking function lnn.ltc (using the
@@ -41,7 +55,7 @@ public class ReviewSearch {
             results.add(rs);
         }
 
-        return  ReviewScore.getIterator(results);
+        return  ReviewScore.getIterator(results, k);
     }
 
     /**
@@ -52,7 +66,17 @@ public class ReviewSearch {
      */
     public Enumeration<Integer> languageModelSearch(Enumeration<String> query,
                                                     double lambda, int k) {
-        return null;
+        Query queryObj = new Query(query);
+        PriorityQueue<ReviewScore> results = new PriorityQueue<>();
+        HashMap<String, Integer> corpusFreq = queryObj.generateCorpusTermFrequency(this.iReader);
+        HashMap<Integer, HashMap<String, Double>> reviewFreqs = queryObj.getReviewIdToFreqMapForQueryTokens(iReader, false);
+        for( int reviewId : reviewFreqs.keySet()){
+            double reviewScore = computeScoreLM(corpusFreq, reviewFreqs.get(reviewId), lambda); ////
+            ReviewScore rs = new ReviewScore(reviewId, reviewScore);
+            results.add(rs);
+        }
+
+        return  ReviewScore.getIterator(results, k);
     }
 
     /**
