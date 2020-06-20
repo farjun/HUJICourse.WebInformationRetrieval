@@ -16,22 +16,26 @@ public class ReviewSearch {
     }
 
 
-    private double computeScore(HashMap<String, Double> queryScore, HashMap<String, Double> documnetScore){
+    private double computeScore(HashMap<String, Double> queryScore, HashMap<String, Double> documentScore){
         double score = 0;
         for(String term : queryScore.keySet()){
-            score += queryScore.get(term)*documnetScore.getOrDefault(term, 0.0);
+            score += queryScore.get(term)*documentScore.getOrDefault(term, 0.0);
         }
         return score;
     }
 
+
     /* computes the LM query score for a review */
-    private double computeScoreLM(HashMap<String, Integer> corpusFreq, HashMap<String, Double> revFreq,
-                                  double lambda){
+    private double computeScoreLM(HashMap<String, Integer>  queryFreq, HashMap<String, Integer> corpusFreq, HashMap<String, Double> revFreq,
+                                  double lambda, int corpusSize, int reviewSize){
+        if(corpusSize<=0 || lambda < 0 || reviewSize <= 0)
+            return 0;
         double score = 1;
-        for(String term : revFreq.keySet()){
+        for(var term: queryFreq.keySet()){
             double globalFreq = (double)corpusFreq.getOrDefault(term, 0);
             double inRevFreq = revFreq.getOrDefault(term, 0.0);
-            score *= lambda*revFreq.getOrDefault(term, 0.0) + (1-lambda)*(double)corpusFreq.getOrDefault(term, 0);
+            score *= Math.pow((lambda*inRevFreq / (double) reviewSize +
+                    (1-lambda)*globalFreq / (double) corpusSize), queryFreq.get(term));
         }
         return score;
     }
@@ -70,8 +74,10 @@ public class ReviewSearch {
         PriorityQueue<ReviewScore> results = new PriorityQueue<>();
         HashMap<String, Integer> corpusFreq = queryObj.generateCorpusTermFrequency(this.iReader);
         HashMap<Integer, HashMap<String, Double>> reviewFreqs = queryObj.getReviewIdToFreqMapForQueryTokens(iReader, false);
+        int corpusSize = iReader.getTokenSizeOfReviews();
         for( int reviewId : reviewFreqs.keySet()){
-            double reviewScore = computeScoreLM(corpusFreq, reviewFreqs.get(reviewId), lambda); ////
+            double reviewScore = computeScoreLM(queryObj.getQueryTermFreq(), corpusFreq, reviewFreqs.get(reviewId), lambda, corpusSize,
+                    iReader.getReviewLength(reviewId));
             ReviewScore rs = new ReviewScore(reviewId, reviewScore);
             results.add(rs);
         }

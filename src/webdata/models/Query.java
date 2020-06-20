@@ -8,6 +8,11 @@ import java.util.HashMap;
 public class Query {
 
     private Enumeration<String> query;
+
+    public HashMap<String, Integer> getQueryTermFreq() {
+        return queryTermFreq;
+    }
+
     public HashMap<String, Integer> queryTermFreq;
 
     public Query(Enumeration<String> query){

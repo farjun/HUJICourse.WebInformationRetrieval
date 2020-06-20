@@ -16,7 +16,8 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class IndexReadeBigInputTest {
-	private static final String inputFile = "./datasets/full/Books.txt";
+	private static final String inputFile = "./datasets/full/foods.txt";
+//	private static final String inputFile = "./datasets/full/Books.txt";
 	private static final String indexDir =  "./src/index";
 	static private IndexReader indexReader;
 	static private IndexWriter indexWriter;
