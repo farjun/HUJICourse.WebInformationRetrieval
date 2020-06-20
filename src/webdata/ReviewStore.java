@@ -39,14 +39,15 @@ public class ReviewStore {
 
     private static void run() {
         String indexDir = "./index";
-        String inputFilePath = "./datasets/counted/10000.txt";
-//        IndexWriter indexWriter = new IndexWriter();
-//        indexWriter.write(inputFilePath, indexDir);
+//        String inputFilePath = "./datasets/counted/10000.txt";
+        String inputFilePath = "./datasets/1000.txt";
+        IndexWriter indexWriter = new IndexWriter();
+        indexWriter.write(inputFilePath, indexDir);
 
         ReviewSearch reviewSearch = new ReviewSearch(new IndexReader(indexDir));
-        printEnumeration(reviewSearch.vectorSpaceSearch(new QueryEnumeration("Guinness"), 4));
+        printEnumeration(reviewSearch.vectorSpaceSearch(new QueryEnumeration("flavored coffee"), 5));
         System.out.println("---------------------------------------------------------------");
-        printEnumeration(reviewSearch.languageModelSearch(new QueryEnumeration("Guinness the"), 0.5, 4));
+        printEnumeration(reviewSearch.languageModelSearch(new QueryEnumeration("flavored coffee"), 0.4, 5));
 
     }
 

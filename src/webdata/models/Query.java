@@ -38,7 +38,7 @@ public class Query {
     public HashMap<String, Integer> generateCorpusTermFrequency(IndexReader iReader){
         HashMap<String, Integer> termMap = new HashMap<>();
         for (String term: queryTermFreq.keySet()) {
-            termMap.put(term,iReader.getTokenFrequency(term));
+            termMap.put(term,iReader.getTokenCollectionFrequency(term));
         }
         return termMap;
     }
