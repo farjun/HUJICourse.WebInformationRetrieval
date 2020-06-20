@@ -91,7 +91,14 @@ public class ReviewSearch {
      * The list should be sorted by the ranking
      */
     public Collection<String> productSearch(Enumeration<String> query, int k) {
-        return null;
+        List<String> productIds = new ArrayList<>();
+        double lambda = 0.4;
+        Enumeration<Integer> result = languageModelSearch(query,  lambda, k);
+        while(result.hasMoreElements()){
+            int reviewId = result.nextElement();
+            productIds.add(iReader.getProductId(reviewId));
+        }
+        return productIds;
     }
 
 

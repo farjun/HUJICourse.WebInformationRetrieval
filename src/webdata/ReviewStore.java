@@ -3,6 +3,7 @@ package webdata;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Enumeration;
 
 public class ReviewStore {
@@ -48,7 +49,14 @@ public class ReviewStore {
         printEnumeration(reviewSearch.vectorSpaceSearch(new QueryEnumeration("flavored coffee"), 5));
         System.out.println("---------------------------------------------------------------");
         printEnumeration(reviewSearch.languageModelSearch(new QueryEnumeration("flavored coffee"), 0.4, 5));
+        System.out.println("---------------------------------------------------------------");
+        printList(reviewSearch.productSearch(new QueryEnumeration("flavored coffee"),  5));
 
+    }
+
+    private static void printList(Collection<String> lst) {
+        for(String s: lst)
+            System.out.println(s);
     }
 
 }
