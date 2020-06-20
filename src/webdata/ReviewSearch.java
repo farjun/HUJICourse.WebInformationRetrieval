@@ -2,6 +2,7 @@ package webdata;
 
 import webdata.models.Query;
 import webdata.models.ReviewScore;
+import webdata.models.ProductScore;
 
 import java.util.*;
 
@@ -41,6 +42,23 @@ public class ReviewSearch {
     }
 
 
+    public Enumeration<Integer> languageModelSearchAux(Enumeration<String> query,
+                                                    double lambda, int k){
+        Query queryObj = new Query(query);
+        PriorityQueue<ReviewScore> results = new PriorityQueue<>();
+        HashMap<String, Integer> corpusFreq = queryObj.generateCorpusTermFrequency(this.iReader);
+        HashMap<Integer, HashMap<String, Double>> reviewFreqs = queryObj.getReviewIdToFreqMapForQueryTokens(iReader, false);
+        int corpusSize = iReader.getTokenSizeOfReviews();
+        for( int reviewId : reviewFreqs.keySet()){
+            double reviewScore = computeScoreLM(queryObj.getQueryTermFreq(), corpusFreq, reviewFreqs.get(reviewId), lambda, corpusSize,
+                    iReader.getReviewLength(reviewId));
+            ReviewScore rs = new ReviewScore(reviewId, reviewScore);
+            results.add(rs);
+        }
+
+        return  ReviewScore.getIterator(results, k);
+    }
+
 
     /**
      * Returns a list of the id-s of the k most highly ranked reviews for the
@@ -70,19 +88,10 @@ public class ReviewSearch {
      */
     public Enumeration<Integer> languageModelSearch(Enumeration<String> query,
                                                     double lambda, int k) {
-        Query queryObj = new Query(query);
-        PriorityQueue<ReviewScore> results = new PriorityQueue<>();
-        HashMap<String, Integer> corpusFreq = queryObj.generateCorpusTermFrequency(this.iReader);
-        HashMap<Integer, HashMap<String, Double>> reviewFreqs = queryObj.getReviewIdToFreqMapForQueryTokens(iReader, false);
-        int corpusSize = iReader.getTokenSizeOfReviews();
-        for( int reviewId : reviewFreqs.keySet()){
-            double reviewScore = computeScoreLM(queryObj.getQueryTermFreq(), corpusFreq, reviewFreqs.get(reviewId), lambda, corpusSize,
-                    iReader.getReviewLength(reviewId));
-            ReviewScore rs = new ReviewScore(reviewId, reviewScore);
-            results.add(rs);
+        if(k<=0) {
+            return Collections.emptyEnumeration();
         }
-
-        return  ReviewScore.getIterator(results, k);
+        return languageModelSearchAux(query, lambda, k);
     }
 
     /**
@@ -91,12 +100,23 @@ public class ReviewSearch {
      * The list should be sorted by the ranking
      */
     public Collection<String> productSearch(Enumeration<String> query, int k) {
+        PriorityQueue<ProductScore> sortedProducts = new PriorityQueue<>();
         List<String> productIds = new ArrayList<>();
         double lambda = 0.4;
-        Enumeration<Integer> result = languageModelSearch(query,  lambda, k);
-        while(result.hasMoreElements()){
-            int reviewId = result.nextElement();
-            productIds.add(iReader.getProductId(reviewId));
+        Enumeration<Integer> bestRevs = languageModelSearchAux(query,  lambda, -1);
+        while(bestRevs.hasMoreElements() && sortedProducts.size() < k){
+            int reviewId = bestRevs.nextElement();
+            String productId = iReader.getProductId(reviewId);
+            int score = iReader.getReviewScore(reviewId);
+            int helpfulnessEnum = iReader.getReviewHelpfulnessNumerator(reviewId);
+            int helpfulnessDenom = iReader.getReviewHelpfulnessDenominator(reviewId);
+            if(!sortedProducts.contains(new ProductScore(productId)))
+                sortedProducts.add(new ProductScore(productId, reviewId, score, helpfulnessEnum, helpfulnessDenom));
+        }
+        while(sortedProducts.size()>0){
+            var prdId = sortedProducts.poll();
+            if(prdId == null) break;
+            productIds.add(prdId.productId);
         }
         return productIds;
     }

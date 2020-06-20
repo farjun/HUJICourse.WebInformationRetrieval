@@ -19,6 +19,7 @@ public class ReviewScore implements Comparable{
     }
 
     public static ReviewScoresIterator getIterator(PriorityQueue<ReviewScore> reviewScores, int k){
+        // in case of k<0 return all
         return new ReviewScoresIterator(reviewScores, k);
     }
 
@@ -33,7 +34,7 @@ public class ReviewScore implements Comparable{
 
         @Override
         public boolean hasMoreElements() {
-            return this.reviewScores.size() > 0 && leftOfK > 0;
+            return this.reviewScores.size() > 0 && leftOfK != 0;
         }
 
         @Override
