@@ -58,14 +58,14 @@ public class Query {
                 int tokenFreq = reviewsWithToken.nextElement();
                 if(reviewIdToFreqMap.containsKey(reviewId)){
                     if(logFreq)
-                        reviewIdToFreqMap.get(reviewId).put(term, 1 + Math.log(tokenFreq));
+                        reviewIdToFreqMap.get(reviewId).put(term, 1 + Math.log10(tokenFreq));
                     else
                         reviewIdToFreqMap.get(reviewId).put(term, (double)tokenFreq);
                 }
                 else {
                     HashMap<String, Double> termToScoreMap = new HashMap<>();
                     if(logFreq)
-                        termToScoreMap.put(term, 1 + Math.log(tokenFreq));
+                        termToScoreMap.put(term, 1 + Math.log10(tokenFreq));
                     else
                         termToScoreMap.put(term, (double) tokenFreq);
 
@@ -86,7 +86,7 @@ public class Query {
                 termMap.put(term, 0.0);
 
             }else {
-                termMap.put(term, (1 + Math.log(freq)) * Math.log(N / freq));
+                termMap.put(term, (1 + Math.log10(freq)) * Math.log10(N / freq));
             }
         }
 
@@ -97,7 +97,7 @@ public class Query {
             }
 
             for(String term : termMap.keySet()){
-                termMap.put(term, termMap.get(term)/ ltcNormSum);
+                termMap.put(term, termMap.get(term)/ Math.sqrt(ltcNormSum));
             }
         }
 

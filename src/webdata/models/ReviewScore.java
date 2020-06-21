@@ -3,7 +3,7 @@ package webdata.models;
 import java.util.Enumeration;
 import java.util.PriorityQueue;
 
-public class ReviewScore implements Comparable{
+public class ReviewScore implements Comparable<ReviewScore>{
     private final int review;
     private final double score;
 
@@ -13,9 +13,12 @@ public class ReviewScore implements Comparable{
     }
 
     @Override
-    public int compareTo(Object o) {
-        ReviewScore obj = (ReviewScore)o;
-        return Double.compare(obj.score, this.score); // order is reversed to sort from big to small
+    public int compareTo(ReviewScore obj) {
+        int res = Double.compare(obj.score, this.score); // order is reversed to sort from big to small
+        if( res == 0){ // if equal score sort by id
+            return Integer.compare(this.review, obj.review);
+        }
+        return res;
     }
 
     public static ReviewScoresIterator getIterator(PriorityQueue<ReviewScore> reviewScores, int k){
