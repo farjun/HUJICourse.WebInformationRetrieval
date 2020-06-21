@@ -2,6 +2,8 @@ package webdata.models;
 
 import webdata.IndexReader;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 
@@ -23,7 +25,7 @@ public class Query {
     public HashMap<String, Integer> generateQueryTermFrequency(){
         HashMap<String, Integer> termMap = new HashMap<>();
         while (query.hasMoreElements()){
-            String term = query.nextElement();
+            String term = query.nextElement().toLowerCase();
             if(termMap.containsKey(term)){
                 termMap.put(term, termMap.get(term) + 1);
             }
@@ -76,17 +78,31 @@ public class Query {
         return reviewIdToFreqMap;
     }
 
+    private int getDf(IndexReader iReader,String term){
+        Enumeration<Integer> reviewsWithToken = iReader.getReviewsWithToken(term);
+        int counter = 0;
+        while (reviewsWithToken.hasMoreElements()) {
+            int rev = reviewsWithToken.nextElement();
+            reviewsWithToken.nextElement();
+            counter++;
+        }
+        return counter;
+    }
+
     public HashMap<String, Double> getLTCScore(IndexReader iReader, boolean normalize){
-        HashMap<String, Integer> stringIntegerHashMap = generateCorpusTermFrequency(iReader);
         HashMap<String, Double> termMap =  new HashMap<>();
-        int N = iReader.getTokenSizeOfReviews();
-        for (String term: stringIntegerHashMap.keySet()) {
-            int freq = stringIntegerHashMap.get(term);
+        int N = iReader.getNumberOfReviews();
+        for (String term: queryTermFreq.keySet()) {
+            int freq = queryTermFreq.get(term);
             if(freq == 0){
                 termMap.put(term, 0.0);
-
             }else {
-                termMap.put(term, (1 + Math.log10(freq)) * Math.log10(N / freq));
+                int df = getDf(iReader, term);
+                if(df != 0)
+                    termMap.put(term, (1 + Math.log10(freq)) * Math.log10(N / df));
+                else
+                    termMap.put(term, 0.0);
+
             }
         }
 

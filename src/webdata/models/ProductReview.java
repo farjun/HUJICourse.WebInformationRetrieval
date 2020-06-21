@@ -45,9 +45,9 @@ public class ProductReview implements Serializable {
         this.summary = summary;
         this.text = text;
 
-        this.tokenStats = new HashMap<String, Integer>();
+        this.tokenStats = new HashMap<>();
         var tokensList = this.text.toLowerCase().split("[^a-zA-Z0-9]+");
-        this.tokens = new ArrayList<String>(Arrays.asList(tokensList).stream().filter(str -> !str.isEmpty()).
+        this.tokens = new ArrayList<>(Arrays.asList(tokensList).stream().filter(str -> !str.isEmpty()).
                 collect(Collectors.toList()));
         this.length = this.tokens.size();
         for(var token: this.tokens){
