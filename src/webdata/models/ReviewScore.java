@@ -50,4 +50,29 @@ public class ReviewScore implements Comparable<ReviewScore>{
             return rv.review;
         }
     }
+
+    public static class ProductScoresIterator implements Enumeration<Integer>{
+        private PriorityQueue<ReviewScore> reviewScores;
+        private int leftOfK;
+
+        public ProductScoresIterator(PriorityQueue<ReviewScore> reviewScores, int k){
+            this.reviewScores = reviewScores;
+            this.leftOfK = k;
+        }
+
+        @Override
+        public boolean hasMoreElements() {
+            return this.reviewScores.size() > 0 && leftOfK != 0;
+        }
+
+        @Override
+        public Integer nextElement() {
+            ReviewScore rv = reviewScores.poll();
+            if(rv == null){
+                return null;
+            }
+            this.leftOfK--;
+            return rv.review;
+        }
+    }
 }

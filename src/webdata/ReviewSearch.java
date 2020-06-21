@@ -4,6 +4,7 @@ import webdata.models.Query;
 import webdata.models.ReviewScore;
 import webdata.models.ProductScore;
 
+import java.awt.image.AreaAveragingScaleFilter;
 import java.util.*;
 
 public class ReviewSearch {
@@ -67,6 +68,9 @@ public class ReviewSearch {
      * The list should be sorted by the ranking
      */
     public Enumeration<Integer> vectorSpaceSearch(Enumeration<String> query, int k) {
+        if(k<=0) {
+            return Collections.emptyEnumeration();
+        }
         Query queryObj = new Query(query);
         PriorityQueue<ReviewScore> results = new PriorityQueue<>();
         HashMap<String, Double> LTCscore = queryObj.getLTCScore(this.iReader, true);
@@ -104,15 +108,23 @@ public class ReviewSearch {
         List<String> productIds = new ArrayList<>();
         double lambda = 0.4;
         Enumeration<Integer> bestRevs = languageModelSearchAux(query,  lambda, -1);
-        while(bestRevs.hasMoreElements() && sortedProducts.size() < k){
+        HashMap<String, ArrayList<Integer>> productsToReviewsMap = new HashMap<>();
+        while(bestRevs.hasMoreElements() && productsToReviewsMap.size() < k) {
             int reviewId = bestRevs.nextElement();
             String productId = iReader.getProductId(reviewId);
-            if(!sortedProducts.contains(new ProductScore(productId))){
-                int score = iReader.getReviewScore(reviewId);
-                int helpfulnessEnum = iReader.getReviewHelpfulnessNumerator(reviewId);
-                int helpfulnessDenom = iReader.getReviewHelpfulnessDenominator(reviewId);
-                sortedProducts.add(new ProductScore(productId, reviewId, score, helpfulnessEnum, helpfulnessDenom));
+            if(productsToReviewsMap.containsKey(productId)){
+                productsToReviewsMap.get(iReader.getProductId(reviewId)).add(reviewId);
+            }else {
+                ArrayList<Integer> reviewIds = new ArrayList<>();
+                reviewIds.add(reviewId);
+                productsToReviewsMap.put(productId, reviewIds);
             }
+
+        }
+
+        for (String productId : productsToReviewsMap.keySet()) {
+            ArrayList<Integer> reviewIds = productsToReviewsMap.get(productId);
+            sortedProducts.add(new ProductScore(productId, iReader, reviewIds));
         }
         while(sortedProducts.size()>0){
             var prdId = sortedProducts.poll();
