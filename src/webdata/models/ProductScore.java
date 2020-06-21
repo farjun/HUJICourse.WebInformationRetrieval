@@ -45,6 +45,7 @@ public class ProductScore implements Comparable {
         ProductScore other = (ProductScore)o;
         if(productId.equals(other.productId))
             return 0; // in case its the same productId
+        // TODO what defined as place of "creativity" in ex3, should go here
         double selfScore = lambda*score + (1-lambda)*(double)helpfulnessNum/(double)helpfulnessDenom;
         double otherScore = lambda*other.score + (1-lambda)*(double)other.helpfulnessNum/(double)other.helpfulnessDenom;
         if(selfScore > otherScore)

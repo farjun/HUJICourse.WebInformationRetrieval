@@ -107,11 +107,12 @@ public class ReviewSearch {
         while(bestRevs.hasMoreElements() && sortedProducts.size() < k){
             int reviewId = bestRevs.nextElement();
             String productId = iReader.getProductId(reviewId);
-            int score = iReader.getReviewScore(reviewId);
-            int helpfulnessEnum = iReader.getReviewHelpfulnessNumerator(reviewId);
-            int helpfulnessDenom = iReader.getReviewHelpfulnessDenominator(reviewId);
-            if(!sortedProducts.contains(new ProductScore(productId)))
+            if(!sortedProducts.contains(new ProductScore(productId))){
+                int score = iReader.getReviewScore(reviewId);
+                int helpfulnessEnum = iReader.getReviewHelpfulnessNumerator(reviewId);
+                int helpfulnessDenom = iReader.getReviewHelpfulnessDenominator(reviewId);
                 sortedProducts.add(new ProductScore(productId, reviewId, score, helpfulnessEnum, helpfulnessDenom));
+            }
         }
         while(sortedProducts.size()>0){
             var prdId = sortedProducts.poll();
