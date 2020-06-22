@@ -10,6 +10,7 @@ public class Query {
     public static HashSet<String> stopwordsSet = new HashSet<>(Arrays.asList(stopwords));
     private final ArrayList<String> filteredWords;
     private Enumeration<String> query;
+    private boolean filterWords;
 
     public HashMap<String, Integer> getQueryTermFreq() {
         return queryTermFreq;
@@ -17,10 +18,12 @@ public class Query {
 
     public HashMap<String, Integer> queryTermFreq;
 
-    public Query(Enumeration<String> query){
+    public Query(Enumeration<String> query, boolean filterWords){
         this.query = query;
+        this.filterWords = filterWords;
         this.filteredWords = new ArrayList<>();
         this.queryTermFreq = generateQueryTermFrequency();
+
     }
 
     private void addToTermMap(String term, HashMap<String, Integer> termMap){
@@ -36,7 +39,7 @@ public class Query {
         HashMap<String, Integer> termMap = new HashMap<>();
         while (query.hasMoreElements()){
             String term = query.nextElement().toLowerCase();
-            if(stopwordsSet.contains(term)){
+            if(filterWords && stopwordsSet.contains(term)){
                 this.filteredWords.add(term);
                 continue;
             }

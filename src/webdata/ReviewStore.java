@@ -50,7 +50,7 @@ public class ReviewStore {
         System.out.println("---------------------------------------------------------------");
         printEnumeration(reviewSearch.languageModelSearch(new QueryEnumeration("the best flavored coffee the the a"), 0.4, 5));
         System.out.println("---------------------------------------------------------------");
-        printList(reviewSearch.productSearch(new QueryEnumeration("the a"),  5));
+        printList(reviewSearch.productSearch(new QueryEnumeration("the a coffee"),  5));
 
     }
 

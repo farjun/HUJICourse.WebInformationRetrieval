@@ -43,9 +43,8 @@ public class ReviewSearch {
     }
 
 
-    public Enumeration<Integer> languageModelSearchAux(Enumeration<String> query,
+    public Enumeration<Integer> languageModelSearchAux(Query queryObj,
                                                     double lambda, int k){
-        Query queryObj = new Query(query);
         PriorityQueue<ReviewScore> results = new PriorityQueue<>();
         HashMap<String, Integer> corpusFreq = queryObj.generateCorpusTermFrequency(this.iReader);
         HashMap<Integer, HashMap<String, Double>> reviewFreqs = queryObj.getReviewIdToFreqMapForQueryTokens(iReader, false);
@@ -71,7 +70,7 @@ public class ReviewSearch {
         if(k<=0) {
             return Collections.emptyEnumeration();
         }
-        Query queryObj = new Query(query);
+        Query queryObj = new Query(query,false);
         PriorityQueue<ReviewScore> results = new PriorityQueue<>();
         HashMap<String, Double> LTCscore = queryObj.getLTCScore(this.iReader, true);
         HashMap<Integer, HashMap<String, Double>> reviewIdToFreqMapForQueryTokens = queryObj.getReviewIdToFreqMapForQueryTokens(iReader, true);
@@ -95,7 +94,8 @@ public class ReviewSearch {
         if(k<=0) {
             return Collections.emptyEnumeration();
         }
-        return languageModelSearchAux(query, lambda, k);
+        Query queryObj = new Query(query,false);
+        return languageModelSearchAux(queryObj, lambda, k);
     }
 
     /**
@@ -107,7 +107,8 @@ public class ReviewSearch {
         PriorityQueue<ProductScore> sortedProducts = new PriorityQueue<>();
         List<String> productIds = new ArrayList<>();
         double lambda = 0.4;
-        Enumeration<Integer> bestRevs = languageModelSearchAux(query,  lambda, -1);
+        Query queryObj = new Query(query,true);
+        Enumeration<Integer> bestRevs = languageModelSearchAux(queryObj,  lambda, -1);
         HashMap<String, ArrayList<Integer>> productsToReviewsMap = new HashMap<>();
         while(bestRevs.hasMoreElements() && productsToReviewsMap.size() < k) {
             int reviewId = bestRevs.nextElement();
