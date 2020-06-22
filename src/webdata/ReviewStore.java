@@ -46,11 +46,11 @@ public class ReviewStore {
         indexWriter.write(inputFilePath, indexDir);
 
         ReviewSearch reviewSearch = new ReviewSearch(new IndexReader(indexDir));
-        printEnumeration(reviewSearch.vectorSpaceSearch(new QueryEnumeration("flavored coffee"), 5));
+        printEnumeration(reviewSearch.vectorSpaceSearch(new QueryEnumeration("the best flavored coffee"), 5));
         System.out.println("---------------------------------------------------------------");
-        printEnumeration(reviewSearch.languageModelSearch(new QueryEnumeration("flavored coffee"), 0.4, 5));
+        printEnumeration(reviewSearch.languageModelSearch(new QueryEnumeration("the best flavored coffee the the a"), 0.4, 5));
         System.out.println("---------------------------------------------------------------");
-        printList(reviewSearch.productSearch(new QueryEnumeration("flavored coffee"),  5));
+        printList(reviewSearch.productSearch(new QueryEnumeration("the a"),  5));
 
     }
 

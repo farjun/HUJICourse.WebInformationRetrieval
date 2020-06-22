@@ -12,20 +12,6 @@ public class ProductScore implements Comparable<ProductScore> {
     private final double lambda = 0.5;
     public final String productId;
     private final double score;
-//    public final int  reviewId, score, helpfulnessNum, helpfulnessDenom;
-
-//    public ProductScore(String productId){
-//        this.productId = productId;
-//        reviewId = score = helpfulnessNum = helpfulnessDenom = -1;
-//    }
-
-//    public ProductScore(String productId, int reviewId, int score, int helpfulnessNum, int helpfulnessDenum){
-//        this.productId = productId;
-//        this.reviewId = reviewId;
-//        this.score = score;
-//        this.helpfulnessNum = helpfulnessNum;
-//        this.helpfulnessDenom = (helpfulnessDenum!=0)?helpfulnessDenum:1;
-//    }
 
     public ProductScore(String productId, IndexReader iReader, ArrayList<Integer> reviewIds) {
         this.productId = productId;
